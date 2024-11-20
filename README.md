@@ -1,3 +1,3 @@
 # bmd-ace
-Dedicated Repository For My Modded Actions &amp; Events For BMD.
-This will include my QOL Edits.
+Dedicated Repository For My Modded Actions &amp; Events For BMD.  
+This Will Include My QOL Edits As Well.
