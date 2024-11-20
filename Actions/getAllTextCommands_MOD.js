@@ -1,10 +1,11 @@
+
 module.exports = {
   data: {
     name: "Get All Text Commands",
   },
   category: "Bot",
   info: {
-    source: "https://github.com/slothyace/bcx/tree/main/Mods/Actions",
+    source: "https://github.com/slothyace/bmd-ace/tree/main/Actions",
     creator: "Acedia",
     donate: "https://ko-fi.com/slothyacedia",
   },
