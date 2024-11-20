@@ -20,27 +20,16 @@ module.exports = {
       storeAs: "criteria",
       name: "Check If Text",
       choices: {
-        startWith = {name: "Starts With", field: false},
-        endWith = {name: "Ends With", field: false},
-        includes = {name: "Includes", field: false},
-        matchRegex = {name: "Matches Regex", field: false}
+        startsWith: {name: "Starts With", field: false},
+        endsWith: {name: "Ends With", field: false},
+        includes: {name: "Includes", field: false},
+        matchesRegex: {name: "Matches Regex", field: false}
       }
     },
     {
       element: "largeInput",
       storeAs: "lookup",
-      name: (values) => {
-        type = values.criteria.type
-        switch (type){
-          case "startWith" || "endWith" || "includes":
-            return `Text`
-            break
-          
-          case "matchRegex":
-            return `Regex Term`
-            break
-        }
-      }
+      name: "Text"
     },
     {
       element: "condition",
@@ -56,26 +45,26 @@ module.exports = {
     },
   ],
 
-  subtitles: (values) => {
+  subtitle: (values) => {
     let looktype
-    switch (values.crtiteria.type){
-      case "startWith":
+    switch (values.criteria.type){
+      case "startsWith":
         looktype = `Starts With`
         break
 
-      case "endWith":
+      case "endsWith":
         looktype = `Ends With`
-        break
-
-      case "matchRegex":
-        looktype = `Matches Regex`
         break
 
       case "includes":
         looktype = `Includes`
         break
+
+      case "matchesRegex":
+        looktype = `Matches Regex`
+        break
     }
-    return `Check If Text ${looktype} "${values.lookup.type}"`
+    return `Check If Text ${looktype} "${values.lookup||""}"`
   },
 
   compatibility: ["Any"],
@@ -88,14 +77,14 @@ module.exports = {
     let result = false
 
     switch (criterion) {
-      case "startWith":
-        if (srcTxt.startWith(lookFor)){
+      case "startsWith":
+        if (srcTxt.startsWith(lookFor)){
           result = true
         } else {result = false}
         break
 
-      case "endWith":
-        if (srcTxt.endWith(lookFor)){
+      case "endsWith":
+        if (srcTxt.endsWith(lookFor)){
           result = true
         } else {result = false}
         break
@@ -106,7 +95,7 @@ module.exports = {
         } else {result = false}
         break
 
-      case "matchRegex":
+      case "matchesRegex":
         if (srcTxt.match(new RegExp("^" + lookFor + "$", "i"))){
           result = true
         } else {result = false}

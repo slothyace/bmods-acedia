@@ -34,7 +34,7 @@ module.exports = {
   ],
 
   subtitle: (values) =>{
-    return `Limit text to ${values.maxLength}, append with ${values.append} if limit exceeded`
+    return `Limit text to ${values.maxLength||""}, append with "${values.append||""}" if limit exceeded`
   },
 
   compatibility: ["Any"],
