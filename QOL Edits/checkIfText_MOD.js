@@ -47,20 +47,28 @@ module.exports = {
 
   script: (values) => {
     function refreshElements(skipAnimation){
-      type = values.criteria.type
+      type = values.data.criteria.type
       switch(type){
         case "startsWith":
+          values.UI[2].name = "Text"
+          break
+
         case "endsWith":
+          values.UI[2].name = "Text"
+          break
+
         case "includes":
-          values.UI[3].name = "Text"
+          values.UI[2].name = "Text"
+          break
         
         case "matchesRegex":
-          values.UI[3].name = "Regex Term"
+          values.UI[2].name = "Regex Term"
+          break
       }
 
       setTimeout(()=>{
         values.updateUI()
-      }, skipAnimation?1: ValidityState.commonAnimation*100)
+      }, skipAnimation?1: values.commonAnimation*100)
     }
 
     refreshElements(true)
@@ -97,7 +105,7 @@ module.exports = {
   async run(values, message, client, bridge){
     srcTxt = bridge.transf(values.sourceText)
     lookFor = bridge.transf(values.lookup)
-    criterion = bridge.transf(values.criteria)
+    criterion = bridge.transf(values.criteria.type)
 
     let result = false
 
