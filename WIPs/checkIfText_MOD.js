@@ -129,6 +129,6 @@ module.exports = {
 
     if (result == true){
       await bridge.call(values.true, values.trueActions)
-    } else (await bridge.call(values.false, values.falseActions))
+    } else if (result == false){await bridge.call(values.false, values.falseActions)}
   }
 }
