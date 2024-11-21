@@ -45,6 +45,31 @@ module.exports = {
     },
   ],
 
+  script: (values) => {
+    function refreshElements(skipAnimation){
+      type = values.criteria.type
+      switch(type){
+        case "startsWith":
+        case "endsWith":
+        case "includes":
+          values.UI[3].name = "Text"
+        
+        case "matchesRegex":
+          values.UI[3].name = "Regex Term"
+      }
+
+      setTimeout(()=>{
+        values.updateUI()
+      }, skipAnimation?1: ValidityState.commonAnimation*100)
+    }
+
+    refreshElements(true)
+
+    values.events.on("change", ()=>{
+      refreshElements()
+    })
+  },
+
   subtitle: (values) => {
     let looktype
     switch (values.criteria.type){
