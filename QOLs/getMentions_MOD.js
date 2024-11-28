@@ -3,8 +3,8 @@ module.exports = {
     name: "Get Mentions",
   },
   info: {
-  source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
-  creator: "Acedia",
+  source: "https://github.com/slothyace/bmods-acedia/tree/main/QOLs",
+  creator: "Acedia QOLs",
   donate: "https://ko-fi.com/slothyacedia",
   },
   category: "Shortcuts",
@@ -13,13 +13,13 @@ module.exports = {
     {
       element: "var",
       storeAs: "membersList",
-      name: "Initial List",
+      name: "Initial member or user List",
     },
     "-",
     {
       element: "typedDropdown",
       storeAs: "style",
-      name: "List or Text?",
+      name: "Output Style",
       choices:{
         list: {name: "List", field: false},
         text: {name: "Text", field: true, placeholder: "Delimiter"},
