@@ -43,9 +43,11 @@ module.exports = {
       return `<@${member.id}>`
     })
 
+    let styleType = bridge.transf(values.style.type)
+    let delimiter = bridge.transf(values.style.value)
     let mentionList
-    if (values.style.type == "text"){
-      mentionList = memList.join(bridge.transf(values.style.value))
+    if (styleType == "text"){
+      mentionList = memList.join(delimiter)
     } else {mentionList = memList}
 
     bridge.store(values.result, mentionList)
