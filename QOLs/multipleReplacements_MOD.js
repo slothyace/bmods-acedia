@@ -20,7 +20,7 @@ module.exports = {
       storeAs: "replaceList",
       name: "Replacements",
       types: {
-        data: "replacements",
+        replacements: "replacements",
       },
       max: 100,
       UItypes: {
