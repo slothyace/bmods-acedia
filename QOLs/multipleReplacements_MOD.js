@@ -1,5 +1,5 @@
 module.exports = {
-  date: {
+  data: {
     name: "Multiple Replacements"
   },
   info: {
