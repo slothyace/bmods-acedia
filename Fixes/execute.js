@@ -1,11 +1,18 @@
 module.exports = {
-  data: { name: "Execute" },
+  data: {
+    name: "Execute",
+  },
+  info: {
+    source: "https://github.com/slothyace/bmods-acedia/tree/main/Fixes",
+    creator: "Acedia Fixes",
+    donate: "https://ko-fi.com/slothyacedia"
+  },
   UI: [
     {
       element: "largeInput",
       storeAs: "command",
       name: "Command",
-      max: 50000000000000000000000000000000000000
+      max: 5000000
     },
     "-",
     {
@@ -21,19 +28,19 @@ module.exports = {
 
   async run(values, command, client, bridge) {
     await new Promise((res, rej) => {
-      let toExec = bridge.transf(values.command).replace("\\", "\\\\");
+      let toExec = String.raw`${bridge.transf(values.command)}`
       require('child_process').exec(toExec, (error, stdout, stderr) => {
         if (error) {
-          bridge.store(values.result, `Error: ${error.message}`);
-          return res();
+          bridge.store(values.result, `Error: ${error.message}`)
+          return res()
         }
         if (stderr) {
-          bridge.store(values.result, `Stderr: ${stderr}`);
-          return res();
+          bridge.store(values.result, `Stderr: ${stderr}`)
+          return res()
         }
-        bridge.store(values.result, stdout);
-        res();
-      });
-    });
+        bridge.store(values.result, stdout)
+        res()
+      })
+    })
   }
 }
