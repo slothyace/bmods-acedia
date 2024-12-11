@@ -1,7 +1,6 @@
 module.exports = {
   data:{
     name: "RCON Commander",
-    timeout: "1.5"
   },
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
@@ -27,6 +26,12 @@ module.exports = {
       name: "RCON Server Password",
     },
     {
+      element: "input",
+      storeAs: "timeout",
+      name: "Timeout After",
+      placeholder: "In Seconds, Defaults To 5s"
+    },
+    {
       element: "largeInput",
       storeAs: "rconCommand",
       name: "RCON Command",
@@ -48,12 +53,6 @@ module.exports = {
       name: "Log To Console For Debugging?",
       true: "Yes",
       false: "No"
-    },
-    {
-      element: "input",
-      storeAs: "timeout",
-      name: "Timeout After In Seconds",
-      placeholder: "In Seconds"
     },
   ],
 
