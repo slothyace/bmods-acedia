@@ -110,8 +110,9 @@ module.exports = {
               if (logging == true){console.log(`Server response: ${response}`)}
               rconServer.close()
               bridge.store(values.rconResponse, response)
-              bridge.runner(values.actions)
               resolve(response)
+              bridge.runner(values.actions)
+              
             },
             onError: (error) => {
               if (logging == true){console.log(`Command error: ${error}`)}
@@ -120,7 +121,7 @@ module.exports = {
             }
           })
         }),
-        new Promise((_, reject) => setTimeout(()=> reject(new Error(`Total Timeout`)), timeout))
+        new Promise((_, reject) => setTimeout(()=> reject(new Error(`Server Took Too Long!`)), timeout))
       ])
     }
     catch(error){
