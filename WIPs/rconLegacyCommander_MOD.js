@@ -65,7 +65,7 @@ module.exports = {
 
   async run(values, interaction, client, bridge){
     const Rcon = require("mbr-rcon")
-    const timeout = Number(bridge.transf(values.timeout))*1000
+    const timeout = bridge.transf(values.timeout) ? Number(bridge.transf(values.timeout))*1000 : 5000
 
     try{
       await Promise.race([

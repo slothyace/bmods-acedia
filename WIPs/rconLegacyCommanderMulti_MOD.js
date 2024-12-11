@@ -89,7 +89,7 @@ module.exports = {
     const Rcon = require("mbr-rcon")
 
     for (let server of values.serverList){
-      const timeout = Number(bridge.transf(server.data.timeout))*1000
+      const timeout = bridge.transf(server.data.timeout) ? Number(bridge.transf(server.data.timeout))*1000 : 5000
       try{
         await Promise.race([
           new Promise((resolve, reject) => {
