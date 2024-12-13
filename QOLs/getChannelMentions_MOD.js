@@ -39,16 +39,20 @@ module.exports = {
   async run(values, message, client, bridge){
     let channelList = bridge.get(values.channelsList)
 
-    channelList = channelList.map(channel =>{
-      return `<#${channel.id}>`
+    let filteredList = []
+
+    channelList = channelList.forEach(channel =>{
+      if (channel.type != 4){
+        filteredList.push(`<#${channel.id}>`)
+      }
     })
 
     let styleType = bridge.transf(values.style.type)
     let delimiter = bridge.transf(values.style.value)
     let mentionList
     if (styleType == "text"){
-      mentionList = channelList.join(delimiter)
-    } else {mentionList = channelList}
+      mentionList = filteredList.join(delimiter)
+    } else {mentionList = filteredList}
 
     bridge.store(values.result, mentionList)
   }
