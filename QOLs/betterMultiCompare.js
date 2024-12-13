@@ -1,6 +1,6 @@
 module.exports = {
   data: {
-    name: "Matches Any"
+    name: "Better Multiple Comparisons"
   },
   info: {
   source: "https://github.com/slothyace/bmods-acedia/tree/main/QOLs",
@@ -44,15 +44,20 @@ module.exports = {
             {
               element: "largeInput",
               storeAs: "compValue",
-              name: "Comparison Value"
+              name: "Comparison Value",
             },
             "-",
+            {
+              element: "toggle",
+              storeAs: "ignore",
+              name: "Do Nothing If Not Matching",
+            },
             {
               element: "condition",
               storeAs: "true",
               storeActionsAs: "trueActions",
-              name: "If Matches Condition, Run"
-            }
+              name: "If Matches Condition, Run",
+            },
           ]
         }
       }
@@ -66,8 +71,8 @@ module.exports = {
     "-",
     {
       element: "condition",
-      storeAs: "false",
-      storeActionsAs: "falseBack",
+      storeAs: "falseBack",
+      storeActionsAs: "falseBackActions",
       name: "If Condition Doesn't Match, Run"
     }
   ],
@@ -77,7 +82,7 @@ module.exports = {
   },
 
   async run(values, interaction, client, bridge){
-    let oriValue = bridge.transf(input)
+    let oriValue = bridge.transf(values.input)
     let matches = false
 
     for (let cnd in values.matchConditions){
@@ -121,7 +126,11 @@ module.exports = {
         await bridge.call(conditionData.true, conditionData.trueActions)
         matches = true
       }
-      else {await bridge.call(values.false, values.falseActions)}
+      else {
+        if(conditionData.ignore == false){
+          await bridge.call(values.falseBack, values.falseBackActions)
+        }
+      }
     }
 
     if (!matches){
