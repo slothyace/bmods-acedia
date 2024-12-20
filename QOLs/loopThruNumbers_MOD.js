@@ -14,10 +14,22 @@ module.exports = {
   modules: [],
   UI: [
     {
-      element: "inputGroup",
-      storeAs: ["startAt", "endAt", "increment"],
-      placeholder: ["1", "100", "1"],
-      name: ["Start At", "End At", "Increment"],
+      element: "input",
+      storeAs: "startAt",
+      placeholder: "1",
+      name: "Start At",
+    },
+    {
+      element: "input",
+      storeAs: "endAt",
+      placeholder: "1000",
+      name: "End At",
+    },
+    {
+      element: "input",
+      storeAs: "increment",
+      placeholder: "1",
+      name: "Increment By",
     },
     {
       element: "store",
