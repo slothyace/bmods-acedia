@@ -50,7 +50,7 @@ module.exports = {
   ],
 
   subtitle: (values) => {
-    return `Loop through ${values.startAt} - ${values.endAt} in ${values.increment} increments.`
+    return `Loop through ${values.startAt} - ${values.endAt} in increments of ${values.increment}.`
   },
 
   compatibility: ["Any"],
