@@ -423,7 +423,7 @@ module.exports = {
       element: "input",
       storeAs: "timeoutDur",
       name: "Timeout After x Seconds",
-      placeholder: "1",
+      placeholder: "2",
     },
     {
       element: "largeInput",
@@ -434,7 +434,7 @@ module.exports = {
   ],
 
   async run(values, interaction, client, bridge){
-    const timeout = bridge.transf(values.timeoutDur) ? Number(bridge.transf(values.timeoutDur))*1000 : 5000
+    const timeout = bridge.transf(values.timeoutDur) ? Number(bridge.transf(values.timeoutDur))*1000 : 10000
 
     try{
       await Promise.race([
