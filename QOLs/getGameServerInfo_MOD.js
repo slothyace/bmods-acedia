@@ -434,7 +434,7 @@ module.exports = {
   ],
 
   async run(values, interaction, client, bridge){
-    const timeout = values.timeout? Number(bridge.trasnf(values.timeoutDur))*1000 : 5000
+    const timeout = bridge.trasnf(values.timeoutDur) ? Number(bridge.trasnf(values.timeoutDur))*1000 : 5000
 
     try{
       await Promise.race([
