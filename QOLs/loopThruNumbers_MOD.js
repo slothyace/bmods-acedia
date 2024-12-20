@@ -2,7 +2,8 @@
 
 module.exports = {
   data: {
-    name: "Loop Through Numbers"
+    name: "Loop Through Numbers",
+    increment: "1"
   },
   info: {
   source: "https://github.com/slothyace/bmods-acedia/tree/main/QOLs",
@@ -43,9 +44,13 @@ module.exports = {
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
-    let startNum = bridge.transf(values.startAt)
-    let endNum = bridge.transf(values.endAt)
-    let increment = bridge.transf(values.increment)
+    let startNum = parseInt(bridge.transf(values.startAt), 10)
+    let endNum = parseInt(bridge.transf(values.endAt), 10)
+    let increment = parseInt(bridge.transf(values.increment), 10) || 1
+
+    if (isNaN(startNum) || isNaN(endNum) || isNaN(increment) || !Number.isInteger(startNum) || !Number.isInteger(endNum) || !Number.isInteger(increment)){
+      throw new Error(`Start At / End At / Increment is not a integer!`)
+    }
 
     for (let start = startNum; start <= endNum; start += increment){
       bridge.store(values.iterationVal, start)
