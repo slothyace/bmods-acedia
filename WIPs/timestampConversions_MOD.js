@@ -28,20 +28,20 @@ module.exports = {
         longDate: {name: "Long Date", field: false},
         shortDateTime: {name: "Short Date / Time", field: false},
         longDateTime: {name: "Long Date / Time", field: false},
-        relative: {name: "Relative", field: false},
+        relative: {name: "Relative Time", field: false},
         custom: {name: "Custom", field: true}
       }
+    },
+    {
+      element: "text",
+      text: "",
+      name: "Example Output"
     },
     {
       element: "store",
       storeAs: "store",
       name: "Store Output As"
     },
-    {
-      element: "text",
-      text: "",
-      name: "Example Output"
-    }
   ],
 
   script: (values)=>{
@@ -51,42 +51,67 @@ module.exports = {
 
       switch(type){
         default:
-          fmtEx = "November 28, 2018 9:01 AM | 28 November 2018 09:01"
+          fmtEx = `<div style="text-align:center">
+            November 28, 2018 9:01 AM | 28 November 2018 09:01
+            </div>`
           break
 
         case "shortTime":
-          fmtEx = "9:01 AM | 09:01"
+          fmtEx = `<div style="text-align:center">
+            9:01 AM | 09:01
+            </div>`
           break
 
         case "longTime":
-          fmtEx = "9:01:00 AM | 09:01:00"
+          fmtEx = `<div style="text-align:center">
+            9:01:00 AM | 09:01:00
+            </div>`
           break
 
         case "shortDate":
-          fmtEx = "11/28/2018 (MM/DD/YYYY)| 28/11/2018 (DD/MM/YYYY)"
+          fmtEx = `<div style="text-align:center">
+            11/28/2018 (MM/DD/YYYY)| 28/11/2018 (DD/MM/YYYY)
+            </div>`
           break
 
         case "longDate":
-          fmtEx = "November 28, 2018 | 28 November 2018"
+          fmtEx = `<div style="text-align:center">
+            November 28, 2018 | 28 November 2018
+            </div>`
           break
 
         case "shortDateTime":
-          fmtEx = "November 28, 2018 9:01 AM | 28 November 2018 09:01"
+          fmtEx = `<div style="text-align:center">
+            November 28, 2018 9:01 AM | 28 November 2018 09:01
+            </div>`
           break
 
         case "longDateTime":
-          fmtEx = "Wednesday, November 28, 2018 9:01 AM | Wednesday, 28 November 2018 09:01"
+          fmtEx = `<div style="text-align:center">
+            Wednesday, November 28, 2018 9:01 AM | Wednesday, 28 November 2018 09:01
+            </div>`
           break
 
         case "relative":
-          fmtEx = "3 years ago | 3 years ago"
+          fmtEx = `<div style="text-align:center">
+            3 years ago | 3 years ago
+            </div>`
           break
 
         case "custom":
-          fmtEx = "Syntax:\nYear - YYYY | YY\nMonth - Mth | MMM | MM\nDate - DD\nDay - Day | dd\nHour - hh\nMinute - mm\nSecond - ss"
+          fmtEx = `<div style="text-align:center">
+            <strong>Syntax:</strong><br>
+            <span>Year - <code>YYYY</code> | <code>YY</code></span><br>
+            <span>Month - <code>Month</code> | <code>MMM</code> | <code>MM</code></span><br>
+            <span>Date - <code>DD</code></span><br>
+            <span>Day - <code>Day</code> | <code>dd</code></span><br>
+            <span>Hour - <code>hh</code></span><br>
+            <span>Minute - <code>mm</code></span><br>
+            <span>Second - <code>ss</code></span>
+            </div>`
       }
 
-      values.UI[3].text = fmtEx
+      values.UI[2].text = fmtEx
 
       setTimeout(()=>{
         values.updateUI()
@@ -101,7 +126,45 @@ module.exports = {
   },
 
   subtitle: (values) => {
-    return `Convert ${values.timestamp} To ${type.name} Format.`
+    let type = values.format.type
+    let timestamp = values.timestamp
+    switch (type){
+      case "default":
+        return `Convert ${timestamp} To Default Format`
+        break
+
+      case "shortTime":
+        return `Convert ${timestamp} To Short Time Format`
+        break
+
+      case "longTime":
+        return `Convert ${timestamp} To Long Time Format`
+        break
+
+      case "shortDate":
+        return `Convert ${timestamp} To Short Date Format`
+        break
+
+      case "longDate":
+        return `Convert ${timestamp} To Long Date Format`
+        break
+
+      case "shortDateTime":
+        return `Convert ${timestamp} To Short Date / Time Format`
+        break
+
+      case "longDateTime":
+        return `Convert ${timestamp} To Long Date / Time Format`
+        break
+
+      case "relative":
+        return `Convert ${timestamp} To Relative Time Format`
+        break
+
+      case "custom":
+        return `Convert ${timestamp} To ${values.format.value} Format`
+        break
+    }
   },
 
   compatibility: ["Any"],
@@ -146,11 +209,12 @@ module.exports = {
 
       case "custom":
         cstmFormat = bridge.transf(values.format.value)
+        let date = new Date(tstmp*1000)
         const components = {
           YYYY: date.getFullYear(), // Full year
           YY: date.getFullYear().toString().slice(-2), // Last two digits of year
-          Mth: date.toLocaleString("en-US", { month: "short" }), // Abbreviated month name
-          MMM: date.toLocaleString("en-US", { month: "long" }), // Full month name
+          MMM: date.toLocaleString("en-US", { month: "short" }), // Abbreviated month name
+          Month: date.toLocaleString("en-US", { month: "long" }), // Full month name
           MM: String(date.getMonth() + 1).padStart(2, "0"), // Month (01-12)
           DD: String(date.getDate()).padStart(2, "0"), // Day of the month (01-31)
           Day: date.toLocaleString("en-US", { weekday: "long" }), // Full day name
@@ -159,7 +223,7 @@ module.exports = {
           mm: String(date.getMinutes()).padStart(2, "0"), // Minutes (00-59)
           ss: String(date.getSeconds()).padStart(2, "0"), // Seconds (00-59)
         }
-        output = cstmFormat.replace(/YYYY|YY|Mth|MMM|MM|DD|Day|dd|hh|mm|ss/g,(match) => components[match] || match)
+        output = cstmFormat.replace(/YYYY|YY|Month|MMM|MM|DD|Day|dd|hh|mm|ss/g,(match) => components[match] || match)
     }
 
     bridge.store(values.store, output)
