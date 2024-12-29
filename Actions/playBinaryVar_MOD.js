@@ -4,6 +4,11 @@ module.exports = {
   },
   modules: ["fs", "ffmpeg", "stream"],
   category: "Music",
+  info: {
+    source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
+    creator: "Acedia",
+    donate: "https://ko-fi.com/slothyacedia",
+  },
   UI: [
     {
       element: "variable",
