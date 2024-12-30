@@ -1,8 +1,15 @@
+// should free the file after its done reading so that other actions can be performed on the file if needed
+
 module.exports = {
   data: {
     name: "Play File",
   },
   category: "Music",
+  info: {
+    source: "https://github.com/slothyace/bmods-acedia/tree/main/QOLs",
+    creator: "Acedia QOLs",
+    donate: "https://ko-fi.com/slothyacedia",
+  },
   UI: [
     {
       element: "input",
