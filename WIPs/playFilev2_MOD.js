@@ -13,7 +13,7 @@ module.exports = {
   UI: [
     {
       element: "input",
-      name: "MP3 File Path",
+      name: "File Path",
       placeholder: "In Project Directory",
       storeAs: "path",
     },
