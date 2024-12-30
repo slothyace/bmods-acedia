@@ -188,6 +188,10 @@ module.exports = {
     let format = bridge.transf(values.format.type)
     let output
 
+    if (tstmp.length == 13){
+      tstmp = Math.floor(tstmp/1000)
+    }
+
     switch (format){
       case "default":
         output = `<t:${tstmp}>`
