@@ -71,6 +71,16 @@ module.exports ={
       <button style="width: fit-content;" onclick="require('electron').shell.openExternal('https://www.python.org/downloads/')"><btext>Download python</btext></button> 
       </div>`
     },
+    // "-",
+    // {
+    //   element: "dropdown",
+    //   storeAs: "advancedMode",
+    //   name: "Advanced Settings",
+    //   choices:[
+    //     {name: "Yes"},
+    //     {name: "No"},
+    //   ],
+    // },
     {
       element: "toggle",
       storeAs: "logging",
@@ -90,6 +100,20 @@ module.exports ={
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
+
+    let dependencies = ["yt-dlp.exe", "ffmpeg.exe", "ffprobe.exe", "ffplay.exe", "ffmpeg.dll"]
+    let projectPath = "./"
+
+    const missingFiles = dependencies.filter((file) => existsSync(path.join(projectPath, file)) == false)
+
+    if (missingFiles.length > 0){
+      console.log("The following required files are missing: ", missingFiles.join(", "))
+      bridge.store(values.finalSource, "Missing Required Files...")
+      bridge.store(values.finalFile, "Missing Required Files...")
+      bridge.store(values.finalName, "Missing Required Files...")
+      return
+    }
+
     // yt-dlp -x --audio-format <format> --windows-filenames -o %(title)s -P <outputPath> --restrict-filenames <url>
     let format = bridge.transf(values.format.type)
     let folderPath = bridge.transf(values.outputFolder)
