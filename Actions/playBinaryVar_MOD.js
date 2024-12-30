@@ -54,7 +54,7 @@ module.exports = {
     const { createAudioResource } = require("@discordjs/voice")
 
     let audioBuffer = bridge.get(values.bufferVar)
-    let songName = bridge.trasnf(values.songName)
+    let songName = bridge.transf(values.songName)
 
     if (values.logging == true){
       console.log("Instance Of Buffer:",audioBuffer instanceof Buffer)
