@@ -1,6 +1,6 @@
 module.exports = {
   data: {
-    name: "Play MP3",
+    name: "Play File",
   },
   category: "Music",
   UI: [
