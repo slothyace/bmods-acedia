@@ -14,7 +14,7 @@ module.exports = {
     {
       element: "input",
       storeAs: "timestamp",
-      name: "Timestamp",
+      name: "Unix Timestamp",
     },
     {
       element: "typedDropdown",
