@@ -10,7 +10,7 @@ module.exports = {
     creator: "Acedia QOLs",
     donate: "https://ko-fi.com/slothyacedia",
   },
-  modules: ["fs", "ffmpeg"],
+  modules: ["fs", "ffmpeg", "stream"],
   UI: [
     {
       element: "input",
@@ -43,8 +43,8 @@ module.exports = {
   async run(values, message, client, bridge) {
     const fs = require("fs");
     const ffmpeg = require("ffmpeg");
-
     const { createAudioResource } = require("@discordjs/voice");
+    const {Readable} = require("stream")
     let path;
     if (fs.existsSync(`${require("../data.json").prjSrc}`)) {
       path = `${require("../data.json").prjSrc}/${bridge.transf(values.path)}`;
