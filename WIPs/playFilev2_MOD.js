@@ -35,6 +35,11 @@ module.exports = {
         },
       ],
     },
+    {
+      element: "toggle",
+      storeAs: "logging",
+      name: "Log Debug Statements"
+    }
   ],
   subtitle: (data, constants) => {
     return `File: ${data.path} - ${data.queuing}`;
@@ -53,6 +58,8 @@ module.exports = {
     }
 
     let audioBuffer = bridge.fs.readFileSync(path)
+    if(values.logging == true){console.log(audioBuffer instanceof Buffer)}
+    
     if (audioBuffer instanceof Buffer == true && typeof audioBuffer == "object"){
       let audioStream = Readable.from(audioBuffer)
       let audio = createAudioResource(audioStream)
