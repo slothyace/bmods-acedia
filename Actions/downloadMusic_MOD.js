@@ -8,7 +8,7 @@ module.exports ={
     //ytdlp: "https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#release-files"
   },
   aliases: ["Download YouTube Audio", "Download Audio"],
-  modules: ["fs", "node:child_process"],
+  modules: ["fs", "path", "node:child_process"],
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
     creator: "Acedia",
@@ -185,6 +185,8 @@ module.exports ={
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
+    const {existsSync} = require("fs")
+    const path = require("path")
 
     let dependencies = ["yt-dlp.exe", "ffmpeg.exe", "ffprobe.exe", "ffplay.exe", "ffmpeg.dll"]
     let projectPath = "./"
@@ -271,6 +273,12 @@ module.exports ={
           bridge.store(values.finalSource, "File Already Exists")
           bridge.store(values.file, "File Already Exists")
           bridge.store(values.finalName, "File Already Exists")
+          return res()
+        }
+        else if(stdout.includes("Sign in to confirm your age.")){
+          bridge.store(values.finalSource, "Explicit Content Detected")
+          bridge.store(values.file, "Explicit Content Detected")
+          bridge.store(values.finalName, "Explicit Content Detected")
           return res()
         }
         else if (error){
