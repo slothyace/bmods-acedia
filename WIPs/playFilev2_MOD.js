@@ -10,6 +10,7 @@ module.exports = {
     creator: "Acedia QOLs",
     donate: "https://ko-fi.com/slothyacedia",
   },
+  modules: ["fs", "ffmpeg"],
   UI: [
     {
       element: "input",
@@ -61,12 +62,14 @@ module.exports = {
         name: bridge.guild.id,
       });
 
+      let fileName = path.match(/[\\/][^\\/]+$/)?.[0]?.substring(1) || "Unknown File"
+
       switch (values.queuing) {
         case `Don't Queue, Just Play`:
           utilities.player.play(audio);
           utilities.nowPlaying = {
             file: bridge.transf(values.path),
-            name: bridge.transf(values.path),
+            name: fileName,
             author: "",
             url: "",
             src: "Local",
@@ -78,7 +81,7 @@ module.exports = {
         case `At End Of Queue`:
           utilities.addToQueue(utilities.queue.length, {
             file: bridge.transf(values.path),
-            name: bridge.transf(values.path),
+            name: fileName,
             author: "",
             url: "",
             src: "Local",
@@ -89,7 +92,7 @@ module.exports = {
         case `At Start Of Queue`:
           utilities.addToQueue(0, {
             file: bridge.transf(values.path),
-            name: bridge.transf(values.path),
+            name: fileName,
             author: "",
             url: "",
             src: "Local",
@@ -100,7 +103,7 @@ module.exports = {
         case `At Custom Position`:
           utilities.addToQueue(Number(bridge.transf(values.queuePosition)), {
             file: bridge.transf(values.path),
-            name: bridge.transf(values.path),
+            name: fileName,
             author: "",
             url: "",
             src: "Local",

@@ -71,22 +71,107 @@ module.exports ={
       <button style="width: fit-content;" onclick="require('electron').shell.openExternal('https://www.python.org/downloads/')"><btext>Download python</btext></button> 
       </div>`
     },
-    // "-",
-    // {
-    //   element: "dropdown",
-    //   storeAs: "advancedMode",
-    //   name: "Advanced Settings",
-    //   choices:[
-    //     {name: "Yes"},
-    //     {name: "No"},
-    //   ],
-    // },
+    "-",
+    {
+      element: "dropdown",
+      storeAs: "advancedMode",
+      name: "Advanced Settings",
+      choices:[
+        {name: "No"},
+        {name: "Yes"},
+      ],
+    },
+    {
+      element: "dropdown",
+      storeAs: "useBrowserCookies",
+      name: "Use Browser Cookies",
+      choices: [{name: "No"}, {name: "Yes"}],
+    },
+    {
+      element: "input",
+      storeAs: "browserCookiesInfo",
+      name: "Browser Cookie Details",
+      placeholder: "BROWSER[+KEYRING][:PROFILE][::CONTAINER]"
+    },
+    {
+      element: "dropdown",
+      storeAs: "useCustomName",
+      name: "Use Custom File Name",
+      choices: [{name: "No"}, {name: "Yes"}],
+    },
+    {
+      element: "input",
+      storeAs: "customName",
+      name: "Custom Name Format",
+      placeholder: "https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#output-template",
+    },
+    {
+      element: "dropdown",
+      storeAs: "useArguments",
+      name: "Add Other Arguments (Only Real Advanced Users)",
+      choices: [{name: "No"}, {name: "Yes"}],
+    },
+    {
+      element: "input",
+      storeAs: "arguments",
+      name: "Arguments",
+      placeholder: "https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#usage-and-options",
+    },
+    "-",
     {
       element: "toggle",
       storeAs: "logging",
       name: "Print Debug Statements"
     }
   ],
+
+  script: (values) =>{
+    function refElm(skipAnimation){
+      let config = values.data.advancedMode
+      let uBC = values.data.useBrowserCookies
+      let uCM = values.data.useCustomName
+      let uA = values.data.useArguments
+
+      if (config == "No") {
+        values.UI[13].element = ""
+        values.UI[14].element = ""
+        values.UI[15].element = ""
+        values.UI[16].element = ""
+        values.UI[17].element = ""
+        values.UI[18].element = ""
+        values.UI[19].element = ""
+      }
+
+      if (config == "Yes"){
+        values.UI[13].element = "dropdown"
+        values.UI[15].element = "dropdown"
+        values.UI[17].element = "dropdown"
+        values.UI[19].element = "-"
+      }
+
+      if (config == "Yes" && uBC == "Yes"){
+        values.UI[14].element = "input"
+      } else {values.UI[14].element = ""}
+
+      if (config == "Yes" && uCM == "Yes"){
+        values.UI[16].element = "input"
+      } else {values.UI[16].element = ""}
+
+      if (config == "Yes" && uA == "Yes"){
+        values.UI[18].element = "input"
+      } else {values.UI[18].element = ""}
+      
+      setTimeout(()=>{
+        values.updateUI()
+      }, skipAnimation?1: values.commonAnimation*100)
+    }
+
+    refElm(true)
+
+    values.events.on("change", ()=> {
+      refElm()
+    })
+  },
 
   subtitle: (values) => {
     if (values.format.type == "others"){
@@ -124,10 +209,28 @@ module.exports ={
     }
 
     await new Promise((res, rej)=>{
-      let command = `yt-dlp -x --audio-format <format> --windows-filenames -o %(title)s -P <outputPath> --restrict-filenames <url>`
+      let command = `yt-dlp -x --audio-format <format> --windows-filenames -o %(title)s -P <outputPath> --restrict-filenames --cookies-from-browser BROWSER[+KEYRING][:PROFILE][::CONTAINER] <additionalArgs> <url>`
+
       command = command.replace("<format>", format)
       command = command.replace("<outputPath>", folderPath)
+      if (bridge.transf(values.useCustomName) == "Yes" && bridge.transf(values.customName).length > 0){
+        command = command.replace("%(title)s", bridge.transf(values.customName).replaceAll("|", ""))
+      }
+      if (bridge.transf(values.useBrowserCookies) == "Yes" && bridge.transf(values.browserCookies).length > 0){
+        command.replace("BROWSER[+KEYRING][:PROFILE][::CONTAINER]", bridge.transf(values.browserCookies).replaceAll("|",""))
+      } else {
+        command.replace("--cookies-from-browser BROWSER[+KEYRING][:PROFILE][::CONTAINER]", "")
+      }
+      if (bridge.transf(values.useArguments) == "Yes" && bridge.transf(values.arguments).length > 0){
+        command.replace("<additionalArguments>", bridge.transf(values.arguments).replaceAll("|", ""))
+      } else {
+        command.replace("<additionalArguments>", "")
+      }
       fcommand = command.replace("<url>", url)
+
+      if (values.logging == true){
+        console.log("Executing Command: ",fcommand)
+      }
 
       require("child_process").exec(fcommand, (error, stdout) =>{
         if (values.logging==true){
