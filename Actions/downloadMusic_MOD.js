@@ -187,18 +187,22 @@ module.exports ={
   async run(values, message, client, bridge){
     const {existsSync} = require("fs")
     const path = require("path")
+    const platform = process.platform
 
-    let dependencies = ["yt-dlp.exe", "ffmpeg.exe", "ffprobe.exe", "ffplay.exe", "ffmpeg.dll"]
-    let projectPath = "./"
 
-    const missingFiles = dependencies.filter((file) => existsSync(path.join(projectPath, file)) == false)
+    if (platform == "win32"){
+      let dependencies = ["yt-dlp.exe", "ffmpeg.exe", "ffprobe.exe", "ffplay.exe", "ffmpeg.dll"]
+      let projectPath = "./"
 
-    if (missingFiles.length > 0){
-      console.log("The following required files are missing: ", missingFiles.join(", "))
-      bridge.store(values.finalSource, "Missing Required Files...")
-      bridge.store(values.finalFile, "Missing Required Files...")
-      bridge.store(values.finalName, "Missing Required Files...")
-      return
+      const missingFiles = dependencies.filter((file) => existsSync(path.join(projectPath, file)) == false)
+      
+      if (missingFiles.length > 0){
+        console.log("The following required files are missing: ", missingFiles.join(", "))
+        bridge.store(values.finalSource, "Missing Required Files...")
+        bridge.store(values.finalFile, "Missing Required Files...")
+        bridge.store(values.finalName, "Missing Required Files...")
+        return
+      }
     }
 
     // yt-dlp -x --audio-format <format> --windows-filenames -o %(title)s -P <outputPath> --restrict-filenames <url>
@@ -257,7 +261,6 @@ module.exports ={
             bridge.store(values.finalFile, file)
             bridge.store(values.finalName, fileName.replaceAll("_"," "))
             if (values.delete == true){
-              const platform = process.platform
               let deleteCommand
               if (platform === "win32") deleteCommand=`del /f /q "${fileSource}"`;
               else if (platform === "linux") deleteCommand=`rm -rf "${fileSource}"`;
