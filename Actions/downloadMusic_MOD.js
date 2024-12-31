@@ -216,18 +216,21 @@ module.exports ={
       command = command.replace("<format>", format)
       command = command.replace("<outputPath>", folderPath)
       if (bridge.transf(values.useCustomName) == "Yes" && bridge.transf(values.customName).length > 0){
-        command = command.replace("%(title)s", bridge.transf(values.customName).replaceAll("|", ""))
+        command = command.replace("%(title)s", bridge.transf(values.customName).replaceAll("|", "").replaceAll(" ","_"))
       }
-      if (bridge.transf(values.useBrowserCookies) == "Yes" && bridge.transf(values.browserCookies).length > 0){
-        command.replace("BROWSER[+KEYRING][:PROFILE][::CONTAINER]", bridge.transf(values.browserCookies).replaceAll("|",""))
+
+      if (bridge.transf(values.useBrowserCookies) == "Yes" && bridge.transf(values.browserCookiesInfo).length > 0){
+        command = command.replace("BROWSER[+KEYRING][:PROFILE][::CONTAINER]", bridge.transf(values.browserCookiesInfo).replaceAll("|",""))
       } else {
-        command.replace("--cookies-from-browser BROWSER[+KEYRING][:PROFILE][::CONTAINER]", "")
+        command = command.replace("--cookies-from-browser BROWSER[+KEYRING][:PROFILE][::CONTAINER]", "")
       }
+
       if (bridge.transf(values.useArguments) == "Yes" && bridge.transf(values.arguments).length > 0){
-        command.replace("<additionalArguments>", bridge.transf(values.arguments).replaceAll("|", ""))
+        command = command.replace("<additionalArgs>", bridge.transf(values.arguments).replaceAll("|", ""))
       } else {
-        command.replace("<additionalArguments>", "")
+        command = command.replace("<additionalArgs>", "")
       }
+      
       fcommand = command.replace("<url>", url)
 
       if (values.logging == true){
