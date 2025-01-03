@@ -1,4 +1,5 @@
 // should free the file after its done reading so that other actions can be performed on the file if needed
+modVersion = "s.v1.0"
 
 module.exports = {
   data: {
@@ -39,6 +40,10 @@ module.exports = {
       element: "toggle",
       storeAs: "logging",
       name: "Log Debug Statements"
+    },
+    {
+      element: "text",
+      text: modVersion,
     }
   ],
   subtitle: (data, constants) => {

@@ -1,3 +1,4 @@
+modVersion = "s.v1.0"
 module.exports = {
   data: {
     name: "Text Conversions",
@@ -39,6 +40,10 @@ module.exports = {
       element: "store",
       storeAs: "store",
       name: "Store Converted Text As"
+    },
+    {
+      element: "text",
+      text: modVersion,
     }
   ],
 

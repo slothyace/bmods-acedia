@@ -1,3 +1,4 @@
+modVersion = "s.v1.0"
 module.exports = {
   data: {
     name: "Play Binary Variable",
@@ -41,6 +42,10 @@ module.exports = {
       element: "toggle",
       storeAs: "logging",
       name: "Log Debug Statements"
+    },
+    {
+      element: "text",
+      text: modVersion,
     }
   ],
   subtitle: (values, constants) => {

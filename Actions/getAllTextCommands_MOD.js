@@ -1,4 +1,4 @@
-
+modVersion = "s.v1.0"
 module.exports = {
   data: {
     name: "Get All Text Command Names",
@@ -19,6 +19,10 @@ module.exports = {
       element: "store",
       storeAs: "idStore",
       name: "Store Command Custom Id List As"
+    },
+    {
+      element: "text",
+      text: modVersion,
     }
   ],
 

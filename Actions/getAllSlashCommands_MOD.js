@@ -1,4 +1,4 @@
-
+modVersion = "v.u1.0"
 module.exports = {
   data: {
     name: "Get All Slash Command Names",
@@ -20,6 +20,10 @@ module.exports = {
       storeAs: "idStore",
       name: "Store Command Custom Id List As"
     },
+    {
+      element: "text",
+      text: modVersion,
+    }
   ],
 
   subtitle: (data, constants) => {

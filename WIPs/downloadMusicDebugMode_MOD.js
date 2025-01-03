@@ -1,6 +1,7 @@
 // requires the yt-dlp binary for whichever platform is it that you use.
 
 const { readFileSync } = require("fs")
+modVersion = "DNU"
 
 module.exports ={
   data: {
@@ -75,6 +76,10 @@ module.exports ={
       element: "toggle",
       storeAs: "logging",
       name: "Print Debug Statements"
+    },
+    {
+      element: "text",
+      text: modVersion,
     }
   ],
 

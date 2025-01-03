@@ -1,3 +1,4 @@
+modVersion = "s.v1.0"
 module.exports={
   data: {
     name: "YouTube Video Search v2"
@@ -72,6 +73,10 @@ module.exports={
       storeAs: "ifNone",
       storeActionsAs: "ifNoneActions",
     },
+    {
+      element: "text",
+      text: modVersion,
+    }
   ],
 
   subtitle: (values) =>{
