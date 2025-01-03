@@ -1,4 +1,4 @@
-modVersion = "u.v1.2"
+modVersion = "u.v1.3"
 module.exports={
   data: {
     name: "YouTube Video Search v2"
@@ -36,7 +36,7 @@ module.exports={
         info: {
           data: {},
           name: "Info",
-          preview: "`Store ${option.data.get} To Variable: ${option.data.store}`",
+          preview: "`Store ${option.data.get} To Variable: ${option.data.store.type}('${option.data.store.value}')`",
           UI:[
             {
               element: "dropdown",
