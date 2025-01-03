@@ -2,7 +2,7 @@ module.exports = {
   data: {
     name: "Play Binary Variable",
   },
-  modules: ["fs", "ffmpeg", "stream"],
+  modules: ["fs", "ffmpeg", "stream", "@discordjs/voice"],
   category: "Music",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",

@@ -10,7 +10,7 @@ module.exports = {
     creator: "Acedia QOLs",
     donate: "https://ko-fi.com/slothyacedia",
   },
-  modules: ["fs", "ffmpeg", "stream"],
+  modules: ["fs", "ffmpeg", "stream", "@discordjs/voice"],
   UI: [
     {
       element: "input",
