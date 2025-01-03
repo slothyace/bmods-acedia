@@ -10,7 +10,7 @@ A dedicated repository for my modded actions for [BMD](https://store.steampowere
 All mods that is owned by me will have a mod version tag attached to it at the bottom.  
 | First Denoter | Second Denoter | Third Denoter |
 | --- | --- | --- |
-| `s` - stable<br></br>`u` - unstable<br></br>`b` - beta testing | Version Number | Patch Number |
+| `s` - stable<br>`u` - unstable<br>`b` - beta | Version Number | Patch Number |
 
 ## Command samples
 Visit [BCS-samples](https://github.com/slothyace/bcs-samples)
