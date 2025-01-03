@@ -5,8 +5,8 @@ module.exports={
   modules: ["yt-search", "youtubei.js", "discordjs/voice"],
   category: "Music",
   info: {
-    source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
-    creator: "Acedia",
+    source: "https://github.com/slothyace/bmods-acedia/tree/main/QOLs",
+    creator: "Acedia QOLs",
     donate: "https://ko-fi.com/slothyacedia",
   },
   UI:[
@@ -35,7 +35,7 @@ module.exports={
         info: {
           data: {},
           name: "Info",
-          preview: "`${values.data}`",
+          preview: "`Store ${values.data.get} To Variable: ${values.data.store}`",
           UI:[
             {
               element: "dropdown",
