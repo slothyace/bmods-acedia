@@ -13,7 +13,7 @@ Inputs
 | Component | Documentation | 
 | --- | --- |
 | `Buffer Variable` | `Final File` output from the [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/downloadMusicFile.md) action. |
-| `Song Name` | `Final File Name` output from the [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/downloadMusicFile.md) action. |
+| `Song Name` | `Final File Name` output from the [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/downloadMusicFile.md) action or any string/text. |
 
 Debugging
 | Component | Documentation |
