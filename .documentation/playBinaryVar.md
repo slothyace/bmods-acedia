@@ -11,6 +11,7 @@ This mod plays audio from a `Buffer` type variable.
 ## Documentation
 Inputs
 | Component | Documentation | 
+| --- | --- |
 | `Buffer Variable` | `Final File` output from the [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/downloadMusicFile.md) action. |
 | `Song Name` | `Final File Name` output from the [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/downloadMusicFile.md) action. |
 
