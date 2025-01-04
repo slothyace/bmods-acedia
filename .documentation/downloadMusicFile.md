@@ -6,7 +6,7 @@ This mod downloads audio from a YouTube / SoundCloud link.
 | Requirements | Where It Should Be Placed In Project Folder |
 | --- | --- |
 | [yt-dlp](https://github.com/yt-dlp/yt-dlp) | Same folder as `bot.js` |
-| All [ffmpeg](https://www.ffmpeg.org/download.html) related stuff, mainly the binary. | Same folder as `bot.js` |
+| All [ffmpeg](https://www.ffmpeg.org/download.html) related stuff, mainly the binary (ffmpeg/ffprobe/ffplay). | Same folder as `bot.js` |
 
 ## Documentation
 Inputs
@@ -34,3 +34,8 @@ Advanced Options
 | `Cookies` | Toggle on to use cookies from the browser, I myself am not sure how to properly format this line to make it pass off properly. |
 | `Custom File Name` | Toggle on to allow for custom file names.<br>[Documentation](https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#output-template) |
 | `Other Arguments` | This passes off additional arguments to the command-line, can be used to enable other things.<br>[Documentation](https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#usage-and-options) |
+
+Debugging
+| Component | Documentation |
+| --- | --- |
+| `Print Debug Statements` | When toggled on, will print whatever the command line outputs as well as the command executed to download the audio. |

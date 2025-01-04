@@ -1,3 +1,20 @@
 # Play Binary Variable
 This mod plays audio from a `Buffer` type variable.
-![](https://github.com/slothyace/bmods-acedia/.documentation/.images/playBinaryVar.png)
+![](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/.images/playBinaryVar.png)
+
+## Requirements
+| Requirements |
+| --- |
+| Node Modules: `fs`, `stream`, `@discordjs/voice` |
+| `Buffer` type variable gotten from [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/downloadMusicFile.md) |
+
+## Documentation
+Inputs
+| Component | Documentation | 
+| `Buffer Variable` | `Final File` output from the [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/downloadMusicFile.md) action. |
+| `Song Name` | `Final File Name` output from the [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/downloadMusicFile.md) action. |
+
+Debugging
+| Component | Documentation |
+| --- | --- |
+| `Print Debug Statements` | When toggled on, will print the variable type and check results. |
