@@ -6,14 +6,14 @@ This mod plays audio from a `Buffer` type variable.
 | Requirements |
 | --- |
 | Node Modules: `fs`, `stream`, `@discordjs/voice` |
-| `Buffer` type variable gotten from [Download Music File](ttps://github.com/slothyace/bmods-acedia/blob/main/.documentation/Download%20Music%20File.md) |
+| `Buffer` type variable gotten from [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/Download%20Music%20File.md) |
 
 ## Documentation
 Inputs
 | Component | Documentation | 
 | --- | --- |
 | `Buffer Variable` | `Final File` output from the [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/Download%20Music%20File.md) action. |
-| `Song Name` | `Final File Name` output from the [Download Music File](ttps://github.com/slothyace/bmods-acedia/blob/main/.documentation/Download%20Music%20File.md) action or any string/text. |
+| `Song Name` | `Final File Name` output from the [Download Music File](https://github.com/slothyace/bmods-acedia/blob/main/.documentation/Download%20Music%20File.md) action or any string/text. |
 
 Debugging
 | Component | Documentation |
