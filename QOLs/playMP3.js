@@ -1,5 +1,5 @@
 // should free the file after its done reading so that other actions can be performed on the file if needed
-modVersion = "s.v1.0"
+modVersion = "s.v1.1"
 
 module.exports = {
   data: {
@@ -51,10 +51,10 @@ module.exports = {
   },
   compatibility: ["Any"],
   async run(values, message, client, bridge) {
-    const fs = require("fs");
-    const ffmpeg = require("ffmpeg");
-    const { createAudioResource } = require("@discordjs/voice");
-    const {Readable} = require("stream")
+    const fs = client.getMods().require("fs");
+    const ffmpeg = client.getMods().require("ffmpeg");
+    const { createAudioResource } = client.getMods().require("@discordjs/voice");
+    const {Readable} = client.getMods().require("stream")
     let path;
     if (fs.existsSync(`${require("../data.json").prjSrc}`)) {
       path = `${require("../data.json").prjSrc}/${bridge.transf(values.path)}`;

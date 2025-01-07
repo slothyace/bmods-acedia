@@ -1,12 +1,13 @@
 const jsonData = require('../data.json');
 const commands = jsonData.commands;
 const prefix = jsonData.prefix;
-modVersion = "s.v1.0"
+modVersion = "s.v1.1"
 
 module.exports = {
   data: {
-    name: "Get Command Aliases",
+    name: "",
   },
+  aliases: ["Get Command Aliases"],
   category: "Bot",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",

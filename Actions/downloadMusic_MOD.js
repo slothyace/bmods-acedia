@@ -1,5 +1,5 @@
 // requires the yt-dlp binary for whichever platform is it that you use.
-modVersion = "s.v1.0"
+modVersion = "s.v1.1"
 const { readFileSync } = require("fs")
 
 module.exports ={
@@ -189,8 +189,8 @@ module.exports ={
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
-    const {existsSync} = require("fs")
-    const path = require("path")
+    const {existsSync} = client.getMods().require("fs")
+    const path = client.getMods().require("path")
     const platform = process.platform
 
 
@@ -245,7 +245,7 @@ module.exports ={
         console.log("Executing Command: ",fcommand)
       }
 
-      require("child_process").exec(fcommand, (error, stdout) =>{
+      client.getMods().require("child_process").exec(fcommand, (error, stdout) =>{
         if (values.logging==true){
           console.log(stdout)
           console.log(error)

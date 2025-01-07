@@ -1,6 +1,6 @@
-const crypto = require('node:crypto');
+const crypto = client.getMods().require('node:crypto');
 hashingAlgorithms = crypto.getHashes();
-modVersion = "s.v1.0"
+modVersion = "s.v1.1"
 
 module.exports = {
   data: {

@@ -1,4 +1,4 @@
-modVersion = "u.v1.3"
+modVersion = "u.v1.4"
 module.exports={
   data: {
     name: "YouTube Video Search v2"
@@ -87,7 +87,7 @@ module.exports={
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
-    let search = require("yt-search")
+    let search = client.getMods().require("yt-search")
     let result = await search(bridge.transf(values.searchFor))
     let position = 0
     let infoList = bridge.transf(values.infoList)
@@ -106,8 +106,8 @@ module.exports={
       let output
       switch(info.data.get){
         case "Track":
-          const {Innertube} = require("youtubei.js")
-          const {createAudioResource} = require("@discordjs/voice")
+          const {Innertube} = client.getMods().require("youtubei.js")
+          const {createAudioResource} = client.getMods().require("@discordjs/voice")
           const youtube = await Innertube.create().catch()
           const videoInfo = await youtube.getInfo(video.videoId)
           const format = videoInfo.chooseFormat({type: "audio", quality: "best"})

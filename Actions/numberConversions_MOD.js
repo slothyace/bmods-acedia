@@ -1,4 +1,4 @@
-modVersion = "s.v1.0"
+modVersion = "s.v1.1"
 module.exports = {
   data: {
     name: "Number Conversions"
@@ -48,7 +48,7 @@ module.exports = {
   compatibility: ["Any"],
 
   async run(values, message, client, bridge) {
-    const { evaluate } = require("mathjs");
+    const { evaluate } = client.getMods().require("mathjs");
     let conversionType = bridge.transf(values.convType.type);
     
     try {
