@@ -39,6 +39,10 @@ module.exports = {
       storeAs: "false",
       storeActionsAs: "falseActions"
     },
+    {
+      element: "text",
+      text: modVersion
+    }
   ],
 
   subtitle: (values) => {
