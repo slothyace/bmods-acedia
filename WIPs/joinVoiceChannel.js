@@ -51,14 +51,13 @@ module.exports = {
         startedAt: new Date().getTime(),
         addToQueue: (at, track) => {
           voiceStuff.queue.splice(at === undefined ? 0 : Number(at), 0, track);
+          client.emit('queueSongAdd', bridge.guild, channel, track)
 
           if (player.state.status == 'idle') {
-            client.emit('queueSongAdd', bridge.guild, channel, track);
-
             player.play(track.audio);
-              voiceStuff.nowPlaying = track;
-              voiceStuff.queue.splice(0, 1);
-              client.emit('trackStart', bridge.guild, channel, voiceStuff.queue[0]);
+            voiceStuff.nowPlaying = track;
+            voiceStuff.queue.splice(0, 1);
+            client.emit('trackStart', bridge.guild, channel, voiceStuff.queue[0])
           }
         }
       }
@@ -81,21 +80,23 @@ module.exports = {
     }
 
     player.on('stateChange', (oldStatus, newStatus) => {
-      if (newStatus.status == 'idle' && !voiceStuff.forgiveIdling) {
-        client.emit('trackEnd', bridge.guild, channel);
-        if (voiceStuff.queue.length != 0) {
-          voiceStuff.nowPlaying = {}
-          player.play(voiceStuff.queue[0].audio);
-          client.emit('trackStart', bridge.guild, channel, voiceStuff.queue[0]);
-          voiceStuff.nowPlaying = voiceStuff.queue[0];
-          voiceStuff.queue.splice(0, 1);
-        } else {
-          client.emit('trackEnd', bridge.guild, channel);
-          client.emit('queueEnd', bridge.guild, channel);
-          voiceStuff.nowPlaying = {}
+      console.log(oldStatus, newStatus)
+      if (newStatus.status === "playing" && oldStatus.status === "playing"){
+        client.emit("trackEnd", bridge.guild, channel)
+        voiceStuff.nowPlaying = {}
+        if (voiceStuff.queue[0].length > 0){
+          player.play(voiceStuff.queue[0].audio)
+          voiceStuff.nowPlaying = voiceStuff.queue[0]
+          client.emit("trackStart", bridge.guild, channel, voiceStuff.queue[0])
+          voiceStuff.queue.splice(0,1)
         }
-      } else {
-        voiceStuff.forgiveIdling = false;
+      }
+      else if (newStatus.status === "idle" && oldStatus.status === "playing"){
+        client.emit("trackEnd", bridge.guild, channel)
+        client.emit("queueEnd", bridge.guild, channel)
+      }
+      else {
+        voiceStuff.forgiveIdling = false
       }
     });
 
