@@ -52,7 +52,7 @@ module.exports = {
     let minimum = parseFloat(bridge.transf(values.lowerRange))
     let maximum = parseFloat(bridge.transf(values.upperRange))
 
-    if (!isNaN(checkNumber) && !isNaN(minimum) && !isNaN(maximum)){
+    if (!isNaN(checkNumber) && !isNaN(minimum) && !isNaN(ma)){
       if (checkNumber >= minimum && maximum >= checkNumber){
         bridge.call(values.true, values.trueActions)
       } else {
