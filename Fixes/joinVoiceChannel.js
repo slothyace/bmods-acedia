@@ -1,7 +1,13 @@
+modVersion = "s.v1.1"
 module.exports = {
   category: "Channels",
   data: {
     name: "Join Voice Channel",
+  },
+  info: {
+    source: "https://github.com/slothyace/bmods-acedia/tree/main/Fixes",
+    creator: "Acedia Fixes",
+    donate: "https://ko-fi.com/slothyacedia",
   },
   UI: [
     {
@@ -9,6 +15,10 @@ module.exports = {
       storeAs: "channel",
       excludeUsers: true
     },
+    {
+      element: "text",
+      text: modVersion
+    }
   ],
   subtitle: (values, constants) => {
     return `${constants.channel(values.channel)}`
@@ -56,6 +66,7 @@ module.exports = {
           if (player.state.status == 'idle') {
             player.play(track.audio);
             voiceStuff.nowPlaying = track;
+            client.emit("queueStart", bridge.guild, channel)
             client.emit('trackStart', bridge.guild, channel, voiceStuff.queue[0])
           }
         }
