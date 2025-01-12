@@ -66,6 +66,7 @@ module.exports = {
           if (player.state.status == 'idle') {
             player.play(track.audio);
             voiceStuff.nowPlaying = track;
+            voiceStuff.queue.splice(0,0)
             client.emit("queueStart", bridge.guild, channel)
             client.emit('trackStart', bridge.guild, channel, voiceStuff.queue[0])
           }
@@ -101,7 +102,7 @@ module.exports = {
           voiceStuff.nowPlaying = voiceStuff.queue[0]
           // console.log(voiceStuff.queue[0])
           client.emit("trackStart", bridge.guild, channel, voiceStuff.queue[0])
-          voiceStuff.queue.splice(0,1)
+          // voiceStuff.queue.splice(0,1)
         } 
         else{
           client.emit("queueEnd", bridge.guild, channel)
@@ -116,7 +117,7 @@ module.exports = {
           voiceStuff.nowPlaying = voiceStuff.queue[0]
           // console.log(voiceStuff.queue[0])
           client.emit("trackStart", bridge.guild, channel, voiceStuff.queue[0])
-          voiceStuff.queue.splice(0,1)
+          // voiceStuff.queue.splice(0,1)
         } 
         else{
           client.emit("queueEnd", bridge.guild, channel)
