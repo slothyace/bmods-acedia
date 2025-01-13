@@ -1,5 +1,5 @@
 let cryptoCache = require('node:crypto');
-hashingAlgorithms = crypto.getHashes();
+hashingAlgorithms = cryptoCache.getHashes();
 modVersion = "s.v1.2"
 
 module.exports = {
