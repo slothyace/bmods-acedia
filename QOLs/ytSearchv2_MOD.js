@@ -87,7 +87,7 @@ module.exports={
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
-    let search = client.getMods().require("yt-search")
+    let search = await client.getMods().require("yt-search")
     let result = await search(bridge.transf(values.searchFor))
     let position = 0
     let infoList = values.infoList
