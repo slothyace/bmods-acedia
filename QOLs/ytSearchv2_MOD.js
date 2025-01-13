@@ -106,8 +106,8 @@ module.exports={
       let output
       switch(info.data.get){
         case "Track":
-          const {Innertube} = client.getMods().require("youtubei.js")
-          const {createAudioResource} = client.getMods().require("@discordjs/voice")
+          const {Innertube} = await client.getMods().require("youtubei.js")
+          const {createAudioResource} = await client.getMods().require("@discordjs/voice")
           const youtube = await Innertube.create().catch()
           const videoInfo = await youtube.getInfo(video.videoId)
           const format = videoInfo.chooseFormat({type: "audio", quality: "best"})
