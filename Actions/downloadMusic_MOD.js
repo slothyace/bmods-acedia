@@ -244,7 +244,8 @@ module.exports ={
         console.log("Executing Command: ",fcommand)
       }
 
-      client.getMods().require("child_process").exec(fcommand, (error, stdout) =>{
+      await client.getMods().require("child_process")
+      require("child_process").exec(fcommand, (error, stdout) =>{
         if (values.logging==true){
           console.log(stdout)
           console.log(error)
