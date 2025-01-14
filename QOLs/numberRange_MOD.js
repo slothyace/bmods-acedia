@@ -3,11 +3,12 @@ module.exports = {
   data: {
     name: "Check If Number Is In Range"
   },
+  aliases: ["If Is In Number Range", "Number Range"],
   modules: [],
   category: "Numbers",
   info: {
-    source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
-    creator: "Acedia",
+    source: "https://github.com/slothyace/bmods-acedia/tree/main/QOLs",
+    creator: "Acedia QOLs",
     donate: "https://ko-fi.com/slothyacedia",
   },
   UI: [
