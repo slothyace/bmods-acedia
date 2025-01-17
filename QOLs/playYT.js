@@ -1,4 +1,5 @@
 const generatePoToken = require('./generatePoToken');
+modVersion = "s.v1.0 | AceTweaks"
 
 module.exports = {
   data: {
@@ -29,6 +30,10 @@ module.exports = {
         },
       ],
     },
+    {
+      element: "text",
+      text: modVersion
+    }
   ],
   subtitle: (values, constants) => {
     return `URL: ${values.url} - ${values.queuing}`;
@@ -45,12 +50,19 @@ module.exports = {
 
     const result = await search(bridge.transf(values.url));
     let url = result.videos[0]?.url || bridge.transf(values.url);
-    await new Promise((resolve, reject) => {
-      let stream = ytdl(url, { filter: 'audioonly' }).pipe(fs.createWriteStream(generatedFilePath)).on('finish', () => {
-        stream.close();
-        resolve();
-      });
-    });
+    await Promise.race([
+      new Promise((resolve, reject) => {
+        let stream = ytdl(url, { filter: 'audioonly' }).pipe(fs.createWriteStream(generatedFilePath)).on('finish', () => {
+          stream.close();
+          resolve();
+        });
+      }),
+
+      new Promise((_, reject) => setTimeout(()=> {
+        fs.unlinkSync(generatedFilePath)
+        reject(new Error(`Fetching Audio Took Too Long!`))
+      }, 100000))
+    ])
 
     let Readable = stream.Readable.from(fs.readFileSync(generatedFilePath));
     const audio = createAudioResource(Readable);

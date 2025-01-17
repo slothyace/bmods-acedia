@@ -1,3 +1,4 @@
+modVersion = "s.v1.0 | AceFix"
 module.exports = {
   data: {
     name: "Skip In Queue",
@@ -9,6 +10,10 @@ module.exports = {
       name: "Skip Over # Songs",
       placeholder: "Number (#)",
       storeAs: "skip"
+    },
+    {
+      element: "text",
+      text: modVersion
     }
   ],
   category: "Music",

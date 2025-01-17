@@ -1,4 +1,4 @@
-modVersion = "s.v1.1 | acefix"
+modVersion = "s.v1.1 | AceFix"
 module.exports = {
   data: {
     name: "Execute",
