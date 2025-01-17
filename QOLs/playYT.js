@@ -13,6 +13,12 @@ module.exports = {
       placeholder: "YouTube Video URL",
       storeAs: "url",
     },
+    {
+      element: "input",
+      name: "Timeout After x Seconds",
+      placeholder: "20",
+      storeAs: "timeoutAfter",
+    },
     "-",
     {
       element: "dropdown",
@@ -47,21 +53,27 @@ module.exports = {
     let randInt = (Date.now()*Math.random()*1000*Math.random()*1000).toString().replaceAll(".","").replaceAll(",","").slice(0,16)
     let generatedFilePath = `./temp_${new Date().getTime()}_${randInt}.mp3`
     const { createAudioResource } = require('@discordjs/voice');
+    let timeoutDur = values.timeoutAfter ? parseInt(bridge.transf(values.timeoutAfter))*1000 : 60000
 
     const result = await search(bridge.transf(values.url));
     let url = result.videos[0]?.url || bridge.transf(values.url);
     await Promise.race([
       new Promise((resolve, reject) => {
-        let stream = ytdl(url, { filter: 'audioonly' }).pipe(fs.createWriteStream(generatedFilePath)).on('finish', () => {
-          stream.close();
+        let stream = ytdl(url, { filter: 'audioonly' })
+        writeFile = fs.createWriteStream(generatedFilePath)
+        stream.pipe(writeFile).on('finish', () => {
+          writeFile.close();
           resolve();
-        });
+        }).on("error", (err) =>{
+          fs.unlink(generatedFilePath)
+          reject(err)
+        })
       }),
 
       new Promise((_, reject) => setTimeout(()=> {
-        fs.unlinkSync(generatedFilePath)
+        fs.unlink(generatedFilePath)
         reject(new Error(`Fetching Audio Took Too Long!`))
-      }, 100000))
+      }, timeoutDur))
     ])
 
     let Readable = stream.Readable.from(fs.readFileSync(generatedFilePath));
