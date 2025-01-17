@@ -91,16 +91,14 @@ module.exports = {
     }
 
     player.on('stateChange', (oldStatus, newStatus) => {
-      // console.log(oldStatus , "\n\n", newStatus, "\n\n")
-      // console.log(voiceStuff.queue.length, "\n\n")
+      console.log(oldStatus , "\n\n", newStatus, "\n\n")
       if (newStatus.status === "playing" && oldStatus.status === "playing"){
         client.emit("trackEnd", bridge.guild, channel)
         voiceStuff.nowPlaying = {}
-        // console.log(voiceStuff.queue.length, "\n\n")
-        if (voiceStuff.queue.length > 0){
+        voiceStuff.queue.splice(0,1)
+        if (voiceStuff.queue.length > 0 && voiceStuff.queue[0] != undefined){
           player.play(voiceStuff.queue[0].audio)
           voiceStuff.nowPlaying = voiceStuff.queue[0]
-          // console.log(voiceStuff.queue[0])
           client.emit("trackStart", bridge.guild, channel, voiceStuff.queue[0])
           // voiceStuff.queue.splice(0,1)
         } 
@@ -111,11 +109,10 @@ module.exports = {
       else if (newStatus.status === "idle" && oldStatus.status === "playing"){
         client.emit("trackEnd", bridge.guild, channel)
         voiceStuff.nowPlaying = {}
-        // console.log(voiceStuff.queue.length, "\n\n")
-        if (voiceStuff.queue.length > 0){
+        voiceStuff.queue.splice(0,1)
+        if (voiceStuff.queue.length > 0 && voiceStuff.queue[0] != undefined){
           player.play(voiceStuff.queue[0].audio)
           voiceStuff.nowPlaying = voiceStuff.queue[0]
-          // console.log(voiceStuff.queue[0])
           client.emit("trackStart", bridge.guild, channel, voiceStuff.queue[0])
           // voiceStuff.queue.splice(0,1)
         } 
