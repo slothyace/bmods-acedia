@@ -91,7 +91,7 @@ module.exports = {
     }
 
     player.on('stateChange', (oldStatus, newStatus) => {
-      console.log(oldStatus , "\n\n", newStatus, "\n\n")
+      // console.log(oldStatus , "\n\n", newStatus, "\n\n")
       if (newStatus.status === "playing" && oldStatus.status === "playing"){
         client.emit("trackEnd", bridge.guild, channel)
         voiceStuff.nowPlaying = {}

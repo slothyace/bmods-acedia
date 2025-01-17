@@ -13,12 +13,6 @@ module.exports = {
       placeholder: "YouTube Video URL",
       storeAs: "url",
     },
-    {
-      element: "input",
-      name: "Timeout After x Seconds",
-      placeholder: "20",
-      storeAs: "timeoutAfter",
-    },
     "-",
     {
       element: "dropdown",
@@ -36,6 +30,19 @@ module.exports = {
         },
       ],
     },
+    "-",
+    {
+      element: "input",
+      name: "Timeout After x Seconds Of Trying To Fetch Audio | Leave Empty For 60s",
+      placeholder: "20",
+      storeAs: "timeoutAfter",
+    },
+    {
+      element: "condition",
+      storeAs: "timeoutCondition",
+      storeActionsAs: "timeoutActions",
+      name: "If Timeout Occurs",
+    },
     {
       element: "text",
       text: modVersion
@@ -50,31 +57,35 @@ module.exports = {
     const search = require('yt-search');
     const stream = require('stream');
     const ytdl = require('@distube/ytdl-core');
-    let randInt = (Date.now()*Math.random()*1000*Math.random()*1000).toString().replaceAll(".","").replaceAll(",","").slice(0,16)
-    let generatedFilePath = `./temp_${new Date().getTime()}_${randInt}.mp3`
+    const randInt = (Date.now()*Math.random()*1000*Math.random()*1000).toString().replaceAll(".","").replaceAll(",","").slice(0,16)
+    const generatedFilePath = `./temp_${new Date().getTime()}_${randInt}.mp3`
     const { createAudioResource } = require('@discordjs/voice');
     let timeoutDur = values.timeoutAfter ? parseInt(bridge.transf(values.timeoutAfter))*1000 : 60000
 
     const result = await search(bridge.transf(values.url));
     let url = result.videos[0]?.url || bridge.transf(values.url);
-    await Promise.race([
-      new Promise((resolve, reject) => {
-        let stream = ytdl(url, { filter: 'audioonly' })
-        writeFile = fs.createWriteStream(generatedFilePath)
-        stream.pipe(writeFile).on('finish', () => {
-          writeFile.close();
-          resolve();
-        }).on("error", (err) =>{
-          fs.unlinkSync(generatedFilePath)
-          reject(err)
-        })
-      }),
+    try{
+      await Promise.race([
+        new Promise((resolve, reject) => {
+          let stream = ytdl(url, { filter: 'audioonly' }).pipe(fs.createWriteStream(generatedFilePath)).on('finish', () => {
+            stream.close();
+            resolve();
+          }).on("error", (err) =>{
+            fs.unlinkSync(generatedFilePath)
+            reject(err)
+          })
+        }),
 
-      new Promise((_, reject) => setTimeout(()=> {
-        fs.unlinkSync(generatedFilePath)
-        reject(new Error(`Fetching Audio Took Too Long!`))
-      }, timeoutDur))
-    ])
+        new Promise((_, reject) => setTimeout(()=> {
+          reject(new Error(`Fetching Audio Took Too Long!`))
+        }, timeoutDur))
+      ])
+    } catch (err){
+      console.error(err)
+      bridge.call(values.timeoutCondition, values.timeoutActions)
+      fs.unlinkSync(generatedFilePath)
+      return
+    }
 
     let Readable = stream.Readable.from(fs.readFileSync(generatedFilePath));
     const audio = createAudioResource(Readable);
