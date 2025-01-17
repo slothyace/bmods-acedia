@@ -40,7 +40,7 @@ module.exports = {
     const stream = require('stream');
     const ytdl = require('@distube/ytdl-core');
     let randInt = (Date.now()*Math.random()*1000*Math.random()*1000).toString().replaceAll(".","").replaceAll(",","").slice(0,16)
-    let generatedFilePath = `./musicTempStaging/temp_${new Date().getTime()}_${randInt}.mp3`
+    let generatedFilePath = `./temp_${new Date().getTime()}_${randInt}.mp3`
     const { createAudioResource } = require('@discordjs/voice');
 
     const result = await search(bridge.transf(values.url));
