@@ -65,13 +65,13 @@ module.exports = {
           writeFile.close();
           resolve();
         }).on("error", (err) =>{
-          fs.unlink(generatedFilePath)
+          fs.unlinkSync(generatedFilePath)
           reject(err)
         })
       }),
 
       new Promise((_, reject) => setTimeout(()=> {
-        fs.unlink(generatedFilePath)
+        fs.unlinkSync(generatedFilePath)
         reject(new Error(`Fetching Audio Took Too Long!`))
       }, timeoutDur))
     ])
