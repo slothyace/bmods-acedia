@@ -47,7 +47,7 @@ jobs:
           echo "Deleting previous releases"
           releases=$(gh release list --limit 100 --json tagName --jq '.[].tagName')
           for release in $releases; do
-            gh release delete $release -y --delete-tags
+            gh release delete $release -y --cleanup-tags
           done
 
         env:
