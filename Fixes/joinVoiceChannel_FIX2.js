@@ -86,8 +86,17 @@ module.exports = {
         voiceStuff.nowPlaying={}
       }
 
-      if (oldStatus.status == "playing" && newStatus.status == "idle" || oldStatus.status == "playing" && newStatus.status == "playing"){
-        
+      if (newStatus.status == "idle" && oldStatus.status == "playing"){
+        if (voiceStuff.queue.length > 0){
+          player.play(voiceStuff.queue[0].audio)
+          voiceStuff.nowPlaying = voiceStuff.queue[0]
+          console.log(voiceStuff.nowPlaying)
+          client.emit("trackStart", bridge.guild, channel, voiceStuff.queue[0])
+          voiceStuff.queue.splice(0,1)
+        } 
+        else{
+          client.emit("queueEnd", bridge.guild, channel)
+        }
       }
     });
 
