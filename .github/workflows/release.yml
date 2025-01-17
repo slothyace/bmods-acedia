@@ -49,6 +49,18 @@ jobs:
           for release in $releases; do
             gh release delete $release -y --cleanup-tags
           done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Delete previous tags
+        id: delete_tags
+        run: |
+          echo "Deleting previous tags"
+          tags=$(git tag)
+          for tag in $tags; do
+            git tag -d $tag
+            git push --delete origin $tag
+          done
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
