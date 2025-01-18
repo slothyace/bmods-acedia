@@ -12,5 +12,8 @@ All mods that is owned by me will have a mod version tag attached to it at the b
 | --- | --- | --- |
 | `s` - stable<br>`u` - unstable<br>`b` - beta | Version Number | Patch Number |
 
+## Like the stuff I make? Support Me!
+<a href="https://ko-fi.com/slothyacedia"><img src="https://github.com/slothyace/slothyace/blob/main/icons/kofi.png" width=240 height=48></a>
+
 ## Command samples
 Visit [BCS-samples](https://github.com/slothyace/bcs-samples)
