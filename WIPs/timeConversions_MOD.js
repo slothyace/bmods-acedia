@@ -49,11 +49,12 @@ module.exports = {
     {
       element: "",
       text: `<div style="text-align:left">
-        <span>Days - <code>DD</code></span><br></br>
-        <span>Hours - <code>HH</code></span><br></br>
-        <span>Minutes - <code>MM</code></span><br></br>
-        <span>Seconds - <code>SS</code></span><br></br>
-        <span>Milliseconds - <code>MS</code></span><br></br>
+        <span>Days: <code>DD</code></span><br></br>
+        <span>Hours: <code>HH</code></span><br></br>
+        <span>Minutes: <code>MM</code></span><br></br>
+        <span>Seconds: <code>SS</code></span><br></br>
+        <span>Milliseconds: <code>MS</code></span><br></br>
+        <span>Recommended Format: <code>DD:HH:MM:SS:MS</code></span><br></br>
       </div>`
     },
     "-",
