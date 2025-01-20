@@ -59,7 +59,7 @@ module.exports = {
     "-",
     {
       element: "store",
-      storeAs: "outputResult",
+      storeAs: "convertedTime",
       name: "Store As"
     },
   ],
@@ -212,6 +212,39 @@ module.exports = {
         let seconds = Math.floor(msTimeBase / 1000)
 
         let milliseconds = msTimeBase % 1000
+
+        if (!format.includes("DD")){
+          hours += days*24
+          days = 0
+        }
+        if (!format.includes("HH")){
+          minutes += hours*60
+          hours = 0
+        }
+        if (!format.includes("MM")){
+          seconds += minutes*60
+          hours = 0
+        }
+        if (!format.includes("SS")){
+          milliseconds += seconds*1000
+          seconds = 0
+        }
+        if (!format.includes("MS") && !format.includes("SS" || "MM" || "HH" || "DD")){
+          console.error(`There is no format provided!`)
+        }
+
+        const components = {
+          DD: days.padStart(2, "0"),
+          HH: hours.padStart(2, "0"),
+          MM: minutes.padStart(2, "0"),
+          SS: seconds.padStart(2, "0"),
+          MS: milliseconds.padStart(3, "0")
+        }
+
+        resultOutput = format.replace(/DD|HH|MM|SS|MS/g, (match)=> components[match] || match)
+        break
     }
+
+    bridge.store(values.convertedTime, resultOutput)
   }
 }
