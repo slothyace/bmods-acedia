@@ -1,4 +1,4 @@
-modVersion = "u.v1.0"
+modVersion = "s.v1.0"
 module.exports = {
   data: {
     name: "Time Conversions"
@@ -49,12 +49,12 @@ module.exports = {
     {
       element: "",
       text: `<div style="text-align:left">
-        <span>Days: <code>DD</code></span><br></br>
-        <span>Hours: <code>HH</code></span><br></br>
-        <span>Minutes: <code>MM</code></span><br></br>
-        <span>Seconds: <code>SS</code></span><br></br>
-        <span>Milliseconds: <code>MS</code></span><br></br>
-        <span>Recommended Format: <code>DD:HH:MM:SS:MS</code></span><br></br>
+        <span>Days: <code>DD</code></span><br>
+        <span>Hours: <code>HH</code></span><br>
+        <span>Minutes: <code>MM</code></span><br>
+        <span>Seconds: <code>SS</code></span><br>
+        <span>Milliseconds: <code>MS</code></span><br>
+        <span>Recommended Format: <code>DD:HH:MM:SS:MS</code></span><br>
       </div>`
     },
     "-",
@@ -63,6 +63,10 @@ module.exports = {
       storeAs: "convertedTime",
       name: "Store As"
     },
+    {
+      element: "text",
+      text: modVersion
+    }
   ],
 
   script: (values)=>{
@@ -81,7 +85,9 @@ module.exports = {
     }
     refelm(true)
 
-    values.event.on("change", ()=>{refelm()})
+    values.events.on("change", ()=>{
+      refelm()
+    })
   },
 
   subtitle: (values, constants, thisAction)=>{
@@ -183,19 +189,19 @@ module.exports = {
         break
 
       case "sec":
-        resultOutput = msTimeBase/1000
+        resultOutput = (msTimeBase/1000).toFixed(3)
         break
 
       case "min":
-        resultOutput = msTimeBase/(1000*60)
+        resultOutput = (msTimeBase/(1000*60)).toFixed(3)
         break
 
       case "hour":
-        resultOutput = msTimeBase/(1000*60*60)
+        resultOutput = (msTimeBase/(1000*60*60)).toFixed(3)
         break
 
       case "day":
-        resultOutput = msTimeBase/(1000*60*60*24)
+        resultOutput = (msTimeBase/(1000*60*60*24)).toFixed(3)
         break
 
       case "custom":
