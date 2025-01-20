@@ -164,15 +164,15 @@ module.exports = {
         break
 
       case "min":
-        msTimeBase = timeInput*1000*60
+        msTimeBase = timeInput*(1000*60)
         break
 
       case "hour":
-        msTimeBase = timeInput*1000*60*60
+        msTimeBase = timeInput*(1000*60*60)
         break
 
       case "day":
-        msTimeBase = timeInput*1000*60*60*24
+        msTimeBase = timeInput*(1000*60*60*24)
         break
     }
 
@@ -200,18 +200,18 @@ module.exports = {
       case "custom":
         let format = bridge.transf(values.outputUnit.value)
 
-        let days = Math.floor(msTimeBase / (1000 * 60 * 60 * 24))
-        msTimeBase %= 1000 * 60 * 60 * 24
+        let days = Math.floor(msTimeBase/(1000*60*60*24))
+        msTimeBase %= 1000*60*60*24
 
-        let hours = Math.floor(msTimeBase / (1000 * 60 * 60))
-        msTimeBase %= 1000 * 60 * 60
+        let hours = Math.floor(msTimeBase/(1000*60*60))
+        msTimeBase %= 1000*60*60
 
-        let minutes = Math.floor(msTimeBase / (1000 * 60))
-        msTimeBase %= 1000 * 60
+        let minutes = Math.floor(msTimeBase/(1000*60))
+        msTimeBase %= 1000*60
 
-        let seconds = Math.floor(msTimeBase / 1000)
+        let seconds = Math.floor(msTimeBase/1000)
 
-        let milliseconds = msTimeBase % 1000
+        let milliseconds = msTimeBase%1000
 
         if (!format.includes("DD")){
           hours += days*24
@@ -229,16 +229,16 @@ module.exports = {
           milliseconds += seconds*1000
           seconds = 0
         }
-        if (!format.includes("MS") && !format.includes("SS" || "MM" || "HH" || "DD")){
+        if (!format.includes("MS") && !format.includes("SS") && !format.includes("MM") && !format.includes("HH") && !format.includes("DD")){
           console.error(`There is no format provided!`)
         }
 
         const components = {
-          DD: days.padStart(2, "0"),
-          HH: hours.padStart(2, "0"),
-          MM: minutes.padStart(2, "0"),
-          SS: seconds.padStart(2, "0"),
-          MS: milliseconds.padStart(3, "0")
+          DD: String(days).padStart(2, "0"),
+          HH: String(hours).padStart(2, "0"),
+          MM: String(minutes).padStart(2, "0"),
+          SS: String(seconds).padStart(2, "0"),
+          MS: String(milliseconds).padStart(3, "0")
         }
 
         resultOutput = format.replace(/DD|HH|MM|SS|MS/g, (match)=> components[match] || match)
