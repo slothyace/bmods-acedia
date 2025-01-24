@@ -1,7 +1,7 @@
 modVersion = "s.v2.0"
 module.exports = {
   data: {
-    name: "Toggle"
+    name: "Toggle Actions"
   },
   aliases: [],
   info: {
@@ -15,15 +15,15 @@ module.exports = {
     {
       element: "toggle",
       storeAs: "toggle",
-      name: "Set Value",
-      true: "True",
-      false: "False"
+      name: "Run Actions",
+      true: "Run",
+      false: "Don't Run"
     },
     {
       element: "actions",
       storeAs: "actions",
       name: "Run Actions",
-      large: true
+      large: false
     },
     {
       element: "largeInput",
@@ -37,13 +37,13 @@ module.exports = {
   ],
 
   subtitle: (values, constants) =>{
-    return `${values.comment}`
+    return `${values.toggle}: ${values.comment}`
   },
 
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
-    if (!!bridge.transf(values.toggle) == true){
+    if (values.toggle == true){
       let promise = new Promise(async res => {
         await bridge.runner(values.actions)
         res()
