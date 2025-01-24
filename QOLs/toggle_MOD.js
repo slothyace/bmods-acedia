@@ -1,4 +1,4 @@
-modVersion = "s.v1.0"
+modVersion = "s.v2.0"
 module.exports = {
   data: {
     name: "Toggle"
@@ -20,9 +20,10 @@ module.exports = {
       false: "False"
     },
     {
-      element: "store",
-      storeAs: "store",
-      name: "Store As",
+      element: "actions",
+      storeAs: "actions",
+      name: "Run Actions",
+      large: true
     },
     {
       element: "largeInput",
@@ -36,12 +37,21 @@ module.exports = {
   ],
 
   subtitle: (values, constants) =>{
-    return `Set ${constants.variable(values.store)} to ${values.toggle}`
+    return `${values.comment}`
   },
 
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
-    bridge.store(values.store, values.toggle)
+    if (!!bridge.transf(values.toggle) == true){
+      let promise = new Promise(async res => {
+        await bridge.runner(values.actions)
+        res()
+      })
+      promise.catch(err => console.log(err))
+      await promise
+    } else {
+      // noop
+    }
   }
 }
