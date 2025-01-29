@@ -15,7 +15,7 @@ module.exports = {
     
   ],
 
-  subtitles: (values) =>{
+  subtitle: (values) =>{
     return ``
   },
 
