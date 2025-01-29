@@ -1,7 +1,7 @@
-modVersion = "u.v1.0"
+modVersion = "s.v1.0"
 module.exports = {
   data: {
-    name: "Fetch Steam Id",
+    name: "Fetch Steam Profile Info",
   },
   aliases: ["Resolve Steam Id"],
   modules: ["node-fetch"],
@@ -37,7 +37,7 @@ module.exports = {
   ],
 
   subtitle: (values) =>{
-    return `Fetch Steam ID Of ${values.steamProfileLink}`
+    return `Fetch Steam Profile Summary Of ${values.steamProfileLink}`
   },
 
   script: (data) => {
@@ -62,7 +62,7 @@ module.exports = {
 
     const extractionRegex = /(?:https?:\/\/)?(?:steamcommunity\.com\/)?(id|profiles)\/([^/]+)/
     let match = steamProfileLink.match(extractionRegex)
-    let identifier = match ? match[2] : undefined
+    let identifier = match ? match[2] : steamProfileLink
 
     let steamId
     if (/^\d+$/.test(identifier) == true && identifier != undefined){
@@ -84,7 +84,7 @@ module.exports = {
       const profileObjectQuery = await fetch(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${steamApiKey}&steamids=${steamId}`)
       const profileObjectResponse = await profileObjectQuery.json()
       if (profileObjectResponse.response.players.length > 0) {
-        profileObject = profileObjectResponse
+        profileObject = profileObjectResponse.response.players[0]
       } else {
         console.error("Failed to fetch profile information")
         profileObject = undefined
