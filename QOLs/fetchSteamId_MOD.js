@@ -40,17 +40,6 @@ module.exports = {
     return `Fetch Steam Profile Summary Of ${values.steamProfileLink}`
   },
 
-  script: (data) => {
-    let element = data.document.getElementById('steamApiKey')
-    element.type = "password"
-    element.onfocus = () => {
-      element.type = ""
-    }
-    element.onblur = () => {
-      element.type = "password"
-    }
-  },
-
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
@@ -73,10 +62,10 @@ module.exports = {
         if (vanityResponse.response.success == 1) {
             steamId = vanityResponse.response.steamid; // Resolved Steam ID
         } else {
-            console.error("Failed to resolve vanity URL to Steam ID");
-            steamId = undefined
+            console.error("Failed To Resolve Vanity To Steam ID");
+            steamId = "Failed To Resolve Vanity To Steam ID"
         }
-    } else {steamId = undefined}
+    } else {steamId = "Failed To Resolve Vanity To Steam ID"}
     bridge.store(values.steamId, steamId)
 
     let profileObject
@@ -86,10 +75,10 @@ module.exports = {
       if (profileObjectResponse.response.players.length > 0) {
         profileObject = profileObjectResponse.response.players[0]
       } else {
-        console.error("Failed to fetch profile information")
-        profileObject = undefined
+        console.error("Failed To Fetch Profile Information")
+        profileObject = "Failed To Fetch Profile Information"
       }
-      bridge.store(values.profileSummary, profileObject)
-    }
+    } else {profileObject = "No Fetching Of Profile Information"}
+    bridge.store(values.profileSummary, profileObject)
   }
 }
