@@ -1,6 +1,7 @@
-!Actions/*
-!Events/*
-!Tweaks/*
-!Fixes/*
-!QOLs/*
-* export-ignore
+.assets/ export-ignore
+.documentation/ export-ignore
+.github/ export-ignore
+.gitattributes export-ignore
+Deprecated/ export-ignore
+WIPs/ export-ignore
+README.md export-ignore
