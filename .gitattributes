@@ -1,9 +1,7 @@
-WIPs/ export-ignore
+* export-ignore
 
-.assets/ export-ignore
-.documentation/ export-ignore
-.github/ export-ignore
-
-README.md export-ignore
-
-.gitattributes export-ignore
+!Actions/*
+!Events/*
+!Tweaks/*
+!Fixes/*
+!QOLS/*
