@@ -1,4 +1,4 @@
-modVersion = "u.v1.0"
+modVersion = "s.v1.1"
 module.exports = {
   data: {
     name: "Check If Number Is In Range"
