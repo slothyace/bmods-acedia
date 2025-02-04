@@ -128,37 +128,46 @@ module.exports = {
     let resultOutput
     let msTimeBase
 
+    if (inputUnitType != "custom"){
+      timeInput = parseFloat(timeInput)
+      if (isNaN(timeInput)){
+        console.error(`${values.timeInput} Is Not A Number!`)
+        bridge.store(values.convertedTime, undefined)
+        return
+      }
+    }
+
     switch (inputUnitType){
       case "ms":
-        msTimeBase = parseFloat(timeInput)
+        msTimeBase = timeInput
         break
 
       case "sec":
-        msTimeBase = parseFloat(timeInput)*1000
+        msTimeBase = timeInput*1000
         break
 
       case "min":
-        msTimeBase = parseFloat(timeInput)*(1000*60)
+        msTimeBase = timeInput*(1000*60)
         break
 
       case "hour":
-        msTimeBase = parseFloat(timeInput)*(1000*60*60)
+        msTimeBase = timeInput*(1000*60*60)
         break
 
       case "day":
-        msTimeBase = parseFloat(timeInput)*(1000*60*60*24)
+        msTimeBase = timeInput*(1000*60*60*24)
         break
 
       case "week":
-        msTimeBase = parseFloat(timeInput)*(1000*60*60*24*7)
+        msTimeBase = timeInput*(1000*60*60*24*7)
         break
 
       case "month":
-        msTimeBase = parseFloat(timeInput)*(1000*60*60*24*30.44)
+        msTimeBase = timeInput*(1000*60*60*24*30.44)
         break
 
       case "year":
-        msTimeBase = parseFloat(timeInput)*(1000*60*60*24*365.25)
+        msTimeBase = timeInput*(1000*60*60*24*365.25)
         break
 
       case "custom":
@@ -289,6 +298,7 @@ module.exports = {
         !format.includes("MO") && 
         !format.includes("YY")){
           console.error(`There is no format provided!`)
+          resultOutput = undefined
           return
         }
 
