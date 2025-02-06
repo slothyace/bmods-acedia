@@ -39,11 +39,11 @@ module.exports = {
 
   subtitle: (values, thisAction) => {
     let type = values.extractionType.type
-    regexExp
+    let regexExp
     if (type == "string"){
       regexExp = values.extraction.value
     } else if (type == "number"){
-      regexExp = `(\d+?)`
+      regexExp = `(\d+)`
     }
     return `Extract ${thisAction.UI.find((e) => e.element == "typedDropdown").choices[values.extraction.type].name}(${regexExp})`
   },
