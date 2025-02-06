@@ -173,7 +173,7 @@ module.exports = {
       case "custom":
         const extractions = {
           year: {regex: /(\d+) ?(year|years|yrs|yr|y|yy)/gi, toMilli: 365.25 * 24 * 60 * 60 * 1000},
-          month: {regex: /(\d+) ?(mo|month|months|mth)/gi, toMilli: 30.44 * 24 * 60 * 60 * 1000},
+          month: {regex: /(\d+) ?(mo|month|months|mth|mths)/gi, toMilli: 30.44 * 24 * 60 * 60 * 1000},
           week: {regex: /(\d+) ?(week|weeks|wk|wks|w)/gi, toMilli: 7 * 24 * 60 * 60 * 1000},
           day: {regex: /(\d+) ?(day|days|d|dd)/gi, toMilli: 24 * 60 * 60 * 1000},
           hour: {regex: /(\d+) ?(hour|hours|hr|hrs|h|hh)/gi, toMilli: 60 * 60 * 1000},
