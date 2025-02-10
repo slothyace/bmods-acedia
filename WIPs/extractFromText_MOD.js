@@ -5,7 +5,7 @@ module.exports = {
   },
   aliases: ["Number Extraction", "Regex Extraction"],
   modules: [],
-  category: "",
+  category: "Text",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
     creator: "Acedia",
@@ -19,17 +19,18 @@ module.exports = {
     },
     {
       element: "typedDropdown",
-      storeAs: "extractionType",
+      storeAs: "extraction",
       name: "Extract",
       choices: {
-        string: {name: "String", field: true},
+        string: {name: "String", field: true, placeholder: "Regex"},
         number: {name: "Number", field: false}
       },
     },
+    "-",
     {
       element: "store",
       storeAs: "extractedItem",
-      name: "Store As"
+      name: "Store Extracted Array As"
     },
     {
       element: "text",
@@ -37,11 +38,11 @@ module.exports = {
     },
   ],
 
-  subtitle: (values, thisAction) => {
-    let type = values.extractionType.type
+  subtitle: (values, constants, thisAction) => {
+    let type = values.extraction.type
     let regexExp
     if (type == "string"){
-      regexExp = values.extraction.value
+      regexExp = values.extraction.value || ""
     } else if (type == "number"){
       regexExp = `(\d+)`
     }
@@ -50,24 +51,22 @@ module.exports = {
 
   compatibility: ["Any"],
 
-  async run(client, message, values, bridge){
-    let sourceText = bridge.transf(values.sourceText)
-    let extractionType = bridge.transf(values.extractionType.type)
+  async run(values, message, client, bridge){
+    let source = bridge.transf(values.sourceText)
+    let extractionType = bridge.transf(values.extraction.type)
 
     let extracts
-    switch (extractionType){
+    switch(extractionType){
       case "string":
-        let extractionRegex = bridge.transf(values.extractionType.value)
-        extracts = [...sourceText.matchAll(new RegExp("^" + extractionRegex + "$", "gi"))]
+        let extractionReg = bridge.transf(values.extraction.value) || ""
+        extracts = [...source.matchAll(new RegExp("^"+extractionReg+"$", "g"))].map((match) => match[0])
         break
-
+      
       case "number":
-        extracts = [...sourceText.matchAll(/(\d+)/gi)]
+        extracts = [...source.matchAll(/(\d+)/g)].map((match) => match[0])
         break
     }
-
-    let result = (extracts && extracts.length > 0) ? extracts : undefined
-
-    bridge.store(values.extractedItem, result)
+    let results = (extracts && extracts.length > 0) ? extracts : []
+    bridge.store(values.extractedItem, results)
   }
 }

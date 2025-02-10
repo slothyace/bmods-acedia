@@ -15,13 +15,13 @@ module.exports = {
     
   ],
 
-  subtitle: (values) =>{
+  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
     return ``
   },
 
   compatibility: ["Any"],
 
-  async run(client, message, values, bridge){
+  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
     
   }
 }

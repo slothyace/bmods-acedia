@@ -30,7 +30,7 @@ module.exports = {
         week: {name: "Weeks", field: false},
         month: {name: "Months", field: false},
         years: {name: "Years", field: false},
-        custom: {name: "Custom", field: false}
+        custom: {name: "Parse Time (Custom)", field: false}
       }
     },
     {
@@ -106,7 +106,7 @@ module.exports = {
     let inputType = thisAction.UI.find((e) => e.element == "typedDropdown").choices[values.inputUnit.type].name
 
     let outputType
-    switch (outputAs){
+    switch (outputUnits){
       default:
         outputType = thisAction.UI.find((e) => e.element == "typedDropdown").choices[values.outputUnit.type].name
         break
@@ -128,10 +128,10 @@ module.exports = {
     let resultOutput
     let msTimeBase
 
-    if (inputUnitType != "custom"){
+    if (inputUnitType !== "custom"){
       timeInput = parseFloat(timeInput)
       if (isNaN(timeInput)){
-        console.error(`${values.timeInput} Is Not A Number!`)
+        console.error(`The given time input is not a number!`)
         bridge.store(values.convertedTime, undefined)
         return
       }
@@ -139,35 +139,35 @@ module.exports = {
 
     switch (inputUnitType){
       case "ms":
-        msTimeBase = timeInput
+        msTimeBase = parseFloat(timeInput)
         break
 
       case "sec":
-        msTimeBase = timeInput*1000
+        msTimeBase = parseFloat(timeInput)*1000
         break
 
       case "min":
-        msTimeBase = timeInput*(1000*60)
+        msTimeBase = parseFloat(timeInput)*(1000*60)
         break
 
       case "hour":
-        msTimeBase = timeInput*(1000*60*60)
+        msTimeBase = parseFloat(timeInput)*(1000*60*60)
         break
 
       case "day":
-        msTimeBase = timeInput*(1000*60*60*24)
+        msTimeBase = parseFloat(timeInput)*(1000*60*60*24)
         break
 
       case "week":
-        msTimeBase = timeInput*(1000*60*60*24*7)
+        msTimeBase = parseFloat(timeInput)*(1000*60*60*24*7)
         break
 
       case "month":
-        msTimeBase = timeInput*(1000*60*60*24*30.44)
+        msTimeBase = parseFloat(timeInput)*(1000*60*60*24*30.44)
         break
 
-      case "year":
-        msTimeBase = timeInput*(1000*60*60*24*365.25)
+      case "years":
+        msTimeBase = parseFloat(timeInput)*(1000*60*60*24*365.25)
         break
 
       case "custom":
@@ -183,24 +183,27 @@ module.exports = {
         }
 
         let extractedValues = {}
-        for (let unit in extractions){
-          let matches = [...timeInput.matchAll(extractions[unit].regex)]
+        for (let unit in extractions) {
+          let matches = [...timeInput.matchAll(extractions[unit].regex)];
 
           if (matches.length > 0) {
-            extractedValues[unit] = matches.reduce((sum,match) => {
-              sum+parseFloat(match[1]), 0
-            })
+            extractedValues[unit] = matches.reduce((sum, match) => {
+              return sum + (parseFloat(match[1]) || 0)
+            }, 0)
           } else {
             extractedValues[unit] = 0
           }
         }
 
         msTimeBase = 0
-        for (let unit in extractedValues){
-          msTimeBase += extractedValues[unit]*extractions[unit].toMilli
+        for (let unit in extractedValues) {
+          msTimeBase += extractedValues[unit] * extractions[unit].toMilli;
         }
+        parseFloat(msTimeBase)
         break
     }
+
+    msTimeBase = Number(msTimeBase)
 
     switch (outputUnitType){
       case "ms":
@@ -208,58 +211,66 @@ module.exports = {
         break
 
       case "sec":
-        resultOutput = (msTimeBase/1000)
+        resultOutput = msTimeBase/1000
         break
 
       case "min":
-        resultOutput = (msTimeBase/(1000*60))
+        resultOutput = msTimeBase/(1000*60)
         break
 
       case "hour":
-        resultOutput = (msTimeBase/(1000*60*60))
+        resultOutput = msTimeBase/(1000*60*60)
         break
 
       case "day":
-        resultOutput = (msTimeBase/(1000*60*60*24))
+        resultOutput = msTimeBase/(1000*60*60*24)
         break
 
       case "week":
-        resultOutput = (msTimeBase/(1000*60*60*24*7))
+        resultOutput = msTimeBase/(1000*60*60*24*7)
         break
 
       case "month":
-        resultOutput = (msTimeBase/(1000*60*60*24*30.44))
+        resultOutput = msTimeBase/(1000*60*60*24*30.44)
         break
 
-      case "year":
-        resultOutput = (msTimeBase/(1000*60*60*24*365.25))
+      case "years":
+        resultOutput = msTimeBase/(1000*60*60*24*365.25)
         break
 
       case "custom":
         let format = bridge.transf(values.outputUnit.value)
 
         let years = Math.floor(msTimeBase/(1000*60*60*24*365.25))
-        msTimeBase %= (1000*60*60*365.25)*years
+        msTimeBase %= (1000*60*60*365.25)
+        console.log(years, typeof years)
 
         let months = Math.floor(msTimeBase/(1000*60*60*24*30.44))
-        msTimeBase %= (1000*60*60*24*30.44)*months
+        msTimeBase %= (1000*60*60*24*30.44)
+        console.log(months, typeof months)
 
         let weeks = Math.floor(msTimeBase/(1000*60*60*24*7))
-        msTimeBase %= (1000*60*60*24*7)*weeks
+        msTimeBase %= (1000*60*60*24*7)
+        console.log(weeks, typeof weeks)
 
         let days = Math.floor(msTimeBase/(1000*60*60*24))
-        msTimeBase %= (1000*60*60*24)*days
+        msTimeBase %= (1000*60*60*24)
+        console.log(days, typeof days)
 
         let hours = Math.floor(msTimeBase/(1000*60*60))
-        msTimeBase %= (1000*60*60)*hours
+        msTimeBase %= (1000*60*60)
+        console.log(hours, typeof hours)
 
         let minutes = Math.floor(msTimeBase/(1000*60))
-        msTimeBase %= (1000*60)*minutes
+        msTimeBase %= (1000*60)
+        console.log(minutes, typeof minutes)
 
         let seconds = Math.floor(msTimeBase/1000)
-        msTimeBase %= (1000)*seconds
+        msTimeBase %= (1000)
+        console.log(seconds, typeof seconds)
 
         let milliseconds = msTimeBase%1000
+        console.log(milliseconds, typeof milliseconds)
 
         if (!format.includes("YY")){
           months += years*(365.25/30.44)
@@ -316,7 +327,6 @@ module.exports = {
         resultOutput = format.replace(/YY|MO|WK|DD|HH|MM|SS|MS/g, (match)=> components[match] || match)
         break
     }
-
     bridge.store(values.convertedTime, resultOutput)
   }
 }
