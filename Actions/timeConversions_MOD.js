@@ -1,4 +1,4 @@
-modVersion = "s.v2.0"
+modVersion = "s.v2.1"
 module.exports = {
   data: {
     name: "Time Conversions"
@@ -243,34 +243,26 @@ module.exports = {
 
         let years = Math.floor(msTimeBase/(1000*60*60*24*365.25))
         msTimeBase %= (1000*60*60*365.25)
-        console.log(years, typeof years)
 
         let months = Math.floor(msTimeBase/(1000*60*60*24*30.44))
         msTimeBase %= (1000*60*60*24*30.44)
-        console.log(months, typeof months)
 
         let weeks = Math.floor(msTimeBase/(1000*60*60*24*7))
         msTimeBase %= (1000*60*60*24*7)
-        console.log(weeks, typeof weeks)
 
         let days = Math.floor(msTimeBase/(1000*60*60*24))
         msTimeBase %= (1000*60*60*24)
-        console.log(days, typeof days)
 
         let hours = Math.floor(msTimeBase/(1000*60*60))
         msTimeBase %= (1000*60*60)
-        console.log(hours, typeof hours)
 
         let minutes = Math.floor(msTimeBase/(1000*60))
         msTimeBase %= (1000*60)
-        console.log(minutes, typeof minutes)
 
         let seconds = Math.floor(msTimeBase/1000)
         msTimeBase %= (1000)
-        console.log(seconds, typeof seconds)
 
         let milliseconds = msTimeBase%1000
-        console.log(milliseconds, typeof milliseconds)
 
         if (!format.includes("YY")){
           months += years*(365.25/30.44)
