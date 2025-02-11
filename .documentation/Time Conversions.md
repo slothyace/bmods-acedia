@@ -32,11 +32,11 @@ Extractions
 ### Custom Output Syntax
 | Time Scale | Syntax |
 | --- | --- |
-| Year | YY |
-| Month | MO |
-| Week | WK |
-| Day | DD |
-| Hour | HH |
-| Minute | MM |
-| Second | SS |
-| Millisecond | MS |
+| Year | `YY` |
+| Month | `MO` |
+| Week | `WK` |
+| Day | `DD` |
+| Hour | `HH` |
+| Minute | `MM` |
+| Second | `SS` |
+| Millisecond | `MS` |
