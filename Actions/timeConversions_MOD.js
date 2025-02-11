@@ -1,7 +1,11 @@
 modVersion = "s.v2.1"
 module.exports = {
   data: {
-    name: "Time Conversions"
+    name: "Time Conversions",
+    "outputUnit":{
+      type: "custom",
+      value: "",
+    },
   },
   aliases: ["Parse Time"],
   modules: [],
