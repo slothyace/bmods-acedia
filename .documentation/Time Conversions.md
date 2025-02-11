@@ -19,7 +19,7 @@ Inputs
 ### Input Time Parsing
 Extractions
 | Time | Time Scale | Extraction Regex |
-| --- | --- |
+| --- | --- | --- |
 | Year | 365.25 days | `/(\d+(?:\.\d+)?) ?(years?\b\|yrs?\b\|yy?\b)/gi` |
 | Month | 30.44 days | `/(\d+(?:\.\d+)?) ?(mo(nths?)?\b\|mths?\b)/gi` |
 | Week | 7 days | `/(\d+(?:\.\d+)?) ?(weeks?\b\|wks?\b\|w\b)/gi` |
