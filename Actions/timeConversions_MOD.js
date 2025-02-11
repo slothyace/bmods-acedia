@@ -198,7 +198,6 @@ module.exports = {
             extractedValues[unit] = 0
           }
         }
-        console.log(extractedValues)
 
         msTimeBase = 0
         for (let unit in extractedValues) {
