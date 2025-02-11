@@ -8,7 +8,6 @@ This mod converts time.
 | NIL |
 
 ## Documentation
-Inputs
 | Component | Documentation | 
 | --- | --- |
 | `Time` | Can be a decimal / integer number. Allows a string if `Time Input Unit` has been set to `Parse Time (Custom)`. |
@@ -16,6 +15,7 @@ Inputs
 | `Output As` | Set a time output unit. If set to `Custom` output, you would need to follow a syntax. |
 | `Store As` | Store the output string as. |
 
+> [!NOTE]
 > All of it gets converted to milliseconds first before it is converted to the output.
 
 ### Input Time Parsing
