@@ -2,7 +2,7 @@ modVersion = "s.v2.1"
 module.exports = {
   data: {
     name: "Time Conversions",
-    "outputUnit":{
+    "inputUnit":{
       type: "custom",
       value: "",
     },
