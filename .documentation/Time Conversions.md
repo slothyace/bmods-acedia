@@ -20,14 +20,14 @@ Inputs
 Extractions
 | Time Scale | Extraction Regex |
 | --- | --- |
-| Year | `/(\d+(?:\.\d+)?) ?(years?\b|yrs?\b|yy?\b)/gi` |
-| Month | `/(\d+(?:\.\d+)?) ?(mo(nths?)?\b|mths?\b)/gi` |
-| Week | `/(\d+(?:\.\d+)?) ?(weeks?\b|wks?\b|w\b)/gi` |
-| Day | `/(\d+(?:\.\d+)?) ?(days?\b|dd?\b)/gi` | 
-| Hour | `/(\d+(?:\.\d+)?) ?(hours?\b|hrs?\b|hh?\b)/gi` |
-| Minute | `/(\d+(?:\.\d+)?) ?(minutes?\b|mins?\b|mm?\b)/gi` |
-| Second | `/(\d+(?:\.\d+)?) ?(seconds?\b|secs?\b|ss?\b)/gi` |
-| Millisecond | `/(\d+(?:\.\d+)?) ?(milliseconds?\b|ms\b)/gi` |
+| Year | `/(\d+(?:\.\d+)?) ?(years?\b\|yrs?\b\|yy?\b)/gi` |
+| Month | `/(\d+(?:\.\d+)?) ?(mo(nths?)?\b\|mths?\b)/gi` |
+| Week | `/(\d+(?:\.\d+)?) ?(weeks?\b\|wks?\b\|w\b)/gi` |
+| Day | `/(\d+(?:\.\d+)?) ?(days?\b\|dd?\b)/gi` | 
+| Hour | `/(\d+(?:\.\d+)?) ?(hours?\b\|hrs?\b\|hh?\b)/gi` |
+| Minute | `/(\d+(?:\.\d+)?) ?(minutes?\b\|mins?\b\|mm?\b)/gi` |
+| Second | `/(\d+(?:\.\d+)?) ?(seconds?\b\|secs?\b\|ss?\b)/gi` |
+| Millisecond | `/(\d+(?:\.\d+)?) ?(milliseconds?\b\|ms\b)/gi` |
 
 ### Custom Output Syntax
 | Time Scale | Syntax |
