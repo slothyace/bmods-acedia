@@ -16,6 +16,8 @@ Inputs
 | `Output As` | Set a time output unit. If set to `Custom` output, you would need to follow a syntax. |
 | `Store As` | Store the output string as. |
 
+> All of it gets converted to milliseconds first before it is converted to the output.
+
 ### Input Time Parsing
 Extractions
 | Time | Time Scale | Extraction Regex |
