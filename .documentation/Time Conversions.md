@@ -18,16 +18,16 @@ Inputs
 
 ### Input Time Parsing
 Extractions
-| Time Scale | Extraction Regex |
+| Time | Time Scale | Extraction Regex |
 | --- | --- |
-| Year | `/(\d+(?:\.\d+)?) ?(years?\b\|yrs?\b\|yy?\b)/gi` |
-| Month | `/(\d+(?:\.\d+)?) ?(mo(nths?)?\b\|mths?\b)/gi` |
-| Week | `/(\d+(?:\.\d+)?) ?(weeks?\b\|wks?\b\|w\b)/gi` |
-| Day | `/(\d+(?:\.\d+)?) ?(days?\b\|dd?\b)/gi` | 
-| Hour | `/(\d+(?:\.\d+)?) ?(hours?\b\|hrs?\b\|hh?\b)/gi` |
-| Minute | `/(\d+(?:\.\d+)?) ?(minutes?\b\|mins?\b\|mm?\b)/gi` |
-| Second | `/(\d+(?:\.\d+)?) ?(seconds?\b\|secs?\b\|ss?\b)/gi` |
-| Millisecond | `/(\d+(?:\.\d+)?) ?(milliseconds?\b\|ms\b)/gi` |
+| Year | 365.25 days | `/(\d+(?:\.\d+)?) ?(years?\b\|yrs?\b\|yy?\b)/gi` |
+| Month | 30.44 days | `/(\d+(?:\.\d+)?) ?(mo(nths?)?\b\|mths?\b)/gi` |
+| Week | 7 days | `/(\d+(?:\.\d+)?) ?(weeks?\b\|wks?\b\|w\b)/gi` |
+| Day | 24 hours |`/(\d+(?:\.\d+)?) ?(days?\b\|dd?\b)/gi` | 
+| Hour | 60 minutes | `/(\d+(?:\.\d+)?) ?(hours?\b\|hrs?\b\|hh?\b)/gi` |
+| Minute | 60 seconds | `/(\d+(?:\.\d+)?) ?(minutes?\b\|mins?\b\|mm?\b)/gi` |
+| Second | 1000 milliseconds |`/(\d+(?:\.\d+)?) ?(seconds?\b\|secs?\b\|ss?\b)/gi` |
+| Millisecond | 1/1000 seconds | `/(\d+(?:\.\d+)?) ?(milliseconds?\b\|ms\b)/gi` |
 
 ### Custom Output Syntax
 | Time Scale | Syntax |
