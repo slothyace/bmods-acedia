@@ -21,6 +21,7 @@ module.exports = {
       element: "input",
       storeAs: "minimum",
       name: "Minimum",
+      placeholder: "Defaults To 0"
     },
     {
       element: "input",

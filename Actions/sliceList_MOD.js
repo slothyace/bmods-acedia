@@ -27,6 +27,7 @@ module.exports = {
       element: "input",
       storeAs: "sliceTill",
       name: "Slice Till Position",
+      placeholder: "To Get Items 1-20 In A List, Slice At 1 Till 20"
     },
     "-",
     {
