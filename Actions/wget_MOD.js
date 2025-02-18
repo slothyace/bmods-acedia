@@ -23,6 +23,22 @@ module.exports = {
       name: "File Path",
       placeholder: "example/file.xyz"
     },
+    {
+      element: "store",
+      storeAs: "fileSize",
+      name: "Store File Size As",
+    },
+    {
+      element: "store",
+      storeAs: "fileBuffer",
+      name: "Store File As",
+    },
+    "-",
+    {
+      element: "toggle",
+      storeAs: "deleteAfter",
+      name: "Delete File?"
+    },
     "-",
     {
       element: "condition",
@@ -52,21 +68,33 @@ module.exports = {
     let fileDir = path.dirname(filePath)
     if (fs.existsSync(fileDir) == false){fs.mkdirSync(fileDir, {recursive: true})}
     
-    let download = wget.download(dlLink, filePath, options)
+    await new Promise((resolve, reject) => {
+      let download = wget.download(dlLink, filePath, options)
 
-    download.on("error", function(err){
-      console.log(err)
-      bridge.call(values.onError, values.onErrorActions)
-      return
+      download.on("error", function(err){
+        console.log(err)
+        bridge.call(values.onError, values.onErrorActions)
+        return resolve(err)
+      })
+
+      download.on("start", function(fileSize){
+        console.log(`File Download From ${dlLink} Started, File Size: ${fileSize}bytes`)
+      })
+
+      download.on("end", function(output){
+        console.log(`File Download From ${dlLink} Completed, ${output}`)
+        let fileSize = fs.statSync(`./${filePath}`).size
+        if (values.fileBuffer){
+          fileRead = bridge.fs.readFileSync(`./${filePath}`)
+          bridge.store(values.fileBuffer, fileRead)
+        }
+        bridge.store(values.fileSize, fileSize)
+        return resolve()
+      })
     })
 
-    download.on("start", function(fileSize){
-      console.log(`File Download From ${dlLink} Started, File Size: ${fileSize}bytes`)
-    })
-
-    download.on("end", function(output){
-      console.log(`File Download From ${dlLink} Completed, ${output}`)
-      return
-    })
+    if (values.deleteAfter == true){
+      fs.unlinkSync(`./${filePath}`)
+    }
   }
 }
