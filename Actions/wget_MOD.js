@@ -82,7 +82,6 @@ module.exports = {
       })
 
       download.on("start", function(fileSize){
-        console.log(`File Download From ${dlLink} Started, File Size: ${fileSize}bytes`)
       })
 
       download.on("end", function(output){
