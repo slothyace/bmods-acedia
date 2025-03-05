@@ -7,7 +7,7 @@ A dedicated repository for my modded actions for [BMD](https://store.steampowere
 3. Fixes for some of the base actions
 
 ## Installation
-Watch the installation guide on [YouTube](https://www.youtube.com/watch?v=qTTGdbSt9yg).
+https://github.com/user-attachments/assets/f4bba707-1b83-418a-a1b3-5666c742801d
 
 ## Mod Versions
 All mods that is owned by me will have a mod version tag attached to it at the bottom.  
