@@ -15,7 +15,7 @@ https://github.com/user-attachments/assets/f4bba707-1b83-418a-a1b3-5666c742801d
 4) On Windows, you can run the `merge.bat` file to merge the folders as intended.
 5) Drag & drop the `Actions` and `Events` folders into the `AppData` folder of your bmd install.
 6) Restart bmd.
-7) Enjoy the mods
+7) Enjoy the mods.
 
 ## Mod Versions
 All mods that is owned by me will have a mod version tag attached to it at the bottom.  
