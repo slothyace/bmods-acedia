@@ -7,8 +7,9 @@ A dedicated repository for my modded actions for [BMD](https://store.steampowere
 3. Fixes for some of the base actions
 
 ## Installation
-https://github.com/user-attachments/assets/f4bba707-1b83-418a-a1b3-5666c742801d
+<video src="https://github.com/user-attachments/assets/f4bba707-1b83-418a-a1b3-5666c742801d">Watch the installation guide on [YouTube](https://youtube.com/watch?v=qTTGdbSt9yg)</video>
 
+## Worded Installation Guide
 1) Download the [repo](https://github.com/slothyace/bmods-acedia/archive/refs/heads/main.zip).
 2) Extract the zip.
 3) Open your bmd install location and open the `AppData` folder.
