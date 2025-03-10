@@ -31,4 +31,4 @@ Some of my mods are documented [here](https://github.com/slothyace/bmods-acedia/
 <a href="https://ko-fi.com/slothyacedia"><img src="https://github.com/slothyace/slothyace/blob/main/icons/kofi.png" width=240 height=48></a>
 
 ## Command samples
-Visit [BCS-samples](https://github.com/slothyace/bcs-samples)
+Visit [bmd-samples](https://github.com/slothyace/bmd-samples)
