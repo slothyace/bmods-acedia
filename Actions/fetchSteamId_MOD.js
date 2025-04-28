@@ -47,9 +47,8 @@ module.exports = {
   compatibility: ["Any"],
 
   async run(values, message, client, bridge){
-    for (const moduleName of this.modules){
-      await client.getMods().require(moduleName)
-    }
+    await client.getMods().require("node-fetch")
+    
     let steamApiKey = bridge.transf(values.steamApiKey)
     let steamProfileLink = bridge.transf(values.steamProfileLink)
     if (steamApiKey == ""){
