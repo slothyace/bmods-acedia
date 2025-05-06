@@ -1,4 +1,4 @@
-modVersion = "s.v1.0 | AceFix"
+modVersion = "s.v2.0 | AceFix"
 module.exports = {
   data: {
     name: "Create File",
@@ -32,8 +32,26 @@ module.exports = {
   },
   compatibility: ["Any"],
   run(values, message, client, bridge) {
+    const path = require("node:path")
     let fs = bridge.fs;
+    const botData = require("../data.json")
+    const workingDir = path.normalize(process.cwd())
+    filePath = bridge.transf(values.path)
+    
+    let fullPath
+    if (workingDir.includes(path.join("common", "Bot Maker For Discord"))){
+      fullPath = path.join(botData.prjSrc, filePath)
+    } else {
+      fullPath = path.join(workingDir, filePath)
+    }
 
-    fs.writeFileSync(bridge.transf(values.path), bridge.transf(values.content))
+    fullPath = path.normalize(fullPath)
+    const dirName = path.dirname(fullPath)
+
+    if (!fs.existSync(dirPath)){
+      fs.mkdirSync(dirPath, { recursive: true })
+    }
+
+    fs.writeFileSync(fullPath, bridge.transf(values.content))
   },
 };
