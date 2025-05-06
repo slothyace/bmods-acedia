@@ -33,7 +33,7 @@ module.exports = {
   compatibility: ["Any"],
   run(values, message, client, bridge) {
     const path = require("node:path")
-    let fs = require("node:fs");
+    const fs = bridge.fs;
     const botData = require("../data.json")
     const workingDir = path.normalize(process.cwd())
     filePath = bridge.transf(values.path)
@@ -48,7 +48,7 @@ module.exports = {
     fullPath = path.normalize(fullPath)
     const dirName = path.dirname(fullPath)
 
-    if (!fs.existSync(dirName)){
+    if (!fs.existsSync(dirName)){
       fs.mkdirSync(dirName, { recursive: true })
     }
 
