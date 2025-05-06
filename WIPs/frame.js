@@ -12,7 +12,10 @@ module.exports = {
     donate: "https://ko-fi.com/slothyacedia",
   },
   UI: [
-    
+    {
+      element: "text",
+      text: modVersion
+    }
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
