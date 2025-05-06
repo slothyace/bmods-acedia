@@ -48,8 +48,8 @@ module.exports = {
     fullPath = path.normalize(fullPath)
     const dirName = path.dirname(fullPath)
 
-    if (!fs.existSync(dirPath)){
-      fs.mkdirSync(dirPath, { recursive: true })
+    if (!fs.existSync(dirName)){
+      fs.mkdirSync(dirName, { recursive: true })
     }
 
     fs.writeFileSync(fullPath, bridge.transf(values.content))
