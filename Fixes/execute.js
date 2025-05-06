@@ -39,18 +39,23 @@ module.exports = {
   async run(values, command, client, bridge) {
     await client.getMods().require("node:child_process")
     const childProcess = require('child_process')
-    let toExec = String.raw`${bridge.transf(values.command)}`
+    let toExec = bridge.transf(values.command).replace(`\\`, `\\\\`)
 
     if (values.newProc == true){
-      const child = childProcess.spawn(toExec, {shell: true, detached: true, stdio: "ignore"})
-      child.on("error", (err) =>{
-        bridge.store(values.result, err)
+      await new Promise((res) => {
+        const child = childProcess.spawn(toExec, {shell: true, detached: true, stdio: "ignore"})
+    
+        child.on("error", (err) => {
+          bridge.store(values.result, `Failed to start: ${err.message}`)
+          return res()
+        })
+    
+        child.on("spawn", () => {
+          bridge.store(values.result, `New Process Started With PID: ${child.pid}`)
+          child.unref()
+          return res()
+        })
       })
-      child.on("spawn", () =>{
-        bridge.store(values.result, `New Process Started With PID: ${child.pid}`)
-        child.unref()
-      })
-
     } else {
       await new Promise((res, rej) => {
         
@@ -68,6 +73,5 @@ module.exports = {
         })
       })
     }
-    
   }
 }
