@@ -33,7 +33,7 @@ module.exports = {
   compatibility: ["Any"],
   run(values, message, client, bridge) {
     const path = require("node:path")
-    let fs = bridge.fs;
+    let fs = require("node:fs");
     const botData = require("../data.json")
     const workingDir = path.normalize(process.cwd())
     filePath = bridge.transf(values.path)
