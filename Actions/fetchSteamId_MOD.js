@@ -4,7 +4,7 @@ module.exports = {
     name: "Fetch Steam Profile Info",
   },
   aliases: ["Resolve Steam Id"],
-  modules: ["node-fetch"],
+  modules: [],
   category: "WebAPIs",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/QOLs",
