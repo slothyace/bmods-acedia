@@ -73,6 +73,24 @@ module.exports = {
     }
 
     let jsonString = bridge.transf(values.content)
+    const sanitizeArrays = (str) => {
+      return str.replace(/\[([^\]]*)\]/g, (match, inner) => {
+        const sanitized = inner
+          .split(',')
+          .map(el => {
+            el = el.trim()
+            if (el === '') return null
+            if (/^[-+]?[0-9]*\.?[0-9]+$/.test(el)) return el // number
+            if (/^".*"$|^'.*'$/.test(el)) return el // already quoted
+            return '"' + el.replace(/"/g, '\\"') + '"' // quote and escape
+          })
+          .filter(el => el !== null)
+          .join(', ')
+        return `[${sanitized}]`
+      })
+    }
+
+    jsonString = sanitizeArrays(jsonString)
     let jsonObject
 
     try {
