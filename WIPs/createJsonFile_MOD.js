@@ -23,6 +23,32 @@ module.exports = {
       storeAs: "content",
       name: "File Content"
     },
+    "-",
+    {
+      element: "html",
+      html: `
+        <button style="width: fit-content;" onclick="
+          const content = document.getElementById('content').value;
+          try {
+            JSON.parse(content);
+            this.style.background = 'green';
+          } catch (error) {
+            this.style.background = 'red';
+          }
+          setTimeout(() => {
+            this.style.background = '';
+          }, 500);
+        "><btext>
+          Validate JSON
+          </btext>
+        </button>
+      `
+    },
+    {
+      element: "text",
+      text: `JSON Validation Button May Not Work If You're Using Variables.<br>Green = Valid JSON<br>Red = Invalid JSON`
+    },
+    "-",
     {
       element: "toggle",
       storeAs: "prettyPrint",

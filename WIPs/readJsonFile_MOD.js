@@ -19,15 +19,16 @@ module.exports = {
       placeholder: "path/to/file.json"
     },
     {
-      element: "store",
-      storeAs: "jsonObject",
-      name: "Store JSON Object As",
-    },
-    {
       element: "input",
       storeAs: "pathToElement",
       name: "Path To Element (Optional)",
       placeholder: "path.to.element | Leave Empty To Read The Whole JSON File",
+    },
+    "-",
+    {
+      element: "store",
+      storeAs: "jsonObject",
+      name: "Store JSON Object As",
     },
     "-",
     {

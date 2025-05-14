@@ -32,6 +32,32 @@ module.exports = {
       storeAs: "content",
       name: "Content",
     },
+    "",
+    {
+      element: "",
+      html: `
+        <button style="width: fit-content;" onclick="
+          const content = document.getElementById('content').value;
+          try {
+            JSON.parse(content);
+            this.style.background = 'green';
+          } catch (error) {
+            this.style.background = 'red';
+          }
+          setTimeout(() => {
+            this.style.background = '';
+          }, 500);
+        "><btext>
+          Validate JSON
+          </btext>
+        </button>
+      `
+    },
+    {
+      element: "",
+      text: `JSON Validation Button May Not Work If You're Using Variables.<br>Green = Valid JSON<br>Red = Invalid JSON`
+    },
+    "-",
     {
       element: "toggle",
       storeAs: "prettyPrint",
@@ -52,7 +78,15 @@ module.exports = {
     function refelm(skipAnimation){
       if (values.data.jsonAction.type == "create"){
         values.UI[2].element = "largeInput"
-      } else {values.UI[2].element = ""}
+        values.UI[3].element = "-"
+        values.UI[4].element = "html"
+        values.UI[5].element = "text"
+      } else {
+        values.UI[2].element = ""
+        values.UI[3].element = ""
+        values.UI[4].element = ""
+        values.UI[5].element = ""
+      }
 
       setTimeout(()=>{
         values.updateUI()
