@@ -21,7 +21,8 @@ module.exports = {
     {
       element: "largeInput",
       storeAs: "content",
-      name: "File Content"
+      name: "File Content",
+      large: true
     },
     "-",
     {

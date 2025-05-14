@@ -31,6 +31,7 @@ module.exports = {
       element: "",
       storeAs: "content",
       name: "Content",
+      large: true
     },
     "",
     {
