@@ -23,6 +23,12 @@ module.exports = {
       storeAs: "jsonObject",
       name: "Store JSON Object As",
     },
+    {
+      element: "input",
+      storeAs: "pathToElement",
+      name: "Path To Element (Optional)",
+      placeholder: "path.to.element | Leave Empty To Read The Whole JSON File",
+    },
     "-",
     {
       element: "text",
@@ -67,6 +73,26 @@ module.exports = {
       jsonObject = {}
     }
 
-    bridge.store(values.jsonObject, jsonObject)
+    let finalResult = jsonObject
+    if (values.pathToElement){
+      let elementPath = bridge.transf(values.pathToElement).trim()
+      if (elementPath.startsWith(`.`)){
+        elementPath.slice(1)
+      }
+
+      try{
+        const keys = elementPath.replace(/\[(\d+)\]/g, `.$1`).split(`.`).filter(Boolean)
+
+        for (const key of keys){
+        if (finalResult && Object.prototype.hasOwnProperty.call(finalResult, key)){
+          finalResult = finalResult[key]
+        } else {finalResult = undefined}
+      }
+      }catch(err){
+        return console.error(`Failed To Parse Path "${elementPath}": ${err.message}`)
+      }
+    }
+
+    bridge.store(values.jsonObject, finalResult)
   }
 }
