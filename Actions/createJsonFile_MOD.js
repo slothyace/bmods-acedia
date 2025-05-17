@@ -107,9 +107,7 @@ module.exports = {
           .map(el => {
             el = el.trim()
             if (el === '') return null
-            if (/^[-+]?[0-9]*\.?[0-9]+$/.test(el)) return `"`+el+`"` // number
-            if (/^".*"$|^'.*'$/.test(el)) return el // already quoted
-            return '"' + el.replace(/"/g, '\\"') + '"' // quote and escape
+            return '"' + el.replace(/^["']|["']$/g, '').replace(/"/g, '\\"') + '"'
           })
           .filter(el => el !== null)
           .join(', ')
