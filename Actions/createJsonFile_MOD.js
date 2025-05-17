@@ -116,6 +116,9 @@ module.exports = {
     }
 
     jsonString = sanitizeArrays(jsonString)
+    if (!/^\s*(\[|\{)/.test(jsonString)) {
+      jsonString = `"${jsonString.replace(/^["']|["']$/g, '').replace(/"/g, '\\"')}"`
+    }
     let jsonObject
 
     try {

@@ -164,7 +164,10 @@ module.exports = {
       })
     }
 
-    sanitizeArrays(rawContent)
+    rawContent = sanitizeArrays(rawContent)
+    if (!/^\s*(\[|\{)/.test(rawContent)) {
+      rawContent = `"${rawContent.replace(/^["']|["']$/g, '').replace(/"/g, '\\"')}"`
+    }
 
     if (objectPath.startsWith(".")) {
       objectPath = objectPath.slice(1)
