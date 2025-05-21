@@ -24,14 +24,14 @@ function modifyFile(filePath){
   }
   
   try {
-    const rawData = fs.readFileSync(inputFilePath, "utf8")
+    const rawData = fs.readFileSync(filePath, "utf8")
     const data = JSON.parse(rawData)
 
     setSilentTrue(data)
 
     const outputFilePath = path.join(
-      path.dirname(inputFilePath),
-      "modified_" + path.basename(inputFilePath)
+      path.dirname(filePath),
+      "modified_" + path.basename(filePath)
     )
 
     fs.writeFileSync(outputFilePath, JSON.stringify(data, null, 2))
