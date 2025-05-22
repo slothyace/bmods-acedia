@@ -2,6 +2,7 @@
 .documentation/ export-ignore
 .github/ export-ignore
 .gitattributes export-ignore
+.abandoned/ export-ignore
 Deprecated/ export-ignore
 WIPs/ export-ignore
 README.md export-ignore
