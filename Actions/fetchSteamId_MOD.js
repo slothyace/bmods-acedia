@@ -62,7 +62,7 @@ module.exports = {
     if (/^\d+$/.test(identifier) == true && identifier != undefined){
       steamId = identifier
     } else if (/^\d+$/.test(identifier) == false && identifier != undefined){
-      const vanityQuery = await fetch(`https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key=${steamApiKey}&vanityurl=${identifier}`)
+      const vanityQuery = await fetch(`https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?key=${steamApiKey}&vanityurl=${identifier}`, {method:"GET", headers: {"Accept":"application/json"}})
       const vanityResponse = await vanityQuery.json()
         if (vanityResponse.response.success == 1) {
             steamId = vanityResponse.response.steamid; // Resolved Steam ID
@@ -75,7 +75,7 @@ module.exports = {
 
     let profileObject
     if (steamId != undefined && values.profileSummary){
-      const profileObjectQuery = await fetch(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${steamApiKey}&steamids=${steamId}`)
+      const profileObjectQuery = await fetch(`https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${steamApiKey}&steamids=${steamId}`, {method:"GET", headers: {"Accept":"application/json"}})
       const profileObjectResponse = await profileObjectQuery.json()
       if (profileObjectResponse.response.players.length > 0) {
         profileObject = profileObjectResponse.response.players[0]
