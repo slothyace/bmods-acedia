@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Loading...</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #111;
+      color: #eee;
+    }
+
+    h1 {
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+      max-width: 1000px;
+      margin: auto;
+      width: 100%;
+    }
+
+    .graph-container {
+      background: #222;
+      border-radius: 8px;
+      padding: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .label {
+      font-size: 1.2rem;
+      margin-bottom: 4px;
+      text-align: left;
+    }
+
+    .value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 4px;
+      text-align: left;
+    }
+
+    .uptime-container {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-top: 10px;
+      color: #4caf50;
+      text-align: left;
+    }
+
+    canvas {
+      background: #000;
+      border-radius: 4px;
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #logBox {
+      background: #000;
+      padding: 1rem;
+      border-radius: 8px;
+      font-family: monospace;
+      height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: left;
+    }
+
+    .log-line {
+      margin-bottom: 4px;
+      display: block;
+      width: 100%;
+      text-align: left;
+      word-break: break-word;
+    }
+
+    .log-error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="banner">Loading...</h1>
+  <div class="grid">
+    <div class="graph-container">
+      <div class="label">Uptime</div>
+      <div id="uptimeValue" class="uptime-container">0 Days 0 Hours 0 Minutes 0 Seconds</div>
+    </div>
+    <div class="graph-container">
+      <div class="label">CPU Usage (%)</div>
+      <canvas id="cpuChart" width="700" height="150"></canvas>
+      <div id="cpuValue" class="value">0%</div>
+    </div>
+    <div class="graph-container">
+      <div class="label">Memory Usage (MB)</div>
+      <canvas id="memChart" width="700" height="150"></canvas>
+      <div id="memValue" class="value">0 MB</div>
+    </div>
+    <div class="graph-container">
+      <div class="label">Logs</div>
+      <div id="logBox"></div>
+    </div>
+  </div>
+
+  <script>
+    const maxPoints = 60;
+    const cpuCanvas = document.getElementById("cpuChart");
+    const memCanvas = document.getElementById("memChart");
+    const cpuCtx = cpuCanvas.getContext("2d");
+    const memCtx = memCanvas.getContext("2d");
+
+    let cpuData = [];
+    let memData = [];
+    let logs = [];
+
+    function drawGraph(ctx, data, maxY, labelFormatter) {
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#4caf50";
+      ctx.beginPath();
+
+      const padding = 40;
+      const w = ctx.canvas.width - padding * 2;
+      const h = ctx.canvas.height - padding * 2;
+      const stepX = w / (maxPoints - 1);
+
+      data.forEach((val, i) => {
+        let x = padding + i * stepX;
+        let y = padding + h - (val / maxY) * h;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      if (data.length > 0) {
+        const lastVal = data[data.length - 1];
+        let x = padding + (data.length - 1) * stepX + 5;
+        let y = padding + h - (lastVal / maxY) * h;
+        ctx.fillStyle = "#fff";
+        ctx.font = "14px Arial";
+        ctx.fillText(labelFormatter(lastVal), x, y + 5);
+      }
+
+      ctx.fillStyle = "#ccc";
+      ctx.font = "12px Arial";
+      ctx.fillText("0", padding - 20, padding + h);
+      ctx.fillText(labelFormatter(maxY), padding - 40, padding + 12);
+    }
+
+    function secondsToDHMS(seconds) {
+      seconds = Math.floor(seconds);
+      const d = Math.floor(seconds / 86400);
+      seconds %= 86400;
+      const h = Math.floor(seconds / 3600);
+      seconds %= 3600;
+      const m = Math.floor(seconds / 60);
+      seconds %= 60;
+      return `${d} Days ${h} Hours ${m} Minutes ${seconds} Seconds`;
+    }
+
+    function addLogLine(line) {
+      const box = document.getElementById("logBox");
+      const div = document.createElement("div");
+      div.className = "log-line" + (line.includes("error") || line.includes("Error") ? " log-error" : "");
+      const now = new Date();
+      const timestamp = now.toLocaleString("en-GB", {
+        day: "2-digit", month: "short", year: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        hour12: false
+      }).replace(",", "").replace(" ", "@");
+      div.textContent = `${timestamp} ${line}`;
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function updateGraphs() {
+      fetch("/monitor/stats")
+        .then(r => r.json())
+        .then(data => {
+          cpuData = data.cpu;
+          memData = data.mem;
+          if (data.name) {
+            document.title = data.name + " Monitor";
+            document.getElementById("banner").textContent = data.name + " Process Monitor";
+          }
+
+          document.getElementById("cpuValue").textContent = cpuData.length ? cpuData[cpuData.length - 1].toFixed(1) + "%" : "0%";
+          document.getElementById("memValue").textContent = memData.length ? memData[memData.length - 1].toFixed(1) + " MB" : "0 MB";
+          document.getElementById("uptimeValue").textContent = secondsToDHMS(data.uptime);
+
+          drawGraph(cpuCtx, cpuData, 100, v => v.toFixed(1) + "%");
+          const memMax = Math.max(...memData, 50);
+          drawGraph(memCtx, memData, memMax, v => v.toFixed(1) + " MB");
+
+          // Logs
+          if (Array.isArray(data.logs)) {
+            logs = data.logs;
+            const box = document.getElementById("logBox");
+            box.innerHTML = "";
+            logs.forEach(addLogLine);
+          }
+        })
+        .catch(err => {
+          addLogLine("Error: " + err.message);
+        });
+    }
+
+    setInterval(updateGraphs, 1000);
+    updateGraphs();
+  </script>
+</body>
+</html>
