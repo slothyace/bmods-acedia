@@ -51,6 +51,8 @@ module.exports = {
     const http = require("node:http")
     const https = require("node:https")
     const os = require("node:os")
+    const path = require("node:path")
+    const fs = require("node:fs")
 
     const host = bridge.transf(values.host) || "0.0.0.0"
     const port = parseInt(bridge.transf(values.port), 10) || 8080
@@ -68,7 +70,7 @@ module.exports = {
     }
 
     let webUiHtmlFile = path.join(workingPath, "webUI", "monitor.html")
-    let webUiDir = path.dirName(webUiHtmlFile)
+    let webUiDir = path.dirname(webUiHtmlFile)
     if (!fs.existsSync(webUiDir)){
       fs.mkdirSync(webUiDir, { recursive: true })
     }
