@@ -2,11 +2,11 @@ modVersion = "u.v1.0"
 module.exports = {
   data: {
     name: "Create Status Page",
-    host: "localhost",
-    port: "19739"
+    host: "0.0.0.0",
+    port: "8080"
   },
   aliases: [],
-  modules: ["node:http", "node:os", "node:fs", "node:path", "node:url"],
+  modules: ["node:http", "node:os", "node:fs", "node:path", "node:url", "node:https"],
   category: "Utilities",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
@@ -18,7 +18,7 @@ module.exports = {
       element: "input",
       storeAs: "host",
       name: "Host",
-      placeholder: "localhost"
+      placeholder: "0.0.0.0 (Available On Local Network)"
     },
     {
       element: "input",
@@ -49,12 +49,49 @@ module.exports = {
     }
 
     const http = require("node:http")
+    const https = require("node:https")
     const os = require("node:os")
-    const host = bridge.transf(values.host) || "localhost"
-    const port = parseInt(bridge.transf(values.port), 10) || 19739
+
+    const host = bridge.transf(values.host) || "0.0.0.0"
+    const port = parseInt(bridge.transf(values.port), 10) || 8080
     const password = bridge.transf(values.password) || ""
+
     const botData = require("../data.json")
     const appName = botData.name || "NodeJS"
+    const workingDir = path.normalize(process.cwd())
+
+    let workingPath
+    if (workingDir.includes(path.join("common", "Bot Maker For Discord"))){
+      workingPath = botData.prjSrc
+    } else {
+      workingPath = workingDir
+    }
+
+    let webUiHtmlFile = path.join(workingPath, "webUI", "monitor.html")
+    let webUiDir = path.dirName(webUiHtmlFile)
+    if (!fs.existsSync(webUiDir)){
+      fs.mkdirSync(webUiDir, { recursive: true })
+    }
+
+    let demoHtmlUrl = ``
+    if (!fs.existsSync(webUiHtmlFile)){
+      console.log(`"monitor.html" Not Found. Downloading...`)
+      https.get(demoHtmlUrl, (res)=>{
+        if (res.statusCode !== 200){
+          console.error(`Failed to download "monitor.html"`)
+          return
+        }
+
+        let data = ""
+        res.on("data", chunk => data += chunk)
+        res.on("end", ()=>{
+          fs.writeFileSync(webUiHtmlFile, data, "utf-8")
+          console.log(`"monitor.html downloaded."`)
+        })
+      }).on("error", (err)=>{
+        console.error(`Error while downloading "monitor.html":`, err)
+      })
+    }
 
     const maxPoints = 300
     const cpuHistory = []
@@ -122,7 +159,6 @@ module.exports = {
 
       if (req.url === "/monitor") {
         res.writeHead(200, { "Content-Type": "text/html" })
-        
       } else if (req.url === "/monitor/stats") {
         res.writeHead(200, { "Content-Type": "application/json" })
         res.end(JSON.stringify({
