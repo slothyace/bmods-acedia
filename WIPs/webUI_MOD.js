@@ -73,10 +73,10 @@ module.exports = {
       fs.mkdirSync(webUiDir, { recursive: true })
     }
 
-    let demoHtmlUrl = ``
+    let coreHtmlUrl = `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/webUi/monitor.html`
     if (!fs.existsSync(webUiHtmlFile)){
       console.log(`"monitor.html" Not Found. Downloading...`)
-      https.get(demoHtmlUrl, (res)=>{
+      https.get(coreHtmlUrl, (res)=>{
         if (res.statusCode !== 200){
           console.error(`Failed to download "monitor.html"`)
           return
