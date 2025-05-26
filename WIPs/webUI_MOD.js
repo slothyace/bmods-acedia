@@ -56,7 +56,7 @@ module.exports = {
 
     const host = bridge.transf(values.host) || "0.0.0.0"
     const port = parseInt(bridge.transf(values.port), 10) || 8080
-    const password = bridge.transf(values.password) || ""
+    const password = bridge.transf(values.password) || "password"
 
     const botData = require("../data.json")
     const appName = botData.name || "NodeJS"
@@ -77,106 +77,34 @@ module.exports = {
 
     let coreHtmlUrl = `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/webUi/monitor.html`
     if (!fs.existsSync(webUiHtmlFile)){
-      console.log(`"monitor.html" Not Found. Downloading...`)
-      https.get(coreHtmlUrl, (res)=>{
-        if (res.statusCode !== 200){
-          console.error(`Failed to download "monitor.html"`)
-          return
-        }
+      try{
+        await new Promise((resolve, reject)=>{
+          https.get(coreHtmlUrl, (response)=>{
+            if(response.statusCode !== 200){
+              reject(new Error(`Failed to download "monitor.html" from GitHub. Status Code: ${response.statusCode}`))
+              return
+            }
 
-        let data = ""
-        res.on("data", chunk => data += chunk)
-        res.on("end", ()=>{
-          fs.writeFileSync(webUiHtmlFile, data, "utf-8")
-          console.log(`"monitor.html downloaded."`)
+            let data = ""
+            response.on("data", chunk => data += chunk)
+            response.on("end", ()=>{
+              try{
+                fs.writeFileSync(webUiHtmlFile, data, "utf-8")
+                console.log(`"monitor.html" downloaded from GitHub.`)
+                resolve()
+              } catch (err){
+                reject(err)
+              }
+            })
+          }).on("error", (err)=>{
+            reject(err)
+          })
         })
-      }).on("error", (err)=>{
-        console.error(`Error while downloading "monitor.html":`, err)
-      })
-    }
-
-    const maxPoints = 300
-    const cpuHistory = []
-    const memHistory = []
-    const logHistory = []
-
-    let lastCPUUsage = process.cpuUsage()
-    let lastTime = process.hrtime()
-
-    function getProcessCPUPercent() {
-      const currentCPU = process.cpuUsage(lastCPUUsage)
-      lastCPUUsage = process.cpuUsage()
-      const currentTime = process.hrtime(lastTime)
-      lastTime = process.hrtime()
-      const elapsedMicroSec = (currentTime[0] * 1e6) + (currentTime[1] / 1000)
-      return ((currentCPU.user + currentCPU.system) / elapsedMicroSec) * 100 || 0
-    }
-
-    function updateStats() {
-      const cpuPercent = getProcessCPUPercent()
-      const memMB = process.memoryUsage().heapUsed / (1024 * 1024)
-      if (cpuHistory.length >= maxPoints) cpuHistory.shift()
-      if (memHistory.length >= maxPoints) memHistory.shift()
-      cpuHistory.push(cpuPercent)
-      memHistory.push(memMB)
-    }
-
-    function formatDate(d = new Date()) {
-      const pad = (n) => n.toString().padStart(2, "0")
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-      return `${pad(d.getDate())}-${months[d.getMonth()]}-${String(d.getFullYear()).slice(-2)}@${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
-    }
-
-    const originalConsoleError = console.error
-    console.error = (...args) => {
-      const msg = args.join(" ")
-      logHistory.push({ msg, ts: formatDate(), error: true })
-      if (logHistory.length > 100) logHistory.shift()
-      originalConsoleError(...args)
-    }
-
-    console.log = ((orig) => (...args) => {
-      const msg = args.join(" ")
-      logHistory.push({ msg, ts: formatDate(), error: false })
-      if (logHistory.length > 100) logHistory.shift()
-      orig(...args)
-    })(console.log)
-
-    setInterval(updateStats, 1000)
-    updateStats()
-
-    function checkAuth(req) {
-      if (!password) return true
-      const auth = req.headers.authorization
-      if (!auth || !auth.startsWith("Basic ")) return false
-      const [user, pass] = Buffer.from(auth.split(" ")[1], "base64").toString().split(":")
-      return pass === password
-    }
-
-    const server = http.createServer((req, res) => {
-      if (!checkAuth(req)) {
-        res.writeHead(401, { "WWW-Authenticate": 'Basic realm="Process Monitor"' })
-        return res.end("Unauthorized")
+      } catch (err){
+        console.error(`Error while downloading "monitor.html" from GitHub:`, err)
       }
+    }
 
-      if (req.url === "/monitor") {
-        res.writeHead(200, { "Content-Type": "text/html" })
-      } else if (req.url === "/monitor/stats") {
-        res.writeHead(200, { "Content-Type": "application/json" })
-        res.end(JSON.stringify({
-          cpu: cpuHistory,
-          mem: memHistory,
-          uptime: process.uptime(),
-          logs: logHistory
-        }))
-      } else {
-        res.writeHead(404)
-        res.end("Not Found")
-      }
-    })
 
-    server.listen(port, host, () => {
-      console.log(`Process Monitor running at http://user:password@${host}:${port}/monitor`)
-    })
   }
 }
