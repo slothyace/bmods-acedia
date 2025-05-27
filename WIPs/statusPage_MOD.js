@@ -113,42 +113,48 @@ module.exports = {
       workingPath = workingDir
     }
 
-    let statusPageHtmlFile = path.join(workingPath, "statusPage", "index.html")
-    let statusPageDir = path.dirname(statusPageHtmlFile)
+    let htmlFilePath = path.join(workingPath, "statusPage", "index.html")
+    let icoFilePath = path.join(workingPath, "statusPage", "bmd.ico")
+    let statusPageDir = path.dirname(htmlFilePath)
     if (!fs.existsSync(statusPageDir)){
       fs.mkdirSync(statusPageDir, { recursive: true })
     }
 
-    let coreHtmlUrl = `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/index.html`
-    if (!fs.existsSync(statusPageHtmlFile)){
-      try{
-        await new Promise((resolve, reject)=>{
-          https.get(coreHtmlUrl, (response)=>{
-            if(response.statusCode !== 200){
-              reject(new Error(`Failed to download "index.html" from GitHub. Status Code: ${response.statusCode}`))
-              return
-            }
-
-            let data = ""
-            response.on("data", chunk => data += chunk)
-            response.on("end", ()=>{
-              try{
-                fs.writeFileSync(statusPageHtmlFile, data, "utf-8")
-                console.log(`"index.html" downloaded from GitHub.`)
-                resolve()
-              } catch (err){
-                reject(err)
+    const siteFiles = {
+      html: {github: `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/index.html`, path: htmlFilePath},
+      ico: {github: `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/bmd.ico`, path: icoFilePath}
+    }
+    for (let coreFile of siteFiles){
+      if (!fs.existsSync(coreFile.path)){
+        try{
+          await new Promise((resolve, reject)=>{
+            https.get(coreFile.site, (response)=>{
+              if(response.statusCode !== 200){
+                reject(new Error(`Failed to download "index.html" from GitHub. Status Code: ${response.statusCode}`))
+                return
               }
+
+              let data = ""
+              response.on("data", chunk => data += chunk)
+              response.on("end", ()=>{
+                try{
+                  fs.writeFileSync(coreFile.path, data, "utf-8")
+                  console.log(`"index.html" downloaded from GitHub.`)
+                  resolve()
+                } catch (err){
+                  reject(err)
+                }
+              })
+            }).on("error", (err)=>{
+              reject(err)
             })
-          }).on("error", (err)=>{
-            reject(err)
           })
-        })
-      } catch (err){
-        console.error(`Error while downloading "index.html" from GitHub:`, err)
+        } catch (err){
+          console.error(`Error while downloading "index.html" from GitHub:`, err)
+        }
       }
     }
-
+    
     let cpuHistory = []
     let memoryHistory = []
     let logHistory = []
