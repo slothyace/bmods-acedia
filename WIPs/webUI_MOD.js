@@ -152,6 +152,7 @@ module.exports = {
     let cpuHistory = []
     let memoryHistory = []
     let logHistory = []
+    let dataHistory = []
 
     // Cpu Usage
     let lastCpuUsage = process.cpuUsage()
@@ -175,14 +176,10 @@ module.exports = {
       const cpuUsagePercent = getProcessCpuPercent()
       const ramUsageMb = getProcessRamMb()
       const timestamp = Date.now()
-      if (cpuHistory.length >= historyCount){
-        cpuHistory.shift()
+      if (dataHistory.length >= historyCount){
+        dataHistory.shift()
       }
-      if (memoryHistory.length >= historyCount){
-        memoryHistory.shift()
-      }
-      cpuHistory.push({timestamp, value: cpuUsagePercent})
-      memoryHistory.push({timestamp, value: ramUsageMb})
+      dataHistory.push({timestamp, cpu: cpuUsagePercent, memory: ramUsageMb})
     }
 
     function createConsoleTimestamp (date = new Date()){
@@ -267,8 +264,7 @@ module.exports = {
             "content-type": "application/json"
           })
           response.end(JSON.stringify({
-            cpu: cpuHistory,
-            memory: memoryHistory,
+            data: dataHistory,
             uptime: process.uptime(),
             logs: logHistory
           }))
