@@ -1,4 +1,4 @@
-modVersion = "s.v1.3"
+modVersion = "s.v1.4"
 module.exports = {
   data: {
     name: "Number Conversions"
