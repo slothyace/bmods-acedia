@@ -3,7 +3,8 @@ module.exports = {
   data: {
     name: "Create Status Page",
     host: "0.0.0.0",
-    port: "8080"
+    port: "8080",
+    historyCount: 60,
   },
   aliases: [],
   modules: ["node:http", "node:os", "node:fs", "node:path", "node:url", "node:https"],
@@ -32,6 +33,13 @@ module.exports = {
       name: "Login Password (Optional)"
     },
     {
+      element: "input",
+      storeAs: "historyCount",
+      name: "History Count (In Seconds)",
+      placeholder: 60
+    },
+    "-",
+    {
       element: "text",
       text: modVersion
     }
@@ -57,6 +65,7 @@ module.exports = {
     const host = bridge.transf(values.host) || "0.0.0.0"
     const port = parseInt(bridge.transf(values.port), 10) || 8080
     const password = bridge.transf(values.password) || "password"
+    const historyCount = parseInt(bridge.transf(values.historyCount)) || 60
 
     const botData = require("../data.json")
     const appName = botData.name || "NodeJS"
@@ -69,19 +78,19 @@ module.exports = {
       workingPath = workingDir
     }
 
-    let webUiHtmlFile = path.join(workingPath, "webUI", "monitor.html")
+    let webUiHtmlFile = path.join(workingPath, "webUI", "index.html")
     let webUiDir = path.dirname(webUiHtmlFile)
     if (!fs.existsSync(webUiDir)){
       fs.mkdirSync(webUiDir, { recursive: true })
     }
 
-    let coreHtmlUrl = `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/webUi/monitor.html`
+    let coreHtmlUrl = `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/webUi/index.html`
     if (!fs.existsSync(webUiHtmlFile)){
       try{
         await new Promise((resolve, reject)=>{
           https.get(coreHtmlUrl, (response)=>{
             if(response.statusCode !== 200){
-              reject(new Error(`Failed to download "monitor.html" from GitHub. Status Code: ${response.statusCode}`))
+              reject(new Error(`Failed to download "index.html" from GitHub. Status Code: ${response.statusCode}`))
               return
             }
 
@@ -90,7 +99,7 @@ module.exports = {
             response.on("end", ()=>{
               try{
                 fs.writeFileSync(webUiHtmlFile, data, "utf-8")
-                console.log(`"monitor.html" downloaded from GitHub.`)
+                console.log(`"index.html" downloaded from GitHub.`)
                 resolve()
               } catch (err){
                 reject(err)
@@ -101,10 +110,131 @@ module.exports = {
           })
         })
       } catch (err){
-        console.error(`Error while downloading "monitor.html" from GitHub:`, err)
+        console.error(`Error while downloading "index.html" from GitHub:`, err)
       }
     }
 
+    let cpuHistory = []
+    let memoryHistory = []
+    let logHistory = []
 
+    // Cpu Usage
+    let lastCpuUsage = process.cpuUsage()
+    let lastCpuTime = process.hrtime()
+    function getProcessCpuPercent(){
+      const currentCpu = process.cpuUsage(lastCpuUsage)
+      const currentTime = process.hrtime(lastCpuTime)
+      lastCpuUsage = process.cpuUsage()
+      lastCpuTime = process.hrtime()
+      const elapsedMicroSeconds = (currentTime[0]*1e6)+(currentTime[1]/1000)
+      const totalCpuUsage = currentCpu.user + currentCpu.system
+      return ((totalCpuUsage/elapsedMicroSeconds)*100).toFixed(2)
+    }
+
+    // Ram Usage
+    function getProcessRamMb(){
+      return (process.memoryUsage().heapUsed/(1024*1024)).toFixed(2)
+    }
+
+    function updateStats(){
+      const cpuUsagePercent = getProcessCpuPercent()
+      const ramUsageMb = getProcessRamMb()
+      if (cpuHistory.length >= historyCount){
+        cpuHistory.shift()
+      }
+      if (memoryHistory.length >= historyCount){
+        memoryHistory.shift()
+      }
+      cpuHistory.push(cpuUsagePercent)
+      memoryHistory.push(ramUsageMb)
+    }
+
+    function createConsoleTimestamp (date = new Date()){
+      const pad = (num)=> num.toString().padStart(2, "0")
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+      return `${pad(date.getDate())}-${months[date.getMonth()]}-${String(date.getFullYear()).slice(-2)}@${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+    }
+
+    const originalConsoleError = console.error
+    console.error = (...args)=>{
+      const msg = args.join(" ")
+      logHistory.push({msg, ts:createConsoleTimestamp(), error:true})
+      if (logHistory.length > 100){
+        logHistory.shift()
+      }
+      originalConsoleError(...args)
+    }
+    console.log =((original)=>(...args)=>{
+      const msg = args.join(" ")
+      logHistory.push({msg, ts:createConsoleTimestamp(), error:false})
+      if (logHistory.length > 100){
+        logHistory.shift()
+      }
+      original(...args)
+    })(console.log)
+
+    setInterval(updateStats, 1000)
+    updateStats()
+
+    function checkAuthorization(request){
+      if (!password){
+        return true
+      }
+      const auth = request.headers.authorization
+      if (!auth || !auth.startsWith("Basic ")){
+        return false
+      }
+      const [user, pass] = Buffer.from(auth.split(" ")[1], "base64").toString().split(":")
+      return pass === password
+    }
+    const server = http.createServer((request, response)=>{
+      if(!checkAuthorization(request)){
+        response.writeHead(401, {
+          "www-authenticate": `Basic realm="Process Monitor"`
+        })
+        return response.end("Unauthorized")
+      }
+
+      let endPoint = request.url
+      switch(endPoint){
+        case "/favicon.ico":
+          const faviconPath = path.join(webUiDir, "favicon.ico")
+          if (fs.existsSync(faviconPath)){
+            response.writeHead(200, {
+              "content-type": "image/x-icon"
+            })
+            fs.createReadStream(faviconPath).pipe(response)
+          }
+          break
+          
+        case "/monitor":
+          response.writeHead(200, {
+            "content-type": "text/html"
+          })
+          fs.createReadStream(webUiHtmlFile).pipe(response)
+          break
+
+        case "/raw":
+          response.writeHead(200, {
+            "content-type": "application/json"
+          })
+          response.end(JSON.stringify({
+            cpu: cpuHistory,
+            memory: memoryHistory,
+            uptime: process.uptime(),
+            logs: logHistory
+          }))
+          break
+
+        default:
+          response.writeHead(404)
+          response.end("Page Not Found")
+          break
+      }
+    })
+
+    server.listen(port=port, host=host, ()=>{
+      console.log(`Status Page Available At "http://user:${password}@${host}:${port}/monitor"`)
+    })
   }
 }
