@@ -121,36 +121,43 @@ module.exports = {
     }
 
     const siteFiles = {
-      html: {github: `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/index.html`, path: htmlFilePath},
-      ico: {github: `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/bmd.ico`, path: icoFilePath}
+      html: {github: `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/index.html`, path: htmlFilePath, name: `index.html`},
+      ico: {github: `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/bmd.ico`, path: icoFilePath, name: `bmd.ico`}
     }
-    for (let coreFile of siteFiles){
-      if (!fs.existsSync(coreFile.path)){
-        try{
-          await new Promise((resolve, reject)=>{
-            https.get(coreFile.site, (response)=>{
-              if(response.statusCode !== 200){
-                reject(new Error(`Failed to download "index.html" from GitHub. Status Code: ${response.statusCode}`))
-                return
+    for (let coreKey in siteFiles) {
+      const file = siteFiles[coreKey];
+
+      if (!fs.existsSync(file.path)) {
+        console.log(`Missing "${file.name}" in ${statusPageDir}, downloading from GitHub.`);
+
+        try {
+          await new Promise((resolve, reject) => {
+            https.get(file.github, (response) => {
+              if (response.statusCode !== 200) {
+                reject(new Error(`Failed to download "${file.name}" from GitHub. Status Code: ${response.statusCode}`));
+                return;
               }
 
-              let data = ""
-              response.on("data", chunk => data += chunk)
-              response.on("end", ()=>{
-                try{
-                  fs.writeFileSync(coreFile.path, data, "utf-8")
-                  console.log(`"index.html" downloaded from GitHub.`)
-                  resolve()
-                } catch (err){
-                  reject(err)
+              const chunks = [];
+
+              response.on("data", (chunk) => chunks.push(chunk));
+
+              response.on("end", () => {
+                try {
+                  const data = Buffer.concat(chunks);
+                  fs.writeFileSync(file.path, data); // No encoding specified so it works for binary too
+                  console.log(`"${file.name}" downloaded from GitHub.`);
+                  resolve();
+                } catch (err) {
+                  reject(err);
                 }
-              })
-            }).on("error", (err)=>{
-              reject(err)
-            })
-          })
-        } catch (err){
-          console.error(`Error while downloading "index.html" from GitHub:`, err)
+              });
+            }).on("error", (err) => {
+              reject(err);
+            });
+          });
+        } catch (err) {
+          console.error(`Error while downloading "${file.name}" from GitHub:`, err);
         }
       }
     }
@@ -237,13 +244,12 @@ module.exports = {
 
       let endPoint = request.url
       switch(endPoint){
-        case "/favicon.ico":
-          const faviconPath = path.join(statusPageDir, "favicon.ico")
-          if (fs.existsSync(faviconPath)){
+        case "/bmd.ico":
+          if (fs.existsSync(icoFilePath)){
             response.writeHead(200, {
               "content-type": "image/x-icon"
             })
-            fs.createReadStream(faviconPath).pipe(response)
+            fs.createReadStream(icoFilePath).pipe(response)
           } else {
             response.writeHead(404)
             response.end("Favicon Not Found!")
@@ -254,14 +260,13 @@ module.exports = {
           response.writeHead(200, {
             "content-type": "text/html"
           })
-          let htmlTemplate = fs.readFileSync(statusPageHtmlFile, "utf-8")
+          let htmlTemplate = fs.readFileSync(htmlFilePath, "utf-8")
           htmlTemplate = htmlTemplate.replaceAll(/\$\{appName\}/g, appName).replaceAll(/\$\{updateInterval\}/g, interval)
           for (let replacement of values.replacements){
             const find = bridge.transf(replacement.data.findText)
             const replace = bridge.transf(replacement.data.replaceText)
             htmlTemplate = htmlTemplate.replaceAll(find, replace)
           }
-          console.log(htmlTemplate)
           response.end(htmlTemplate)
           break
 
