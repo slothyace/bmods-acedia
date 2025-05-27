@@ -31,6 +31,15 @@ module.exports = {
         GeneralisedPrice: {name: "Generalised Price | Result: XX,XXX.xx", field: false}
       }
     },
+    {
+      element: "typedDropdown",
+      storeAs: "decimalNotation",
+      name: "Decimal Notation",
+      choices: {
+        period: {name: `Period "."`, field: false},
+        comma: {name: `Comma ","`, field: false},
+      },
+    },
     "-",
     {
       element: "store",
@@ -54,7 +63,14 @@ module.exports = {
     await client.getMods().require("mathjs");
     const { evaluate } = require("mathjs")
     let conversionType = bridge.transf(values.convType.type);
+    let decimalNotation = bridge.transf(values.decimalNotation.type)
     
+    const switchDecNotation = (num) => {
+      let [whole, dec] = String(num).split(".")
+      whole = whole.replaceAll(",",".")
+      return dec? `${whole},${dec}` : whole
+    }
+
     try {
       let input = 0;
       input = evaluate(bridge.transf(values.OriginalNum));
@@ -136,7 +152,10 @@ module.exports = {
             convertedTxt = `${formatted}.${parts[1]}`
             break
         }
-  
+
+        if (decimalNotation == "comma"){
+          convertedTxt = switchDecNotation(convertedTxt)
+        }
         bridge.store(values.store, convertedTxt);
       }
       
