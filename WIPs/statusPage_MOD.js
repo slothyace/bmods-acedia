@@ -244,7 +244,7 @@ module.exports = {
 
       let endPoint = request.url
       switch(endPoint){
-        case "/bmd.ico":
+        case "/favicon.ico":
           if (fs.existsSync(icoFilePath)){
             response.writeHead(200, {
               "content-type": "image/x-icon"
