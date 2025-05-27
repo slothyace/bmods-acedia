@@ -4,7 +4,7 @@ module.exports = {
     name: "Create Status Page",
     host: "0.0.0.0",
     port: "8080",
-    historyCount: 60,
+    historyCount: 60
   },
   aliases: [],
   modules: ["node:http", "node:os", "node:fs", "node:path", "node:url", "node:https"],
@@ -26,17 +26,51 @@ module.exports = {
       storeAs: "port",
       name: "Port"
     },
-    "-",
     {
       element: "input",
       storeAs: "password",
       name: "Login Password (Optional)"
     },
+    "-",
     {
       element: "input",
       storeAs: "historyCount",
-      name: "History Count (In Seconds)",
+      name: "History Count",
       placeholder: 60
+    },
+    {
+      element: "input",
+      storeAs: "interval",
+      name: "Update Interval (In Seconds)",
+      placeholder: 5
+    },
+    "-",
+    {
+      element: "menu",
+      storeAs: "replacements",
+      name: "HTML Content Replacements",
+      types: {
+        replacements: "replacements"
+      },
+      UItypes: {
+        replacements:{
+          data:{},
+          name: "Replace",
+          preview: "`${option.data.findText} with ${option.data.replaceText}",
+          UI: [
+            {
+              element: "input",
+              storeAs: "findText",
+              name: "Find Text",
+            },
+            {
+              element: "input",
+              storeAs: "replaceText",
+              name: "Replacement Text",
+            },
+          ],
+        },
+      },
     },
     "-",
     {
@@ -66,6 +100,7 @@ module.exports = {
     const port = parseInt(bridge.transf(values.port), 10) || 8080
     const password = bridge.transf(values.password) || "password"
     const historyCount = parseInt(bridge.transf(values.historyCount)) || 60
+    const interval = parseInt(bridge.transf(values.interval))*1000 || 5000
 
     const botData = require("../data.json")
     const appName = botData.name || "NodeJS"
@@ -139,14 +174,15 @@ module.exports = {
     function updateStats(){
       const cpuUsagePercent = getProcessCpuPercent()
       const ramUsageMb = getProcessRamMb()
+      const timestamp = Date.now()
       if (cpuHistory.length >= historyCount){
         cpuHistory.shift()
       }
       if (memoryHistory.length >= historyCount){
         memoryHistory.shift()
       }
-      cpuHistory.push(cpuUsagePercent)
-      memoryHistory.push(ramUsageMb)
+      cpuHistory.push({timestamp, value: cpuUsagePercent})
+      memoryHistory.push({timestamp, value: ramUsageMb})
     }
 
     function createConsoleTimestamp (date = new Date()){
@@ -173,7 +209,7 @@ module.exports = {
       original(...args)
     })(console.log)
 
-    setInterval(updateStats, 1000)
+    setInterval(updateStats, interval)
     updateStats()
 
     function checkAuthorization(request){
@@ -187,6 +223,7 @@ module.exports = {
       const [user, pass] = Buffer.from(auth.split(" ")[1], "base64").toString().split(":")
       return pass === password
     }
+
     const server = http.createServer((request, response)=>{
       if(!checkAuthorization(request)){
         response.writeHead(401, {
@@ -204,14 +241,25 @@ module.exports = {
               "content-type": "image/x-icon"
             })
             fs.createReadStream(faviconPath).pipe(response)
+          } else {
+            response.writeHead(404)
+            response.end("Favicon Not Found!")
           }
           break
-          
+
         case "/monitor":
           response.writeHead(200, {
             "content-type": "text/html"
           })
-          fs.createReadStream(webUiHtmlFile).pipe(response)
+          let htmlTemplate = fs.readFileSync(webUiHtmlFile, "utf-8")
+          htmlTemplate = htmlTemplate.replaceAll(/\$\{appName\}/g, appName).replaceAll(/\$\{updateInterval\}/g, interval)
+          for (let replacement of values.replacements){
+            const find = bridge.transf(replacement.data.findText)
+            const replace = bridge.transf(replacement.data.replaceText)
+            htmlTemplate = htmlTemplate.replaceAll(find, replace)
+          }
+          console.log(htmlTemplate)
+          response.end(htmlTemplate)
           break
 
         case "/raw":
@@ -228,12 +276,12 @@ module.exports = {
 
         default:
           response.writeHead(404)
-          response.end("Page Not Found")
+          response.end("Page Not Found!")
           break
       }
     })
 
-    server.listen(port=port, host=host, ()=>{
+    server.listen(port, host, ()=>{
       console.log(`Status Page Available At "http://user:${password}@${host}:${port}/monitor"`)
     })
   }

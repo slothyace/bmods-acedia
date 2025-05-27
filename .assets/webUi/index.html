@@ -86,6 +86,7 @@
   <script>
     const cpuCtx = document.getElementById("cpuChart").getContext("2d");
     const ramCtx = document.getElementById("ramChart").getContext("2d");
+    const INTERVAL = ${updateInterval};
 
     const generateTimeLabels = (length) => {
       const now = new Date();
@@ -171,14 +172,17 @@
       const res = await fetch("/raw");
       const data = await res.json();
 
-      const labels = generateTimeLabels(data.cpu.length);
+      const labels = data.cpu.map(entry => {
+        const date = new Date(entry.timestamp);
+        return date.toLocaleTimeString();
+      });
 
       cpuChart.data.labels = labels;
-      cpuChart.data.datasets[0].data = data.cpu;
+      cpuChart.data.datasets[0].data = data.cpu.map(entry=> parseFloat(entry.value));
       cpuChart.update();
 
       ramChart.data.labels = labels;
-      ramChart.data.datasets[0].data = data.memory;
+      ramChart.data.datasets[0].data = data.memory.map(entry=> parseFloat(entry.value));
       ramChart.update();
 
       const logOutput = document.getElementById("logOutput");
@@ -193,7 +197,7 @@
       logOutput.scrollTop = logOutput.scrollHeight;
     }
 
-    setInterval(updateData, 1000);
+    setInterval(updateData, INTERVAL);
     updateData();
   </script>
 </body>
