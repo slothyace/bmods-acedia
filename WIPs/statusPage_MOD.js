@@ -113,14 +113,14 @@ module.exports = {
       workingPath = workingDir
     }
 
-    let webUiHtmlFile = path.join(workingPath, "webUI", "index.html")
-    let webUiDir = path.dirname(webUiHtmlFile)
-    if (!fs.existsSync(webUiDir)){
-      fs.mkdirSync(webUiDir, { recursive: true })
+    let statusPageHtmlFile = path.join(workingPath, "statusPage", "index.html")
+    let statusPageDir = path.dirname(statusPageHtmlFile)
+    if (!fs.existsSync(statusPageDir)){
+      fs.mkdirSync(statusPageDir, { recursive: true })
     }
 
-    let coreHtmlUrl = `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/webUi/index.html`
-    if (!fs.existsSync(webUiHtmlFile)){
+    let coreHtmlUrl = `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/index.html`
+    if (!fs.existsSync(statusPageHtmlFile)){
       try{
         await new Promise((resolve, reject)=>{
           https.get(coreHtmlUrl, (response)=>{
@@ -133,7 +133,7 @@ module.exports = {
             response.on("data", chunk => data += chunk)
             response.on("end", ()=>{
               try{
-                fs.writeFileSync(webUiHtmlFile, data, "utf-8")
+                fs.writeFileSync(statusPageHtmlFile, data, "utf-8")
                 console.log(`"index.html" downloaded from GitHub.`)
                 resolve()
               } catch (err){
@@ -232,7 +232,7 @@ module.exports = {
       let endPoint = request.url
       switch(endPoint){
         case "/favicon.ico":
-          const faviconPath = path.join(webUiDir, "favicon.ico")
+          const faviconPath = path.join(statusPageDir, "favicon.ico")
           if (fs.existsSync(faviconPath)){
             response.writeHead(200, {
               "content-type": "image/x-icon"
@@ -248,7 +248,7 @@ module.exports = {
           response.writeHead(200, {
             "content-type": "text/html"
           })
-          let htmlTemplate = fs.readFileSync(webUiHtmlFile, "utf-8")
+          let htmlTemplate = fs.readFileSync(statusPageHtmlFile, "utf-8")
           htmlTemplate = htmlTemplate.replaceAll(/\$\{appName\}/g, appName).replaceAll(/\$\{updateInterval\}/g, interval)
           for (let replacement of values.replacements){
             const find = bridge.transf(replacement.data.findText)
