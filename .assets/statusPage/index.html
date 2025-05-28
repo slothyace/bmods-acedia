@@ -6,21 +6,31 @@
     <title id="tabName">Loading...</title>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
     <style>
+      
     </style>
   </head>
   <body>
     <h1 id="h1-topBanner">Loading...</h1>
     <script>
       let updateInterval = 1000
-      function fetchStatus(){
-        fetch("/raw").then(response => response.json()).then(data=>{
-          document.title = `${data.prjName} Status Page`
-          document.getElementById("h1-topBanner").innerText = `${data.prjName} Status Page`
-          updateInterval = data.updInterval
-        })
+      let initialisedConstant = false
+      let rawData
+      async function fetchRawData(){
+        rawResponse = await fetch("/raw")
+        rawData = await rawResponse.json()
+
+        if(initialisedConstant == false){
+          document.title = `${rawData.prjName} Status Page`
+          document.getElementById("h1-topBanner").innerText = `${rawData.prjName} Status Page`
+          updateInterval = rawData.updInterval
+          initialisedConstant = true
+        }
+        
+        
       }
-      fetchStatus()
-      setInterval(fetchStatus, updateInterval)
+      fetchRawData()
+
+      setInterval(fetchRawData, updateInterval)
     </script>
   </body>
 </html>
