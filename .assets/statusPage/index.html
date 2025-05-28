@@ -11,10 +11,16 @@
   <body>
     <h1 id="h1-topBanner">Loading...</h1>
     <script>
-      fetch("/raw").then(response => response.json()).then(data=>{
-        document.title = `${data.prjName} Status Page`
-        document.getElementById("h1-topBanner").innerText = `${data.prjName} Status Page`
-      })
+      let updateInterval = 1000
+      function fetchStatus(){
+        fetch("/raw").then(response => response.json()).then(data=>{
+          document.title = `${data.prjName} Status Page`
+          document.getElementById("h1-topBanner").innerText = `${data.prjName} Status Page`
+          updateInterval = data.updInterval
+        })
+      }
+      fetchStatus()
+      setInterval(fetchStatus, updateInterval)
     </script>
   </body>
 </html>

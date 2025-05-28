@@ -353,6 +353,7 @@ module.exports = {
           response.end(JSON.stringify({
             prjName: appName,
             data: dataHistory,
+            updInterval: interval,
             uptime: process.uptime(),
             logs: logHistory,
             commands: {
