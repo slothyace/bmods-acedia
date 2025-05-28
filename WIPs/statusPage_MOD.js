@@ -107,7 +107,7 @@ module.exports = {
     const port = parseInt(bridge.transf(values.port), 10) || 8080
     const password = bridge.transf(values.password) || "password"
     const graphHistoryCount = parseInt(bridge.transf(values.graphHistoryCount)) || 60
-    const consoleHistoryCount = parseInt(bridge.transf(values.consoleHistoryCount)) || 100
+    const logsHistoryCount = parseInt(bridge.transf(values.consoleHistoryCount)) || 100
     const interval = parseInt(bridge.transf(values.interval))*1000 || 5000
 
     const botData = require("../data.json")
@@ -171,9 +171,6 @@ module.exports = {
       }
     }
 
-    let logHistory = []
-    let dataHistory = []
-
     // Cpu Usage
     let lastCpuUsage = process.cpuUsage()
     let lastCpuTime = process.hrtime()
@@ -236,7 +233,7 @@ module.exports = {
     let nodeJsVer = process.versions.node
     let ocncJsVer = oceanic.Constants.VERSION
 
-
+    let dataHistory = []
     function updateStats(){
       const cpuUsagePercent = getProcessCpuPercent()
       const ramUsageMb = getProcessRamMb()
@@ -255,13 +252,16 @@ module.exports = {
       })
     }
 
+    // Logs
+    let logHistory = []
     function createConsoleTimestamp (date = new Date()){
       const pad = (num)=> num.toString().padStart(2, "0")
       const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
       return `${pad(date.getDate())}-${months[date.getMonth()]}-${String(date.getFullYear()).slice(-2)}@${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
     }
 
-    function createLogs(logHistory, createConsoleTimestamp, maxLength = consoleHistoryCount){
+
+    function createLogs(logHistory, createConsoleTimestamp, maxLength = logsHistoryCount){
       const consoleMethods = {
         error: console.error,
         warn: console.warn,
@@ -294,6 +294,7 @@ module.exports = {
         }
       })
     }
+    createLogs(logHistory, createConsoleTimestamp, logsHistoryCount)
 
     setInterval(updateStats, interval)
     updateStats()
