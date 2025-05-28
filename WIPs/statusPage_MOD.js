@@ -34,9 +34,15 @@ module.exports = {
     "-",
     {
       element: "input",
-      storeAs: "historyCount",
-      name: "History Count",
+      storeAs: "graphHistoryCount",
+      name: "Graph History Count",
       placeholder: 60
+    },
+    {
+      element: "input",
+      storeAs: "consoleHistoryCount",
+      name: "Console History Count",
+      placeholder: 1000
     },
     {
       element: "input",
@@ -95,11 +101,13 @@ module.exports = {
     const os = require("node:os")
     const path = require("node:path")
     const fs = require("node:fs")
+    const oceanic = require("oceanic.js")
 
     const host = bridge.transf(values.host) || "0.0.0.0"
     const port = parseInt(bridge.transf(values.port), 10) || 8080
     const password = bridge.transf(values.password) || "password"
-    const historyCount = parseInt(bridge.transf(values.historyCount)) || 60
+    const graphHistoryCount = parseInt(bridge.transf(values.graphHistoryCount)) || 60
+    const consoleHistoryCount = parseInt(bridge.transf(values.consoleHistoryCount)) || 100
     const interval = parseInt(bridge.transf(values.interval))*1000 || 5000
 
     const botData = require("../data.json")
@@ -120,50 +128,49 @@ module.exports = {
       fs.mkdirSync(statusPageDir, { recursive: true })
     }
 
+    // Getting Files From GitHub If They Dont Exist
     const siteFiles = {
       html: {github: `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/index.html`, path: htmlFilePath, name: `index.html`},
       ico: {github: `https://raw.githubusercontent.com/slothyace/bmods-acedia/refs/heads/main/.assets/statusPage/bmd.ico`, path: icoFilePath, name: `bmd.ico`}
     }
     for (let coreKey in siteFiles) {
-      const file = siteFiles[coreKey];
+      const file = siteFiles[coreKey]
 
       if (!fs.existsSync(file.path)) {
-        console.log(`Missing "${file.name}" in ${statusPageDir}, downloading from GitHub.`);
+        console.log(`Missing "${file.name}" in ${statusPageDir}, downloading from GitHub.`)
 
         try {
           await new Promise((resolve, reject) => {
             https.get(file.github, (response) => {
               if (response.statusCode !== 200) {
-                reject(new Error(`Failed to download "${file.name}" from GitHub. Status Code: ${response.statusCode}`));
-                return;
+                reject(new Error(`Failed to download "${file.name}" from GitHub. Status Code: ${response.statusCode}`))
+                return
               }
 
-              const chunks = [];
+              const chunks = []
 
-              response.on("data", (chunk) => chunks.push(chunk));
+              response.on("data", (chunk) => chunks.push(chunk))
 
               response.on("end", () => {
                 try {
-                  const data = Buffer.concat(chunks);
-                  fs.writeFileSync(file.path, data); // No encoding specified so it works for binary too
-                  console.log(`"${file.name}" downloaded from GitHub.`);
-                  resolve();
+                  const data = Buffer.concat(chunks)
+                  fs.writeFileSync(file.path, data) // No encoding specified so it works for binary too
+                  console.log(`"${file.name}" downloaded from GitHub.`)
+                  resolve()
                 } catch (err) {
-                  reject(err);
+                  reject(err)
                 }
-              });
+              })
             }).on("error", (err) => {
-              reject(err);
-            });
-          });
+              reject(err)
+            })
+          })
         } catch (err) {
-          console.error(`Error while downloading "${file.name}" from GitHub:`, err);
+          console.error(`Error while downloading "${file.name}" from GitHub:`, err)
         }
       }
     }
-    
-    let cpuHistory = []
-    let memoryHistory = []
+
     let logHistory = []
     let dataHistory = []
 
@@ -185,14 +192,67 @@ module.exports = {
       return (process.memoryUsage().heapUsed/(1024*1024)).toFixed(2)
     }
 
+    let slashCommands = []
+    let textCommands = []
+    let msgCommands = []
+    let userCommands = []
+    let events = []
+    let msgContentCommands = []
+    let anyMessageCommands = []
+    const commands = botData.commands
+    commands.forEach(command =>{
+      switch (command.trigger){
+        case "slashCommand":
+          slashCommands.push(command.customId)
+          break
+
+        case "textCommand":
+          textCommands.push(command.customId)
+          break
+
+        case "event":
+          events.push(command.customId)
+          break
+        
+        case "message":
+          msgCommands.push(command.customId)
+          break
+
+        case "user":
+          userCommands.push(command.customId)
+          break
+
+        case "msgContent":
+          msgContentCommands.push(command.customId)
+          break
+
+        case "anyMessage":
+          anyMessageCommands.push(command.customId)
+      }
+    })
+
+    let guildCount = client.guilds.size
+    let userCount = client.users.size
+    let nodeJsVer = process.versions.node
+    let ocncJsVer = oceanic.Constants.VERSION
+
+
     function updateStats(){
       const cpuUsagePercent = getProcessCpuPercent()
       const ramUsageMb = getProcessRamMb()
       const timestamp = Date.now()
-      if (dataHistory.length >= historyCount){
+      if (dataHistory.length >= graphHistoryCount){
         dataHistory.shift()
       }
-      dataHistory.push({timestamp, cpu: cpuUsagePercent, memory: ramUsageMb})
+      dataHistory.push({
+        timestamp,
+        cpu: cpuUsagePercent,
+        memory: ramUsageMb,
+        counts: {
+          guild: guildCount,
+          users: userCount,
+        },
+      })
     }
 
     function createConsoleTimestamp (date = new Date()){
@@ -201,23 +261,39 @@ module.exports = {
       return `${pad(date.getDate())}-${months[date.getMonth()]}-${String(date.getFullYear()).slice(-2)}@${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
     }
 
-    const originalConsoleError = console.error
-    console.error = (...args)=>{
-      const msg = args.join(" ")
-      logHistory.push({msg, ts:createConsoleTimestamp(), error:true})
-      if (logHistory.length > 100){
-        logHistory.shift()
+    function createLogs(logHistory, createConsoleTimestamp, maxLength = consoleHistoryCount){
+      const consoleMethods = {
+        error: console.error,
+        warn: console.warn,
+        log: console.log,
       }
-      originalConsoleError(...args)
+
+      Object.entries(consoleMethods).forEach(([type, originalFn])=>{
+        console[type] = (...args) => {
+          const fullMsg = args.map(arg =>{
+            if (arg instanceof Error){
+              return arg.stack
+            }
+            if (typeof arg === "object"){
+              return JSON.stringify(arg, null, 2)
+            }
+            return String(arg)
+          }).join(" ")
+
+          logHistory.push({
+            msg: fullMsg,
+            timestamp: createConsoleTimestamp(),
+            type,
+          })
+
+          if(logHistory.length > maxLength){
+            logHistory.shift()
+          }
+
+          originalFn(...args)
+        }
+      })
     }
-    console.log =((original)=>(...args)=>{
-      const msg = args.join(" ")
-      logHistory.push({msg, ts:createConsoleTimestamp(), error:false})
-      if (logHistory.length > 100){
-        logHistory.shift()
-      }
-      original(...args)
-    })(console.log)
 
     setInterval(updateStats, interval)
     updateStats()
@@ -275,9 +351,23 @@ module.exports = {
             "content-type": "application/json"
           })
           response.end(JSON.stringify({
+            prjName: appName,
             data: dataHistory,
             uptime: process.uptime(),
-            logs: logHistory
+            logs: logHistory,
+            commands: {
+              slashCmd: slashCommands.length,
+              textCmd: textCommands.length,
+              msgCmd: msgCommands.length,
+              userCmd: userCommands.length,
+              msgCntCmd: msgContentCommands.length,
+              anyMsgCmd: anyMessageCommands.length,
+              event: events.length,
+            },
+            versions: {
+              node: nodeJsVer,
+              oceanic: ocncJsVer,
+            },
           }))
           break
 
