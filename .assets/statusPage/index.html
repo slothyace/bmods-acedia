@@ -7,31 +7,124 @@
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
     <style>
       body {
-        background-color: #2e2e2e;
+        background-color: #1e1e1e;
       }
-      #statusPageBanner {
+      #statusPageBanner{
+        margin-top: 5px;
+        margin-bottom: 5px;
         font-size: 32px;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color: #ffffff;
         text-align: center;
       }
-      #uptimeBanner {
+      #uptimeBanner{
+        margin-top: 5px;
+        margin-bottom: 5px;
         font-size: 24px;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color: #ffffff;
         text-align: center;
       }
+      #logsBanner{
+        margin-top: 15px;
+        margin-bottom: 15px;
+        font-size: 24px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #ffffff;
+        text-align: center;
+      }
+      #graphBanner{
+        margin-top: 15px;
+        margin-bottom: 15px;
+        font-size: 24px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #ffffff;
+        text-align: center;
+      }
+      .graphGrid{
+        display: grid;
+        align-content: center;
+        justify-content: center;
+        grid-template-columns: repeat(2, 400px);
+        grid-template-rows: repeat(2, 250px);
+        gap: 10px;
+        padding: 10px;
+      }
+      @media (max-width: 600px) {
+        .graphGrid {
+          grid-template-columns: 1fr;
+          grid-template-rows: repeat(4, 200px);
+          width: 300px;
+        }
+      }
+      .graph{
+        background-color: #2e2e2e;
+        border: 1px solid #ffffff;
+        text-align: center;
+        font-size: 1.5rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border-radius: 10px;
+      }
+      canvas{
+        width: 100%;
+        height: 300px;
+      }
     </style>
   </head>
   <body>
     <h1 id="statusPageBanner">Loading...</h1>
-    <div>
-      <h2 id="uptimeBanner">Loading...</h2>
+    <h2 id="uptimeBanner">Loading...</h2>
+    <h2 id="graphBanner">Resource Usage</h2>
+    <div class="graphGrid">
+      <div class="graph" style="grid-column: 1; grid-row: 1;">
+        <h3 style="margin: 0px; font-size: 12px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #ffffff;">CPU Usage</h3>
+        <canvas id="cpuGraph">
+        </canvas>
+      </div>
+      <div class="graph" style="grid-column: 2; grid-row: 1;">
+        <canvas id="memoryGraph">
+        </canvas>
+      </div>
+      <div class="graph" style="grid-column: 1; grid-row: 2;">
+        <canvas id="serversGraph">
+        </canvas>
+      </div>
+      <div class="graph" style="grid-column: 2; grid-row: 2;">
+        <canvas id="usersGraph">
+        </canvas>
+      </div>
     </div>
+    <div class="logsConsole">
+      <h3 id="logsBanner">Logs</h3>
+      <div>
+        <canvas id="console">
+
+        </canvas>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       let updateInterval = 1000
       let initialisedConstant = false
       let rawData
+
+      const htmlCpuGraph = document.getElementById("cpuGraph")
+      let cpuGraph = new Chart(htmlCpuGraph,{
+        type: "line",
+        data: {
+          //labels: [],
+          datasets: [{
+            label: "CPU Usage (%)",
+            data: [],
+            borderColor: "#ff6384",
+            borderWidth: 1,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 2
+          }]
+        }
+      })
+      
 
       const formatUptime = (uptime)=>{
         uptime = Math.floor(Number(uptime))
@@ -56,20 +149,38 @@
           updateInterval = rawData.updInterval
           initialisedConstant = true
         }
-        
+
+        updateCpuGraph()
       }
+
+      function updateCpuGraph(){
+        const cpuData = rawData.data.map(dataPoint =>({
+          x: new Date(dataPoint.timestamp).toLocaleTimeString(),
+          y: dataPoint.cpu
+        }))
+        const timeLabels = rawData.data.map(dataPoint =>(
+          new Date(dataPoint.timestamp).toLocaleTimeString()
+        ))
+        // cpuGraph.data.labels = timeLabels
+        cpuGraph.data.datasets[0].data = cpuData
+        console.log(cpuGraph.data.labels)
+        console.log(cpuGraph.data.datasets[0].data)
+      }
+
       function updateTime(){
         if (rawData && rawData.startTime != null){
           let now = Date.now()
           let startTimestamp = rawData.startTime
-          let timeOnline = (now - startTimestamp)/1000
+          let timeOnline = Math.floor((now - startTimestamp)/1000)
           document.getElementById("uptimeBanner").innerText = `Uptime: ${formatUptime(timeOnline)}`
         }
       }
       
       fetchRawData().then(()=>{
+        updateTime()
         setInterval(updateTime, 1000)
         setInterval(fetchRawData, updateInterval)
+        setInterval(updateCpuGraph, updateInterval)
       })
       
     </script>
