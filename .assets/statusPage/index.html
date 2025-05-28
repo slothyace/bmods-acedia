@@ -10,7 +10,7 @@
     </style>
   </head>
   <body>
-    <h1 id="h1-topBanner">Loading...</h1>
+    <h1 id="statusPageBanner">Loading...</h1>
     <script>
       let updateInterval = 1000
       let initialisedConstant = false
@@ -21,12 +21,12 @@
 
         if(initialisedConstant == false){
           document.title = `${rawData.prjName} Status Page`
-          document.getElementById("h1-topBanner").innerText = `${rawData.prjName} Status Page`
+          document.getElementById("statusPageBanner").innerText = `${rawData.prjName} Status Page`
           updateInterval = rawData.updInterval
           initialisedConstant = true
         }
         
-        
+
       }
       fetchRawData()
 

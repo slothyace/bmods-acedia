@@ -370,7 +370,7 @@ module.exports = {
               node: nodeJsVer,
               oceanic: ocncJsVer,
             },
-          }))
+          }, null, 2))
           break
 
         default:
