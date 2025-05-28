@@ -19,10 +19,27 @@
   </head>
   <body>
     <h1 id="statusPageBanner">Loading...</h1>
+    <div>
+      <h2 id="uptimeBanner">Loading...</h2>
+    </div>
     <script>
       let updateInterval = 1000
       let initialisedConstant = false
       let rawData
+
+      const formatUptime = (uptime)=>{
+        uptime = Math.floor(Number(uptime))
+        let leftOverSeconds = uptime
+        let days = Math.floor(leftOverSeconds/(60*60*24))
+        leftOverSeconds %= (60*60*24)
+        let hours = Math.floor(leftOverSeconds/(60*60))
+        leftOverSeconds %= (60*60)
+        let minutes = Math.floor(leftOverSeconds/60)
+        leftOverSeconds %= 60
+        let seconds = leftOverSeconds
+        return `Uptime: ${days}Day ${hours}Hr ${minutes}Min ${seconds}Sec`
+      }
+
       async function fetchRawData(){
         rawResponse = await fetch("/raw")
         rawData = await rawResponse.json()
