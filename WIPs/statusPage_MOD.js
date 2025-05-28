@@ -113,6 +113,7 @@ module.exports = {
     const botData = require("../data.json")
     const appName = botData.name || "NodeJS"
     const workingDir = path.normalize(process.cwd())
+    const botStartTimestamp = Date.now()
 
     let workingPath
     if (workingDir.includes(path.join("common", "Bot Maker For Discord"))){
@@ -356,6 +357,7 @@ module.exports = {
             data: dataHistory,
             updInterval: interval,
             uptime: process.uptime(),
+            botStartTimestamp: botStartTimestamp,
             logs: logHistory,
             commands: {
               slashCmd: slashCommands.length,
