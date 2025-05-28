@@ -357,7 +357,7 @@ module.exports = {
             data: dataHistory,
             updInterval: interval,
             uptime: process.uptime(),
-            botStartTimestamp: botStartTimestamp,
+            startTime: botStartTimestamp,
             logs: logHistory,
             commands: {
               slashCmd: slashCommands.length,
