@@ -15,6 +15,12 @@
         color: #ffffff;
         text-align: center;
       }
+      #uptimeBanner {
+        font-size: 24px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #ffffff;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
@@ -51,6 +57,7 @@
           initialisedConstant = true
         }
         
+        document.getElementById("uptimeBanner").innerText = `Uptime: ${formatUptime(rawData.uptime)}`
 
       }
       fetchRawData()
