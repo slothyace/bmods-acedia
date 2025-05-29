@@ -1,4 +1,4 @@
-modVersion = "u.v1.0"
+modVersion = "u.v1.7"
 module.exports = {
   data: {
     name: "Create Status Page",
