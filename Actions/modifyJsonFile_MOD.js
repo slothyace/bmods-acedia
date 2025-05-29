@@ -124,7 +124,9 @@ module.exports = {
 
     const forbiddenFiles = [
       path.normalize("AppData/Toolkit/storedData.json"),
-      path.normalize("AppData/data.json")
+      path.normalize("AppData/data.json"),
+      path.normalize("vars.json"),
+      path.normalize("schedules")
     ]
     if (forbiddenFiles.some(fp => fullPath.endsWith(fp))){
       return console.error(`Essential Files Are Not To Be Messed With!!`)
