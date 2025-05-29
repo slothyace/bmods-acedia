@@ -241,7 +241,7 @@ module.exports = {
     function updateStats(){
       const cpuUsagePercent = getProcessCpuPercent()
       const ramUsageMb = getProcessRamMb()
-      const timestamp = Date.now()
+      const timestamp = new Date()
       if (dataHistory.length >= graphHistoryCount){
         dataHistory.shift()
       }
@@ -258,12 +258,6 @@ module.exports = {
 
     // Logs
     let logHistory = []
-    function createConsoleTimestamp (date = new Date()){
-      const pad = (num)=> num.toString().padStart(2, "0")
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-      return `${pad(date.getDate())}-${months[date.getMonth()]}-${String(date.getFullYear()).slice(-2)}@${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
-    }
-
 
     function createLogs(logHistory, createConsoleTimestamp, maxLength = logsHistoryCount){
       const consoleMethods = {
@@ -286,7 +280,7 @@ module.exports = {
 
           logHistory.push({
             msg: fullMsg,
-            timestamp: createConsoleTimestamp(),
+            timestamp: new Date(),
             type,
           })
 
