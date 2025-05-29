@@ -169,9 +169,8 @@
 
       function updateTime(){
         if (rawData && rawData.startTime != null){
-          let now = Date.now()
           let startTimestamp = rawData.startTime
-          let timeOnline = Math.floor((now - startTimestamp)/1000)
+          let timeOnline = Math.floor((new Date() - new Date(startTimestamp))/1000)
           document.getElementById("uptimeBanner").innerText = `Uptime: ${formatUptime(timeOnline)}`
         }
       }

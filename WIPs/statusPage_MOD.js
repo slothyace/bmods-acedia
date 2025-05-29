@@ -116,7 +116,7 @@ module.exports = {
     const botData = require("../data.json")
     const appName = botData.name || "NodeJS"
     const workingDir = path.normalize(process.cwd())
-    const botStartTimestamp = Date.now()
+    const botStartTimestamp = new Date()
 
     let workingPath
     if (workingDir.includes(path.join("common", "Bot Maker For Discord"))){
@@ -259,7 +259,7 @@ module.exports = {
     // Logs
     let logHistory = []
 
-    function createLogs(logHistory, createConsoleTimestamp, maxLength = logsHistoryCount){
+    function createLogs(logHistory, maxLength = logsHistoryCount){
       const consoleMethods = {
         error: console.error,
         warn: console.warn,
@@ -292,7 +292,7 @@ module.exports = {
         }
       })
     }
-    createLogs(logHistory, createConsoleTimestamp, logsHistoryCount)
+    createLogs(logHistory, logsHistoryCount)
 
     setInterval(updateStats, interval)
     updateStats()
