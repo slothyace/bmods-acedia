@@ -2,9 +2,11 @@ modVersion = "u.v1.0"
 module.exports = {
   data: {
     name: "Create Status Page",
-    host: "0.0.0.0",
-    port: "8080",
-    historyCount: 60
+    host: "localhost",
+    port: "3000",
+    graphHistoryCount: 60,
+    consoleHistoryCount: 1000,
+    interval: 2.5
   },
   aliases: [],
   modules: ["node:http", "node:os", "node:fs", "node:path", "node:url", "node:https"],
@@ -104,7 +106,7 @@ module.exports = {
     const oceanic = require("oceanic.js")
 
     const host = bridge.transf(values.host) || "0.0.0.0"
-    const port = parseInt(bridge.transf(values.port), 10) || 8080
+    const port = parseInt(bridge.transf(values.port), 10) || 3000
     const password = bridge.transf(values.password) || "password"
     const graphHistoryCount = parseInt(bridge.transf(values.graphHistoryCount)) || 60
     const logsHistoryCount = parseInt(bridge.transf(values.consoleHistoryCount)) || 100
