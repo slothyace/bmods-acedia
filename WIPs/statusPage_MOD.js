@@ -58,13 +58,14 @@ module.exports = {
       storeAs: "replacements",
       name: "HTML Content Replacements",
       types: {
-        replacements: "replacements"
+        replacements: "replacements",
       },
+      max: 99999,
       UItypes: {
         replacements:{
-          data:{},
+          data: {},
           name: "Replace",
-          preview: "`${option.data.findText} with ${option.data.replaceText}",
+          preview: "`${option.data.findText} with ${option.data.replaceText}`",
           UI: [
             {
               element: "input",
@@ -110,7 +111,7 @@ module.exports = {
     const password = bridge.transf(values.password) || "password"
     const graphHistoryCount = parseInt(bridge.transf(values.graphHistoryCount)) || 60
     const logsHistoryCount = parseInt(bridge.transf(values.consoleHistoryCount)) || 100
-    const interval = parseInt(bridge.transf(values.interval))*1000 || 5000
+    const interval = parseFloat(bridge.transf(values.interval))*1000 || 5000
 
     const botData = require("../data.json")
     const appName = botData.name || "NodeJS"

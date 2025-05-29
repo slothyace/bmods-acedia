@@ -69,11 +69,11 @@ module.exports = {
           "Accept": "application/json",
           "User-Agent": "Other"
         }})
-      if (!vanityResponse.ok || vanityResponse.headers.get("content-type") !== `application/json; charset=UTF-8`){
+      if (!vanityResponse.ok || !vanityResponse.headers.get("content-type").includes(`application/json`)){
         let vanityErrorText = await vanityResponse.text()
         console.error(`HTTP Error! ${vanityErrorText}`)
         steamId = undefined
-      } else if (vanityResponse.headers.get("content-type") === `application/json; charset=UTF-8`){
+      } else if (vanityResponse.headers.get("content-type").includes(`application/json`)){
         const vanityData = await vanityResponse.json()
         if (vanityData.response.success == 1) {
             steamId = vanityData.response.steamid
@@ -94,11 +94,11 @@ module.exports = {
           "Accept": "application/json",
           "User-Agent": "Other"
         }})
-      if (!summaryResponse.ok || summaryResponse.headers.get("content-type") !== `application/json; charset=UTF-8`){
+      if (!summaryResponse.ok || !summaryResponse.headers.get("content-type").includes(`application/json`)){
         let summaryErrorText = await summaryResponse.text()
         console.error(`HTTP Error! ${summaryErrorText}`)
         profileObject = undefined
-      } else if (summaryResponse.headers.get("content-type") === `application/json; charset=UTF-8`){
+      } else if (summaryResponse.headers.get("content-type").includes(`application/json`)){
         const summary = await summaryResponse.json()
         if (summary.response.players.length > 0) {
           profileObject = summary.response.players[0]
