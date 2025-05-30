@@ -1,4 +1,4 @@
-modVersion = "u.v1.8"
+modVersion = "s.v2.0"
 module.exports = {
   data: {
     name: "Create Status Page",
@@ -13,7 +13,7 @@ module.exports = {
   category: "Utilities",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
-    creator: "Acedia",
+    creator: "Acedia & qizzle",
     donate: "https://ko-fi.com/slothyacedia",
   },
   UI: [
