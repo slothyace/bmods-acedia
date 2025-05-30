@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statuspage</title>
+    <link rel="stylesheet" href="C:/Developing/Git/statuspage/style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"
+      defer
+    ></script>
+  </head>
+  <body
+    class="dark:bg-neutral-900 dark:text-white bg-neutral-100 text-black font-sans"
+  >
+    <header class="w-screen h-24 bg-neutral-950 fixed top-0 left-0 z-50">
+      <div class="flex items-center h-full mx-24">
+        <h1 class="text-2xl font-semibold">Dev Statuspage</h1>
+      </div>
+    </header>
+    <div class="flex justify-between mx-16 gap-6 mt-32">
+      <div class="flex flex-col gap-4 w-full">
+        <h1 class="text-xl font-medium">Usage</h1>
+        <div
+          class="flex flex-col gap-4 max-h-[80vh] overflow-y-hidden justify-between h-[80vh]"
+        >
+          <div
+            class="bg-neutral-950 rounded-xl p-4 flex flex-col gap-2 flex-1 min-h-0"
+          >
+            <h1 class="font-semibold">
+              CPU Usage <span class="text-white/25">(in %)</span>
+            </h1>
+            <canvas id="cpuUsageChart" class="flex-1 min-h-0 w-full"></canvas>
+          </div>
+          <div
+            class="bg-neutral-950 rounded-xl p-4 flex flex-col gap-2 flex-1 min-h-0"
+          >
+            <h1 class="font-semibold">
+              Memory Usage <span class="text-white/25">(in MB)</span>
+            </h1>
+            <canvas
+              id="memoryUsageChart"
+              class="flex-1 min-h-0 w-full"
+            ></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col gap-4 w-full">
+        <h1 class="text-xl font-medium">Logs</h1>
+        <div
+          id="console"
+          class="w-full h-[80vh] bg-neutral-950 rounded-xl p-4 flex flex-col gap-2 overflow-y-auto font-mono"
+        >
+          <div class="flex gap-2 items-baseline">
+            <span class="bg-white text-sm px-2 py-1 h-fit rounded-md text-black"
+              >LOG</span
+            >
+            <span
+              title="May 28, 2025, 17:25:47"
+              class="bg-neutral-700 text-sm px-2 py-1 rounded-md"
+              >17:25:47</span
+            >
+            <p class="break-all">
+              Status Page Available At
+              "http://user:password@localhost:3000/monitor"
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mx-16 my-8">
+      <h1 class="text-xl font-medium">Stats</h1>
+      <div class="gap-4 mt-4 grid grid-cols-4">
+        <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+          <h1 class="font-semibold">Uptime</h1>
+          <p>00:01:29:27</p>
+        </div>
+        <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+          <h1 class="font-semibold">Guilds</h1>
+          <p>2</p>
+        </div>
+        <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+          <h1 class="font-semibold">Users</h1>
+          <p>14</p>
+        </div>
+
+        <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+          <h1 class="font-semibold">Project Name</h1>
+          <p>Dev</p>
+        </div>
+        <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+          <h1 class="font-semibold">Start Time</h1>
+          <p>
+            Wed May 28 2025 15:25:47
+            <span class="text-white/40">(2 days ago)</span>
+          </p>
+        </div>
+        <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+          <h1 class="font-semibold">Node.js Version</h1>
+          <p>23.5.0</p>
+        </div>
+        <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+          <h1 class="font-semibold">Oceanic.js Version</h1>
+          <p>1.11.2</p>
+        </div>
+        <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+          <h1 class="font-semibold">Statuspage Version</h1>
+          <p>0.1.0</p>
+        </div>
+      </div>
+      <div>
+        <h1 class="text-xl font-medium mt-6">Commands</h1>
+        <div class="grid grid-cols-4 gap-4 mt-4">
+          <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+            <h1 class="font-semibold">Slash Commands</h1>
+            <p>1</p>
+          </div>
+          <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+            <h1 class="font-semibold">Text Commands</h1>
+            <p>5</p>
+          </div>
+          <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+            <h1 class="font-semibold">Message Commands</h1>
+            <p>0</p>
+          </div>
+          <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+            <h1 class="font-semibold">User Commands</h1>
+            <p>0</p>
+          </div>
+          <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+            <h1 class="font-semibold">Message Count Commands</h1>
+            <p>0</p>
+          </div>
+          <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+            <h1 class="font-semibold">Any Message Commands</h1>
+            <p>0</p>
+          </div>
+          <div class="bg-neutral-950 rounded-xl p-4 flex-1">
+            <h1 class="font-semibold">Events</h1>
+            <p>0</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <div class="mx-16 my-8 text-center">
+        <p class="text-sm text-neutral-500">
+          Powered by
+          <a
+            href="https://github.com/"
+            target="_blank"
+            class="text-blue-500/60 hover:underline"
+            >bmd-statuspage</a
+          >
+        </p>
+        <p class="text-sm text-neutral-500 mt-2">
+          Made with ❤️ by slothyacedia & qizzle
+        </p>
+      </div>
+    </footer>
+  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      const ctx = document.getElementById("cpuUsageChart").getContext("2d");
+
+      const data = {
+        prjName: "Dev",
+        data: [
+          {
+            timestamp: 1748451013971,
+            cpu: "0.00",
+            memory: "23.04",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451018986,
+            cpu: "0.00",
+            memory: "23.06",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451023991,
+            cpu: "0.30",
+            memory: "23.10",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451029002,
+            cpu: "0.00",
+            memory: "23.15",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451034005,
+            cpu: "0.00",
+            memory: "23.19",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451039007,
+            cpu: "0.00",
+            memory: "23.22",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451044009,
+            cpu: "0.00",
+            memory: "23.25",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451049010,
+            cpu: "0.00",
+            memory: "23.27",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451054017,
+            cpu: "0.00",
+            memory: "23.30",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451059019,
+            cpu: "0.00",
+            memory: "23.33",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451064031,
+            cpu: "0.00",
+            memory: "22.59",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451069045,
+            cpu: "0.00",
+            memory: "22.61",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451074056,
+            cpu: "0.00",
+            memory: "22.64",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451079062,
+            cpu: "0.00",
+            memory: "22.69",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451084070,
+            cpu: "0.00",
+            memory: "22.74",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451089079,
+            cpu: "0.00",
+            memory: "22.77",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451094093,
+            cpu: "0.00",
+            memory: "22.79",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451099096,
+            cpu: "0.32",
+            memory: "22.84",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451104108,
+            cpu: "0.00",
+            memory: "22.86",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451109112,
+            cpu: "0.00",
+            memory: "22.89",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451114119,
+            cpu: "0.00",
+            memory: "22.91",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451119134,
+            cpu: "0.00",
+            memory: "22.94",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451124138,
+            cpu: "0.00",
+            memory: "22.97",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451129149,
+            cpu: "0.00",
+            memory: "22.99",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451134155,
+            cpu: "0.00",
+            memory: "23.03",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451139161,
+            cpu: "0.00",
+            memory: "23.06",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451144160,
+            cpu: "0.00",
+            memory: "23.09",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451149161,
+            cpu: "0.00",
+            memory: "23.12",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451154173,
+            cpu: "0.00",
+            memory: "23.14",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451159189,
+            cpu: "0.00",
+            memory: "23.17",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451164203,
+            cpu: "0.00",
+            memory: "23.19",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451169210,
+            cpu: "0.00",
+            memory: "23.22",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451174213,
+            cpu: "0.00",
+            memory: "23.27",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451179215,
+            cpu: "0.00",
+            memory: "23.33",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451184228,
+            cpu: "0.00",
+            memory: "22.59",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451189233,
+            cpu: "0.32",
+            memory: "22.61",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451194234,
+            cpu: "0.00",
+            memory: "22.64",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451199234,
+            cpu: "0.00",
+            memory: "22.68",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451204240,
+            cpu: "0.00",
+            memory: "22.71",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451209248,
+            cpu: "0.00",
+            memory: "22.73",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451214253,
+            cpu: "0.00",
+            memory: "22.76",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451219262,
+            cpu: "0.30",
+            memory: "22.80",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451224270,
+            cpu: "0.00",
+            memory: "22.84",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451229273,
+            cpu: "0.00",
+            memory: "22.89",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451234276,
+            cpu: "0.00",
+            memory: "22.92",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451239280,
+            cpu: "0.00",
+            memory: "22.95",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451244281,
+            cpu: "0.00",
+            memory: "22.97",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451249290,
+            cpu: "0.00",
+            memory: "23.00",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451254293,
+            cpu: "0.00",
+            memory: "23.04",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451259307,
+            cpu: "0.00",
+            memory: "23.07",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451264309,
+            cpu: "0.00",
+            memory: "23.10",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451269319,
+            cpu: "0.00",
+            memory: "23.13",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451274327,
+            cpu: "0.00",
+            memory: "23.15",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451279339,
+            cpu: "0.00",
+            memory: "23.19",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451284339,
+            cpu: "0.00",
+            memory: "23.22",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451289342,
+            cpu: "0.00",
+            memory: "23.27",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451294344,
+            cpu: "0.00",
+            memory: "23.30",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451299358,
+            cpu: "0.00",
+            memory: "23.34",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451304366,
+            cpu: "0.00",
+            memory: "22.62",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+          {
+            timestamp: 1748451309379,
+            cpu: "0.30",
+            memory: "22.76",
+            counts: {
+              guild: 2,
+              users: 14,
+            },
+          },
+        ],
+        updInterval: 5000,
+        uptime: 5372.4951444,
+        startTime: 1748445947329,
+        logs: [
+          {
+            msg: `Status Page Available At "http://user:password@localhost:3000/monitor"`,
+            timestamp: "28-May-25@17:25:47",
+            type: "log",
+          },
+        ],
+        commands: {
+          slashCmd: 1,
+          textCmd: 5,
+          msgCmd: 0,
+          userCmd: 0,
+          msgCntCmd: 0,
+          anyMsgCmd: 0,
+          event: 0,
+        },
+        versions: {
+          node: "23.5.0",
+          oceanic: "1.11.2",
+        },
+      };
+
+      const cpuUsageChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          datasets: [
+            {
+              label: "CPU Usage (%)",
+              data: data.data.map((d) => ({
+                x: d.timestamp,
+                y: parseFloat(d.cpu),
+              })),
+              borderColor: "rgba(75, 192, 192, 1)",
+              backgroundColor: "rgba(75, 192, 192, 0.2)",
+              fill: true,
+            },
+          ],
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          responsive: true,
+          scales: {
+            x: {
+              type: "time",
+              time: {
+                unit: "second",
+                displayFormats: {
+                  second: "HH:mm:ss",
+                },
+              },
+            },
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
+      const memoryUsageChart = new Chart(
+        document.getElementById("memoryUsageChart").getContext("2d"),
+        {
+          type: "line",
+          data: {
+            datasets: [
+              {
+                label: "Memory Usage (MB)",
+                data: data.data.map((d) => ({
+                  x: d.timestamp,
+                  y: parseFloat(d.memory),
+                })),
+                borderColor: "rgba(153, 102, 255, 1)",
+                backgroundColor: "rgba(153, 102, 255, 0.2)",
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            plugins: {
+              legend: {
+                display: false,
+              },
+            },
+            responsive: true,
+            scales: {
+              x: {
+                type: "time",
+                time: {
+                  unit: "second",
+                },
+              },
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        }
+      );
+    });
+
+    const console = document.getElementById("console");
+    const logEntry = document.createElement("div");
+    logEntry.className = "flex gap-2 items-baseline";
+    logEntry.innerHTML = `<span class="bg-white text-sm px-2 py-1 h-fit rounded-md text-black"
+              >LOG</span
+            >
+            <span
+              title="May 28, 2025, 17:25:47"
+              class="bg-neutral-700 text-sm px-2 py-1 rounded-md"
+              >17:25:47</span
+            >
+            <p class="break-all">
+              Status Page Available At
+              "http://user:password@localhost:3000/monitor"
+            </p>`;
+    for (let i = 0; i < 100; i++) {
+      console.appendChild(logEntry.cloneNode(true));
+    }
+    console.scrollTop = console.scrollHeight;
+  </script>
+</html>
