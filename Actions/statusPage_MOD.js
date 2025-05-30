@@ -54,35 +54,6 @@ module.exports = {
     },
     "-",
     {
-      element: "menu",
-      storeAs: "replacements",
-      name: "HTML Content Replacements",
-      types: {
-        replacements: "replacements",
-      },
-      max: 99999,
-      UItypes: {
-        replacements:{
-          data: {},
-          name: "Replace",
-          preview: "`${option.data.findText} with ${option.data.replaceText}`",
-          UI: [
-            {
-              element: "input",
-              storeAs: "findText",
-              name: "Find Text",
-            },
-            {
-              element: "input",
-              storeAs: "replaceText",
-              name: "Replacement Text",
-            },
-          ],
-        },
-      },
-    },
-    "-",
-    {
       element: "text",
       text: modVersion
     }
@@ -336,12 +307,6 @@ module.exports = {
             "content-type": "text/html"
           })
           let htmlTemplate = fs.readFileSync(htmlFilePath, "utf-8")
-          htmlTemplate = htmlTemplate.replaceAll(/\$\{appName\}/g, appName).replaceAll(/\$\{updateInterval\}/g, interval)
-          for (let replacement of values.replacements){
-            const find = bridge.transf(replacement.data.findText)
-            const replace = bridge.transf(replacement.data.replaceText)
-            htmlTemplate = htmlTemplate.replaceAll(find, replace)
-          }
           response.end(htmlTemplate)
           break
 
