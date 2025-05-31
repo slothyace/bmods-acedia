@@ -313,6 +313,7 @@ module.exports = {
     }
 
     const server = http.createServer((request, response)=>{
+      let endPoint = request.url
       if(!checkAuthorization(request)){
         response.writeHead(401, {
           "www-authenticate": `Basic realm="Process Monitor"`
@@ -320,7 +321,6 @@ module.exports = {
         return response.end("Unauthorized")
       }
 
-      let endPoint = request.url
       switch(endPoint){
         case "/favicon.ico":
           if (fs.existsSync(icoFilePath)){
