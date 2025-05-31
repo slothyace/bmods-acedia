@@ -61,6 +61,15 @@ module.exports = {
       name: "Theme",
       placeholder: "default"
     },
+    {
+      element: "text",
+      text: `<div style="text-align=left">
+      Check Out Available Themes On GitHub
+      <button class="hoverablez" style="width: fit-content;" onclick="require('electron').shell.openExternal('https://github.com/slothyace/bmd-statusPage/tree/main/themes')">
+      <btext>Explore Themes</btext>
+      </button>
+      </div>`
+    },
     "-",
     {
       element: "text",
