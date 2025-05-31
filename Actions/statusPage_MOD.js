@@ -2,7 +2,7 @@ modVersion = "s.v2.1"
 
 module.exports = {
   data: {
-    name: "Create Status Page Rework",
+    name: "Create Status Page",
     host: "localhost",
     port: "3000",
     graphHistoryCount: 60,
@@ -10,7 +10,7 @@ module.exports = {
     interval: 2.5,
     theme: "default"
   },
-  aliases: [],
+  aliases: ["Status Page", "Web UI"],
   modules: ["node:http", "node:os", "node:fs", "node:path", "node:url", "node:https"],
   category: "Utilities",
   info: {
