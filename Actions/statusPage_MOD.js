@@ -300,7 +300,7 @@ module.exports = {
       }
     }
     if (missingSiteFiles.length > 0){
-      return console.error(`Files (${missingSiteFiles}) Are Missing To Serve The Page!`)
+      return console.error(`Files (${missingSiteFiles.join(", ")}) Are Missing To Serve The Page!`)
     }
 
     const server = http.createServer((request, response)=>{
