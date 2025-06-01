@@ -103,6 +103,7 @@ module.exports = {
 
     const host = bridge.transf(values.host) || "0.0.0.0"
     const port = parseInt(bridge.transf(values.port), 10) || 3000
+    const username = bridge.transf(values.username) || "user"
     const password = bridge.transf(values.password) || "password"
     const graphHistoryCount = parseInt(bridge.transf(values.graphHistoryCount)) || 60
     const logsHistoryCount = parseInt(bridge.transf(values.consoleHistoryCount)) || 100
