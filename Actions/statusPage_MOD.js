@@ -237,7 +237,7 @@ module.exports = {
 
       if (!fs.existsSync(file.path)) {
         console.log(
-          `Missing "${file.name}" in ${statusPageThemeDir}, downloading from GitHub.`
+          `Missing "${file.name}" in ${file.path}, downloading from GitHub.`
         );
 
         try {
