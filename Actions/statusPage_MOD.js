@@ -388,6 +388,13 @@ module.exports = {
           }, null, 2))
           break
 
+        case "/":
+          response.writeHead(302, {
+            "location": "/monitor"
+          })
+          response.end()
+          break
+
         default:
           response.writeHead(404)
           response.end("Page Not Found!")
