@@ -30,10 +30,16 @@ module.exports = {
       storeAs: "port",
       name: "Port"
     },
+    "-",
+    {
+      element: "input",
+      storeAs: "username",
+      name: "Login Username (Optional, defaults to: user)"
+    },
     {
       element: "input",
       storeAs: "password",
-      name: "Login Password (Optional)"
+      name: "Login Password (Optional, defaults to: password)"
     },
     "-",
     {
@@ -118,9 +124,9 @@ module.exports = {
     let htmlFilePath = path.join(workingPath, "statusPage", "themes", theme, "index.html")
     let icoFilePath = path.join(workingPath, "statusPage", "themes", theme, "bmd.ico")
     let cssFilePath = path.join(workingPath, "statusPage", "themes", theme, "style.css")
-    let statusPageDir = path.dirname(htmlFilePath)
-    if (!fs.existsSync(statusPageDir)){
-      fs.mkdirSync(statusPageDir, { recursive: true })
+    let statusPageThemeDir = path.join(workingPath, "statusPage", "themes", theme)
+    if (!fs.existsSync(statusPageThemeDir)){
+      fs.mkdirSync(statusPageThemeDir, { recursive: true })
     }
 
     // Getting Files From GitHub If They Dont Exist
@@ -133,7 +139,7 @@ module.exports = {
       const file = siteFiles[coreKey]
 
       if (!fs.existsSync(file.path)) {
-        console.log(`Missing "${file.name}" in ${statusPageDir}, downloading from GitHub.`)
+        console.log(`Missing "${file.name}" in ${statusPageThemeDir}, downloading from GitHub.`)
 
         try {
           await new Promise((resolve, reject) => {
@@ -297,8 +303,8 @@ module.exports = {
       if (!auth || !auth.startsWith("Basic ")){
         return false
       }
-      const [user, pass] = Buffer.from(auth.split(" ")[1], "base64").toString().split(":")
-      return pass === password
+      const [loginUser, loginPassword] = Buffer.from(auth.split(" ")[1], "base64").toString().split(":")
+      return loginUser === username && loginPassword === password
     }
 
     let missingSiteFiles = []
@@ -389,7 +395,7 @@ module.exports = {
     })
 
     server.listen(port, host, ()=>{
-      console.log(`Status Page Available At "http://user:${password}@${host}:${port}/monitor"`)
+      console.log(`Status Page Available At "http://${host}:${port}/monitor"`)
     })
   }
 }
