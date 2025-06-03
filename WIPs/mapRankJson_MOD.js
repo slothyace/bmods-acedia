@@ -1,7 +1,7 @@
 modVersion = "u.v1.0"
 module.exports = {
   data: {
-    name: "Map And Sort JSON Data"
+    name: "Map And Sort Object Data"
   },
   aliases: [],
   modules: [],
@@ -27,7 +27,7 @@ module.exports = {
     {
       element: "input",
       storeAs: "defaultValue",
-      name: "Default Value If Item Doesn't Exist",
+      name: "Default Value If Element Doesn't Exist",
     },
     "-",
     {
@@ -84,7 +84,7 @@ module.exports = {
       await client.getMods().require(moduleName)
     }
 
-    let originalData = bridge.get(values.data) || undefined
+    let dataObject = bridge.get(values.data) || undefined
     let objectPath = bridge.transf(values.elementPath).trim()
     let defaultValue = bridge.transf(values.defaultValue)
     let sortType = bridge.transf(values.sortType.type)
@@ -99,7 +99,12 @@ module.exports = {
       objectPath = objectPath.slice(1)
     }
 
-    if (objectPath === "" || objectPath.includes("..") || objectPath.startsWith(".") || objectPath.endsWith(".")){
+    if (
+      objectPath === "" || 
+      objectPath.includes("..") || 
+      objectPath.startsWith(".") || 
+      objectPath.endsWith(".")
+    ){
       return console.error(`Invalid Path: "${objectPath}"`)
     }
 
@@ -112,56 +117,57 @@ module.exports = {
       }
     }
 
-    let result
-    if (typeof originalData === "object"){
-
-      let sortedArray = Object.entries(originalData).map(([id, data])=>({
-        id, data, sortValue: getValueByPath(data, objectPath)
-      }))
-
-      switch(sortType){
-        case "numberInc":
-          sortedArray.sort((a,b)=> {
-            return (Number(b.sortValue)||0) - (Number(a.sortValue)||0)
-          })
-          break
-
-        case "numberDec":
-          sortedArray.sort((a,b)=> {
-            return (Number(a.sortValue)||0) - (Number(b.sortValue)||0)
-          })
-          break
-
-        case "alphabInc":
-          sortedArray.sort((a,b)=> {
-            return String(a.sortValue).localeCompare(String(b.sortValue))
-          })
-          break
-
-        case "alphabDec":
-          sortedArray.sort((a,b)=> {
-            return String(b.sortValue).localeCompare(String(a.sortValue))
-          })
-          break
-      }
-
-      if (returnAmount === "topN"){
-        sortedArray = sortedArray.slice(0, (Number(bridge.transf(values.returnAmount.value))||10))
-      }
-
-      result = {}
-      for (let {id, data} of sortedArray){
-        result[id] = data
-      }
-    } else {
-      result = undefined
+    
+    if (typeof dataObject !== "object"){
       return console.error(`Provided Data Is Not A Valid JSON Object.`)
     }
 
-    if (returnType === "list"){
-      result = Object.entries(result).map(([id, data])=>({
-        id, data, sortValue: getValueByPath(data, objectPath)
-      }))
+    let objectArray = Object.entries(dataObject).map(([id, data])=>({
+      id, data, sortValue: getValueByPath(data, objectPath)
+    }))
+
+    switch(sortType){
+      case "numberInc":
+        objectArray.sort((a,b)=> {
+          return (Number(b.sortValue)||0) - (Number(a.sortValue)||0)
+        })
+        break
+
+      case "numberDec":
+        objectArray.sort((a,b)=> {
+          return (Number(a.sortValue)||0) - (Number(b.sortValue)||0)
+        })
+        break
+
+      case "alphabInc":
+        objectArray.sort((a,b)=> {
+          return String(a.sortValue).localeCompare(String(b.sortValue))
+        })
+        break
+
+      case "alphabDec":
+        objectArray.sort((a,b)=> {
+          return String(b.sortValue).localeCompare(String(a.sortValue))
+        })
+        break
+    }
+
+    if (returnAmount === "topN"){
+      objectArray = objectArray.slice(0, (Number(bridge.transf(values.returnAmount.value))||10))
+    }
+
+    let result
+    switch (returnType){
+      case "list":
+        result = objectArray
+        break
+
+      case "json":
+        result = {}
+        for (let object of objectArray){
+          result[object.id] = object.data
+        }
+        break
     }
 
     bridge.store(values.sorted, result)
