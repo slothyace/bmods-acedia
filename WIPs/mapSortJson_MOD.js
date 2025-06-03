@@ -21,13 +21,13 @@ module.exports = {
     {
       element: "input",
       storeAs: "elementPath",
-      name: "Element Path",
-      placeholder: "path.to.item"
+      name: "Path To Comparison Value",
+      placeholder: "path.to.value"
     },
     {
       element: "input",
       storeAs: "defaultValue",
-      name: "Default Value If Element Doesn't Exist",
+      name: "Default Value",
     },
     "-",
     {
@@ -35,8 +35,8 @@ module.exports = {
       storeAs: "sortType",
       name: "Sort By",
       choices: {
-        numberInc: {name: "Numbers Increasing", field: false},
-        numberDec: {name: "Numbers Decreasing", field: false},
+        numberInc: {name: "Numbers Increasing 0 -> 9", field: false},
+        numberDec: {name: "Numbers Decreasing 9 -> 0", field: false},
         alphabInc: {name: "Alphabet A -> Z", field: false},
         alphabDec: {name: "Alphabet Z -> A", field: false},
       },
@@ -91,7 +91,7 @@ module.exports = {
     let returnAmount = bridge.transf(values.returnAmount.type)
     let returnType = bridge.transf(values.returnType.type)
 
-    if (originalData == undefined){
+    if (dataObject == undefined){
       return console.error(`Please Provide Data!`)
     }
 
@@ -116,7 +116,6 @@ module.exports = {
         return objectValue
       }
     }
-
     
     if (typeof dataObject !== "object"){
       return console.error(`Provided Data Is Not A Valid JSON Object.`)
@@ -129,13 +128,13 @@ module.exports = {
     switch(sortType){
       case "numberInc":
         objectArray.sort((a,b)=> {
-          return (Number(b.sortValue)||0) - (Number(a.sortValue)||0)
+          return (Number(a.sortValue)||0) - (Number(b.sortValue)||0)
         })
         break
 
       case "numberDec":
         objectArray.sort((a,b)=> {
-          return (Number(a.sortValue)||0) - (Number(b.sortValue)||0)
+          return (Number(b.sortValue)||0) - (Number(a.sortValue)||0)
         })
         break
 
