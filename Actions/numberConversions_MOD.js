@@ -9,6 +9,7 @@ module.exports = {
     donate: "https://ko-fi.com/slothyacedia"
   },
   category: "Numbers",
+  aliases: ["Format Numbers"],
   modules: ["mathjs"],
   UI: [
     {
@@ -27,8 +28,8 @@ module.exports = {
         Generalise: {name: "Generalised Expression | Result: 2 d.p. + K/M/B/T", field: false},
         Log2r: {name: "Log2 | Result: 2^n+r", field: false},
         PrimeFactors: {name: "Prime Factors", field: false},
-        Price: {name: "Standard Price | Result: XXXXX.xx", field: false},
-        GeneralisedPrice: {name: "Generalised Price | Result: XX,XXX.xx", field: false}
+        Price: {name: "Price | Result: XXXXX.xx", field: false},
+        GeneralisedPrice: {name: "Standardized Price | Result: XX,XXX.xx", field: false}
       }
     },
     {
