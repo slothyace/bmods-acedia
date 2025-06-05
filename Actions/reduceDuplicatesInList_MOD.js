@@ -1,11 +1,12 @@
-modVersion = "u.v1.0"
+modVersion = "s.v1.0"
 module.exports = {
   data: {
-    name: "Reduce Duplicates In List"
+    name: "Reduce Duplicates In List",
+    symbol: "×",
   },
   aliases: [],
   modules: [],
-  category: "List",
+  category: "Lists",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
     creator: "Acedia",
@@ -17,14 +18,29 @@ module.exports = {
       storeAs: "inputList",
       name: "List",
     },
+    "-",
     {
       element: "typedDropdown",
-      storeAs: "affix",
-      name: "Affix With",
+      storeAs: "affixPos",
+      name: "Affix Position",
       choices: {
-        prefix: {name: "Prefix", field: true, placeholder: "Result: ×5 Example"},
-        suffix: {name: "Suffix", field: true, placeholder: "Result: Example ×5"}
-      }
+        prefix: {name: "Before Element | Example: ×5 Element", field: false},
+        suffix: {name: "After Element | Example: Element ×5", field: false},
+      },
+    },
+    {
+      element: "input",
+      storeAs: "symbol",
+      name: "Multiplier Symbol"
+    },
+    {
+      element: "typedDropdown",
+      storeAs: "multiplierPos",
+      name: "Multiplier Position",
+      choices: {
+        before: {name: "Before Symbol | Example: 5×", field: false},
+        after: {name: "After Symbol | Example: ×5", field: false},
+      },
     },
     "-",
     {
@@ -57,15 +73,32 @@ module.exports = {
       elementMap[element] = (elementMap[element]||0) + 1
     }
 
-    let affixType = bridge.transf(values.affix.type)
-    let affixValue = bridge.transf(values.affix.value) || `×`
+    let affixPosition = bridge.transf(values.affixPos.type)
+    let multiplierPosition = bridge.transf(values.multiplierPos.type)
+    let mergedPositioner = `${multiplierPosition}${affixPosition}`
+    let symbol = bridge.transf(values.symbol) || ""
     let reduced = []
     for (let [item, count] of Object.entries(elementMap)){
-      if (affixType == "prefix" && count > 1){
-        reduced.push(`${affixValue}${count} ${item}`)
-      } else if (affixType == "suffix" && count > 1){
-        reduced.push(`${item} ${affixValue}${count}`)
-      } else {
+      if (count > 1){
+        switch(mergedPositioner){
+          case "beforeprefix":
+            reduced.push(`${count}${symbol} ${item}`)
+            break
+
+          case "afterprefix":
+            reduced.push(`${symbol}${count} ${item}`)
+            break
+
+          case "beforesuffix":
+            reduced.push(`${item} ${count}${symbol}`)
+            break
+
+          case "aftersuffix":
+            reduced.push(`${item} ${symbol}${count}`)
+            break
+        }
+      }
+      else {
         reduced.push(item)
       }
     }
