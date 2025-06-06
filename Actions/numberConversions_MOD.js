@@ -141,7 +141,7 @@ module.exports = {
       input = evaluate(originalExpression)
       let number = parseFloat(input)
 
-      if (!isNaN(number)){
+      if (!isNaN(number) && number <= 1.7e308){
         switch(conversionType){
           case "plain":
           case "Normal":
@@ -262,7 +262,7 @@ module.exports = {
 
         bridge.store(values.store, convertedTxt)
       } else {
-        bridge.store(values.store, `Number Format Not Supported.`)
+        bridge.store(values.store, `Number Format Not Supported Or Is Too Big.`)
       }
 
     } catch (error) {
