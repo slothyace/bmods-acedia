@@ -1,4 +1,4 @@
-modVersion = "s.v2.0"
+modVersion = "v2.1.3"
 module.exports = {
   data: {
     name: "Number Conversions",
@@ -28,7 +28,7 @@ module.exports = {
         sciNot: {name: "Scientific Notation | Example: 1.234×10⁵", field: false},
         generalized: {name: "Generalized Expression | Example: 1.23 + K/M/B/T", field: false},
         log2r: {name: "Log2r | Example: 2³+1", field: false},
-        primeFactors: {name: "Prime Factors | Example: 2³×3²x11", field: true, placeholder: "Prime Maximum | i.e. 10000"},
+        primeFactors: {name: "Prime Factors | Example: 2³×3²x11", field: false},
         price: {name: "Price | Example: 1234.56", field: false},
         standardPrice: {name: "Standardized Price | Example: 1,234.56", field: false},
       }
@@ -107,8 +107,8 @@ module.exports = {
       return String(num).split("").map(char => superscriptMap[char] || char).join("")
     }
 
-    function toNormalScript(num){
-      const superscriptMap = {
+    function parseSuperScript(expression){
+      const normalizeSuperscriptMap = {
         "⁰": "0",
         "¹": "1",
         "²": "2",
@@ -125,13 +125,20 @@ module.exports = {
         "⁽": "(",
         "⁾": ")",
       }
-      return `^${String(num).split("").map(char => superscriptMap[char] || char).join("")}`
+      normalizedExpression = expression.replace(/([0-9.]+)([⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁽⁾]+)/g, (_, base, exponent) =>{
+        let normalizeSuper = exponent.split("").map(char => normalizeSuperscriptMap[char] || char).join("")
+        return `${base}^${normalizeSuper}`
+      })
+
+      return normalizedExpression
     }
+
+    let originalExpression = parseSuperScript(bridge.transf(values.OriginalNum))
 
     let input = 0
     let convertedTxt
     try {
-      input = evaluate(bridge.transf(values.OriginalNum))
+      input = evaluate(originalExpression)
       let number = parseFloat(input)
 
       if (!isNaN(number)){
@@ -192,12 +199,11 @@ module.exports = {
 
           case "primeFactors":
           case "PrimeFactors":
-            let maxPrime = parseInt(bridge.transf(values.convType.value)) || 10000
             const expressAsPF = (num)=>{
               let factors = []
               let divisor = 2
               
-              while (num >= 2 && divisor < maxPrime){ //Hard cap at 1012 digit prime so that the bot doesn't sht itself
+              while (num >= 2 && divisor <= 10000){ //Hard cap divisor at 10k so that the bot doesn't sht itself
                 if (num % divisor === 0){
                   factors.push(divisor)
                   num = num / divisor

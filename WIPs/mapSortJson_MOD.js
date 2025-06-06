@@ -1,4 +1,4 @@
-modVersion = "u.v1.0"
+modVersion = "v1.0.6"
 module.exports = {
   data: {
     name: "Map And Sort Object Data"

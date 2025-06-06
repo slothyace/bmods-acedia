@@ -1,4 +1,4 @@
-modVersion = "u.v1.0"
+modVersion = "v1.0.2"
 module.exports = {
   data: {
     name: "Find Uniques In List"
