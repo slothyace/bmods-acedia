@@ -40,7 +40,10 @@ module.exports = {
                 {name: "Less Than", field: false},
                 {name: "Equals To", field: false},
                 {name: "Not Equals To", field: false},
-                {name: "Matches Regex", field: false}
+                {name: "Matches Regex", field: false},
+                {name: "Starts With", field: false},
+                {name: "Ends With", field: false},
+                {name: "Contains", field: false}
               ],
             },
             {
@@ -126,6 +129,25 @@ module.exports = {
           if (conditionMatch = oriValue.match(new RegExp("^" + compValue + "$", "i"))){
             conditionMatch = true
           }
+          break
+
+        case "Starts With":
+          if(oriValue.startsWith(compValue)){
+            conditionMatch = true
+          }
+          break
+
+        case "Ends With":
+          if(oriValue.endsWith(compValue)){
+            conditionMatch = true
+          }
+          break
+
+        case "Contains":
+          if(oriValue.includes(compValue)){
+            conditionMatch = true
+          }
+          break
       }
 
       if (conditionMatch == true){
