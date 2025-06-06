@@ -1,7 +1,7 @@
 modVersion = "s.v2.0"
 module.exports = {
   data: {
-    name: "Number Conversions"
+    name: "Number Conversions",
   },
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
@@ -28,7 +28,7 @@ module.exports = {
         sciNot: {name: "Scientific Notation | Example: 1.234×10⁵", field: false},
         generalized: {name: "Generalized Expression | Example: 1.23 + K/M/B/T", field: false},
         log2r: {name: "Log2r | Example: 2³+1", field: false},
-        primeFactors: {name: "Prime Factors | Example: 2³×3²x11", field: false},
+        primeFactors: {name: "Prime Factors | Example: 2³×3²x11", field: true, placeholder: "Prime Maximum | i.e. 10000"},
         price: {name: "Price | Example: 1234.56", field: false},
         standardPrice: {name: "Standardized Price | Example: 1,234.56", field: false},
       }
@@ -192,11 +192,12 @@ module.exports = {
 
           case "primeFactors":
           case "PrimeFactors":
+            let maxPrime = parseInt(bridge.transf(values.convType.value)) || 10000
             const expressAsPF = (num)=>{
               let factors = []
               let divisor = 2
               
-              while (num >= 2 && divisor < 1012){ //Hard cap at 1012 digit prime so that the bot doesn't sht itself
+              while (num >= 2 && divisor < maxPrime){ //Hard cap at 1012 digit prime so that the bot doesn't sht itself
                 if (num % divisor === 0){
                   factors.push(divisor)
                   num = num / divisor
