@@ -36,14 +36,17 @@ module.exports = {
               storeAs: "conditionType",
               name: "Operand",
               choices: [
-                {name: "More Than", field: false},
-                {name: "Less Than", field: false},
                 {name: "Equals To", field: false},
                 {name: "Not Equals To", field: false},
+                {name: "More Than", field: false},
+                {name: "More Than / Equals To", field: false},
+                {name: "Less Than", field: false},
+                {name: "Less Than / Equal To", field: false},
                 {name: "Matches Regex", field: false},
                 {name: "Starts With", field: false},
                 {name: "Ends With", field: false},
-                {name: "Contains", field: false}
+                {name: "Contains", field: false},
+                {name: "Is Number", field: false},
               ],
             },
             {
@@ -91,25 +94,37 @@ module.exports = {
 
       switch (conditionType){
         case "More Than":
-          if(oriValue > compValue){
+          if(Number(oriValue) > Number(compValue)){
+            conditionMatch = true
+          }
+          break
+
+        case "More Than / Equals To":
+          if(Number(oriValue) >= Number(compValue)){
             conditionMatch = true
           }
           break
 
         case "Less Than":
-          if(oriValue < compValue){
+          if(Number(oriValue) < Number(compValue)){
+            conditionMatch = true
+          }
+          break
+
+        case "Less Than / Equals To":
+          if(Number(oriValue) <= Number(compValue)){
             conditionMatch = true
           }
           break
 
         case "Equals To":
-          if(oriValue == compValue){
+          if(Number(oriValue) === Number(compValue)){
             conditionMatch = true
           }
           break
 
         case "Not Equals To":
-          if(oriValue != compValue){
+          if(Number(oriValue) !== Number(compValue)){
             conditionMatch = true
           }
           break
@@ -134,6 +149,12 @@ module.exports = {
 
         case "Contains":
           if(oriValue.includes(compValue)){
+            conditionMatch = true
+          }
+          break
+
+        case "Is Number":
+          if(typeof parseFloat(oriValue) === "number" && `${parseFloat(oriValue)}` !== `NaN`){
             conditionMatch = true
           }
           break
