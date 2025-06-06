@@ -1,4 +1,4 @@
-modVersion = "s.v1.1"
+modVersion = "s.v2.0"
 module.exports = {
   data: {
     name: "Better Multiple Comparisons"
@@ -53,21 +53,10 @@ module.exports = {
             },
             "-",
             {
-              element: "toggle",
-              storeAs: "ignore",
-              name: "Do Nothing If Not Matching",
-            },
-            {
               element: "condition",
               storeAs: "true",
               storeActionsAs: "trueActions",
-              name: "If Condition Matches, Run",
-            },
-            {
-              element: "condition",
-              storeAs: "false",
-              storeActionsAs: "falseActions",
-              name: "If Condition Doesn't Match"
+              name: "If True, Run",
             }
           ]
         }
@@ -77,15 +66,9 @@ module.exports = {
       element: "condition",
       storeAs: "else",
       storeActionsAs: "elseActions",
-      name: "If No Matches, Run"
+      name: "If No Matches At All, Run"
     },
     "-",
-    // {
-    //   element: "condition",
-    //   storeAs: "falseBack",
-    //   storeActionsAs: "falseBackActions",
-    //   name: "If Condition Doesn't Match, Run"
-    // },
     {
       element: "text",
       text: modVersion,
@@ -160,14 +143,9 @@ module.exports = {
         await bridge.call(conditionData.true, conditionData.trueActions)
         matches = true
       }
-      else {
-        if(conditionData.ignore == false){
-          await bridge.call(conditionData.false, conditionData.falseActions)
-        }
-      }
     }
 
-    if (!matches){
+    if (matches === false){
       await bridge.call(values.else, values.elseActions)
     }
   }
