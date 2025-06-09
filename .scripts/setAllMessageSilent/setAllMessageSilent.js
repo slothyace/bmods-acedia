@@ -1,6 +1,6 @@
-const fs = require("fs")
-const path = require("path")
-const readline = require("readline")
+const fs = require("node:fs")
+const path = require("node:path")
+const readline = require("node:readline")
 
 function setSilentTrue(obj) {
   if (Array.isArray(obj)) {
@@ -16,15 +16,14 @@ function setSilentTrue(obj) {
   }
 }
 
-function modifyFile(filePath){
-  const baseName = path.basename(filePath)
-  if (baseName !== "data.json") {
-    console.error("❌ The file must be named exactly 'data.json'.")
+function modifyFile(filePath) {
+  if (path.basename(filePath) !== "data.json") {
+    console.error(`File Isn't "data.json"!`)
     return
   }
-  
+
   try {
-    const rawData = fs.readFileSync(filePath, "utf8")
+    const rawData = fs.readFileSync(path.normalize(filePath), "utf-8")
     const data = JSON.parse(rawData)
 
     setSilentTrue(data)
@@ -34,26 +33,21 @@ function modifyFile(filePath){
       "modified_" + path.basename(filePath)
     )
 
-    fs.writeFileSync(outputFilePath, JSON.stringify(data, null, 2))
-    console.log(`✅ Modified file saved as: ${outputFilePath}`)
+    fs.writeFileSync(outputFilePath, JSON.stringify(data, null, 2), "utf-8")
+    console.log(`Modified File Saved As: ${outputFilePath}`)
   } catch (err) {
-    console.error("❌ Failed to process the file:", err.message)
+    console.error("Failed To Process The File:", err.message)
   }
 }
 
-// Get the input file path from the command-line args
-const inputFilePath = process.argv[2]
+// Always prompt user for the file path
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+})
 
-if (inputFilePath) {
-  modifyFile(inputFilePath)
-} else {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  })
-
-  rl.question("📝 Enter the path to the JSON file: ", (answer) => {
-    rl.close()
-    modifyFile(answer.trim())
-  })
-}
+rl.question(`Drag the "data.json" file into this terminal: `, (answer) => {
+  const filePath = answer.trim().replaceAll(`"`, ``)
+  modifyFile(filePath)
+  rl.close()
+})
