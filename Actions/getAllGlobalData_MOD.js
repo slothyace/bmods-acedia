@@ -1,3 +1,4 @@
+modVersion = "v1.0.0"
 module.exports = {
   data: { name: "Get All Global Data" },
   category: "Global Data",
@@ -13,6 +14,10 @@ module.exports = {
       storeAs: "store",
       name: "Store As"
     },
+    {
+      element: "text",
+      text: modVersion
+    }
   ],
 
   subtitle: (values, constants) => {

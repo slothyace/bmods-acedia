@@ -1,3 +1,4 @@
+modVersion = "v1.0.0"
 module.exports = {
   data: {
     name: "Multiple Regex Comparisons",
@@ -54,6 +55,10 @@ module.exports = {
         },
       },
     },
+    {
+      element: "text",
+      text: modVersion,
+    }
   ],
 
   subtitle: (data) => {

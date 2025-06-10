@@ -1,3 +1,4 @@
+modVersion = "v1.0.2 | AcediaQOLs"
 module.exports = {
   data: {
     name: "Multiple Comparisons",
@@ -74,6 +75,10 @@ module.exports = {
         }
       }
     },
+    {
+      element: "text",
+      text: modVersion,
+    }
   ],
 
   subtitle: (data) => {

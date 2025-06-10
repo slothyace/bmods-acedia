@@ -1,7 +1,9 @@
+modVersion = "v1.0.0"
 module.exports = {
   data: {
     name: "Text Conversions",
   },
+  aliases: ["Convert Text", "Base64 Decode", "Base64 Encode", "Binary Encode", "Binary Decode", "URL Encode", "URL Decode", "Uppercase", "Lowercase"],
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
     creator: "Acedia",
@@ -19,8 +21,8 @@ module.exports = {
       storeAs: "convType",
       name: "Conversion",
       choices: {
-        JSONstringify:{name: "JSON to String", field: false},
-        JSONparse:{name: "String to JSON", field: false},
+        // JSONstringify:{name: "JSON to String", field: false},
+        // JSONparse:{name: "String to JSON", field: false},
         URIencode: {name: "URL Encode (Ignores \"?\", \"=\", \"/\", \"&\", \":\")", field: false},
         URIdecode: {name: "URL Decode (Ignores \"?\", \"=\", \"/\", \"&\", \":\")", field: false},
         URIencodeComp: {name: "URL Component Encode (Encodes Everything)", field: false},
@@ -38,6 +40,10 @@ module.exports = {
       element: "store",
       storeAs: "store",
       name: "Store Converted Text As"
+    },
+    {
+      element: "text",
+      text: modVersion,
     }
   ],
 
@@ -53,13 +59,13 @@ module.exports = {
     let convertedTxt;
 
     switch (conversionType) {
-      case "JSONstringify":
-        convertedTxt = JSON.stringify(toConv)
-        break
+      // case "JSONstringify":
+      //   convertedTxt = JSON.stringify(toConv)
+      //   break
 
-      case "JSONparse":
-        convertedTxt = JSON.parse(toConv)
-        break
+      // case "JSONparse":
+      //   convertedTxt = JSON.parse(toConv)
+      //   break
 
       case "URIencode":
         convertedTxt = encodeURI(toConv)

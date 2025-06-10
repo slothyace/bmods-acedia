@@ -1,7 +1,9 @@
+modVersion = "v1.2.0"
 module.exports = {
   data: {
     name: "Extended RCON Commander"
   },
+  aliases: ["Send RCON Command v2"],
   category: "RCON",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
@@ -60,6 +62,10 @@ module.exports = {
       true: "Yes",
       false: "No"
     },
+    {
+      element: "text",
+      text: modVersion,
+    }
   ],
 
   subtitle: (values) => {
@@ -69,6 +75,9 @@ module.exports = {
   compatibility: ["Any"],
 
   async run(values, interaction, client, bridge){
+    for (const moduleName of this.modules){
+      await client.getMods().require(moduleName)
+    }
     const Rcon = require("rcon")
 
     const config = {

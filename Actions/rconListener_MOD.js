@@ -1,3 +1,4 @@
+modVersion = "v1.2.0"
 module.exports = {
   data: {
     name: "RCON Listener",
@@ -60,6 +61,10 @@ module.exports = {
       true: "Yes",
       false: "No"
     },
+    {
+      element: "text",
+      text: modVersion,
+    }
   ],
 
   subtitle: (values) => {
@@ -69,6 +74,9 @@ module.exports = {
   compatibility: ["Any"],
 
   async run(values, interaction, client, bridge){
+    for (const moduleName of this.modules){
+      await client.getMods().require(moduleName)
+    }
     const Rcon = require("rcon")
 
     const config = {

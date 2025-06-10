@@ -1,3 +1,4 @@
+modVersion = "v1.0.0"
 module.exports = {
   data: {
     name: "Get User Mentions In List",
@@ -30,6 +31,10 @@ module.exports = {
       storeAs: "result",
       name: "Store Result As:",
     },
+    {
+      element: "text",
+      text: modVersion,
+    }
   ],
 
   subtitle: (values, constants) => {

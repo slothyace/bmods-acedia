@@ -1,3 +1,4 @@
+modVersion = "v1.0.0"
 module.exports = {
   data: {
     name: "Get Member Multiple Datas",
@@ -54,6 +55,10 @@ module.exports = {
         },
       },
     },
+    {
+      element: "text",
+      text: modVersion,
+    }
   ],
 
   subtitle: (values, constants) => {

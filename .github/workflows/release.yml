@@ -41,6 +41,30 @@ jobs:
           echo "Calculated version: $version"
           echo "version=$version" >> $GITHUB_ENV
 
+      - name: Delete previous releases
+        id: delete_releases
+        run: |
+          echo "Deleting previous releases"
+          releases=$(gh release list --limit 100 --json tagName --jq '.[].tagName')
+          for release in $releases; do
+            gh release delete $release -y
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Delete previous tags
+        id: delete_tags
+        run: |
+          echo "Deleting previous tags"
+          tags=$(git tag)
+          for tag in $tags; do
+            git tag -d $tag
+            git push --delete origin $tag
+          done
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Release
         id: create_release
         run: |
