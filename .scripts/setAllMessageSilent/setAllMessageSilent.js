@@ -40,7 +40,6 @@ function modifyFile(filePath) {
   }
 }
 
-// Always prompt user for the file path
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
