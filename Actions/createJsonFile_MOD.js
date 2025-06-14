@@ -30,12 +30,8 @@ module.exports = {
       html: `
         <button style="width: fit-content;" onclick="
           const content = document.getElementById('content').value;
-          let parsedContent = content
-          .replace(/\$\{.*?\}/g, '"PLACEHOLDER"')
-          .replace(/\{[^\{\}\[\]":,]*?\}/g, '"PLACEHOLDER"')
-          .replace(/<.*?>/g, '"PLACEHOLDER"')
           try {
-            JSON.parse(parsedContent);
+            JSON.parse(content);
             this.style.background = 'green';
           } catch (error) {
             this.style.background = 'red';
