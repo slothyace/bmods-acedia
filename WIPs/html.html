@@ -1,0 +1,67 @@
+`<text>${element.name}${getHelpMenu(element, index)}</text><textarea class="largeInput" style="height: ${element.large ? "600px" : "130px"}; resize: vertical !important;" id="${element.storeAs}" placeholder="${element.placeholder || ""}" onmouseover="variableInsertionData = {accept: true, type: 'indirect'}" onblur="createCheckpoint(); action.data['${element.storeAs}'] = document.getElementById('${element.storeAs}').value;">${action.data[element.storeAs]}<script>
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll("textarea.largeInput").forEach(setupJsonFormatting);
+});
+
+function setupJsonFormatting(textarea) {
+  textarea.addEventListener('keydown', function(e) {
+    const { value, selectionStart: start, selectionEnd: end } = textarea;
+
+    const insertText = (before, after = '') => {
+      textarea.value = value.slice(0, start) + before + after + value.slice(end);
+      textarea.selectionStart = textarea.selectionEnd = start + before.length;
+    };
+
+    const getIndent = () => {
+      const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+      const currentLine = value.slice(lineStart, start);
+      const match = currentLine.match(/^\s*/);
+      return match ? match[0] : '';
+    };
+
+    const pairs = { '{': '}', '[': ']', '"': '"' };
+
+    // Auto-close brackets and quotes
+    if (pairs[e.key] && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      insertText(e.key, pairs[e.key]);
+      textarea.selectionStart = textarea.selectionEnd = start + 1;
+      return;
+    }
+
+    // Smart indent/dedent on Enter
+    if (e.key === 'Enter') {
+      const prevChar = value[start - 1];
+      const nextChar = value[start];
+      const indent = getIndent();
+      const tab = '  ';
+
+      if ((prevChar === '{' && nextChar === '}') || (prevChar === '[' && nextChar === ']')) {
+        e.preventDefault();
+        const insert = `\n${indent}${tab}\n${indent}`;
+        textarea.value = value.slice(0, start) + insert + value.slice(end);
+        textarea.selectionStart = textarea.selectionEnd = start + indent.length + tab.length + 1;
+        return;
+      }
+
+      e.preventDefault();
+      textarea.value = value.slice(0, start) + '\n' + indent + value.slice(end);
+      textarea.selectionStart = textarea.selectionEnd = start + indent.length + 1;
+      return;
+    }
+
+    // Optional: tab key for indent
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      insertText('  ');
+      return;
+    }
+
+    // Skip over closing char if already present
+    if (['}', ']', '"'].includes(e.key) && value[start] === e.key) {
+      e.preventDefault();
+      textarea.selectionStart = textarea.selectionEnd = start + 1;
+    }
+  });
+}
+</script></textarea>`

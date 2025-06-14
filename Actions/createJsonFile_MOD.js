@@ -1,4 +1,4 @@
-modVersion = "v1.0.0"
+modVersion = "v1.0.1"
 module.exports = {
   data: {
     name: "Create JSON File"
@@ -30,8 +30,12 @@ module.exports = {
       html: `
         <button style="width: fit-content;" onclick="
           const content = document.getElementById('content').value;
+          let parsedContent = content
+          .replace(/\$\{.*?\}/g, '"PLACEHOLDER"')
+          .replace(/\{[^\{\}\[\]":,]*?\}/g, '"PLACEHOLDER"')
+          .replace(/<.*?>/g, '"PLACEHOLDER"')
           try {
-            JSON.parse(content);
+            JSON.parse(parsedContent);
             this.style.background = 'green';
           } catch (error) {
             this.style.background = 'red';
