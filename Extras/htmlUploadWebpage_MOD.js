@@ -1,7 +1,9 @@
-modVersion = "v1.0.0"
+modVersion = "v1.0.2"
 module.exports = {
   data: {
-    name: "Start HTML Upload Webpage"
+    name: "Start HTML Upload Webpage",
+    host: "localhost",
+    port: "3001",
   },
   aliases: [],
   modules: ["node:http","node:os","node:fs","node:path","node:url","node:crypto",],
