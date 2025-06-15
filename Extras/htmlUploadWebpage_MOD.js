@@ -1,4 +1,4 @@
-modVersion = "v1.0.4"
+modVersion = "v1.0.5"
 module.exports = {
   data: {
     name: "Start HTML Upload Webpage",
@@ -45,7 +45,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Create HTML View Site`
+    return `Create HTML Upload Webpage ${values.host}:${values.port}/upload`
   },
 
   compatibility: ["Any"],
