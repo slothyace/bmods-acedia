@@ -101,7 +101,13 @@ module.exports = {
               response.writeHead(200, {
                 "content-type": "application/json"
               })
-              response.end(JSON.stringify({success: true, url: returnUrl, fileName: path.join(storageDir, `${fileName}.html`)}))
+              response.end(JSON.stringify(
+                {
+                  success: true,
+                  url: returnUrl,
+                  fileName: fileName,
+                  filePath: path.join(storageDir, `${fileName}.html`)
+                }))
             })
           } else {
             response.writeHead(404)
