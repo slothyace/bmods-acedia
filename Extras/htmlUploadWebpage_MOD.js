@@ -56,11 +56,9 @@ module.exports = {
     }
 
     const http = require("node:http")
-    const os = require("node:os")
     const path = require("node:path")
     const fs = require("node:fs")
     const crypto = require("node:crypto")
-    const oceanic = require("oceanic.js")
 
     const host = bridge.transf(values.host) || "0.0.0.0"
     const port = parseInt(bridge.transf(values.port), 10) || 3000
@@ -103,7 +101,7 @@ module.exports = {
               response.writeHead(200, {
                 "content-type": "application/json"
               })
-              response.end(JSON.stringify({success: true, url: returnUrl, fileName: `${storageDir}/${fileName}.html`}))
+              response.end(JSON.stringify({success: true, url: returnUrl, fileName: path.join(storageDir, `${fileName}.html`)}))
             })
           } else {
             response.writeHead(404)
