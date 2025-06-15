@@ -1,4 +1,4 @@
-modVersion = "v1.0.2"
+modVersion = "v1.0.4"
 module.exports = {
   data: {
     name: "Start HTML Upload Webpage",
@@ -87,7 +87,6 @@ module.exports = {
         case "/upload":
           if (request.method == "POST" && request.headers["uploadpass"] == uploadPassword.trim()){
             let postBody = ""
-            let fileLoc
             request.on("data", (dataChunk)=> (postBody += dataChunk))
             request.on("end", ()=>{
               let json = JSON.parse(postBody)
@@ -95,7 +94,7 @@ module.exports = {
               htmlContent = Buffer.from(htmlContent, "base64").toString("utf-8")
               let fileHash = crypto.createHash("md5").update(htmlContent).digest("hex")
               let fileName = `${Date.now()}-${fileHash}`
-              fileLoc = path.join(storageFolder, `${fileName}.html`)
+              let fileLoc = path.join(storageFolder, `${fileName}.html`)
               fs.writeFileSync(fileLoc, htmlContent, "utf-8")
               let returnUrl = `http://${host}:${port}/${fileName}`
               response.writeHead(200, {
@@ -111,27 +110,31 @@ module.exports = {
             })
           } else {
             response.writeHead(404)
-            response.end(`Invalid Endpoint!`)
+            response.end(`This API Endpoint Only Accepts The "POST" Method!`)
           }
           break
 
         default:
-          let lookForFile = endPoint.replaceAll("/", "")
-          if (fs.existsSync(path.join(storageFolder, `${lookForFile}.html`))){
+          let viewFileName
+          if (endPoint.startsWith("/") == true){
+            viewFileName = endPoint.slice(1)
+          }
+          let completeViewFilePath = path.join(storageFolder, `${viewFileName}.html`)
+          if (fs.existsSync(completeViewFilePath)){
             response.writeHead(200, {
               "content-type": "text/html"
             })
-            fs.createReadStream(path.join(storageFolder, `${lookForFile}.html`)).pipe(response)
+            fs.createReadStream(completeViewFilePath).pipe(response)
           } else {
             response.writeHead(404)
-            response.end(`No File Found!`)
+            response.end(`File "${viewFileName}" Not Found!`)
           }
           break
       }
     })
 
     server.listen(port, host, ()=>{
-      console.log(`Upload Endpoint Started On /upload`)
+      console.log(`Upload Endpoint Started On http://${host}:${port}/upload.`)
     })
   }
 }
