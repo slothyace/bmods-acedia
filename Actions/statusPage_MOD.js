@@ -11,15 +11,7 @@ module.exports = {
     theme: "default",
   },
   aliases: ["Status Page", "Web UI"],
-  modules: [
-    "node:http",
-    "node:os",
-    "node:fs",
-    "node:path",
-    "node:url",
-    "node:https",
-    "node:crypto",
-  ],
+  modules: ["node:http", "node:os", "node:fs", "node:path", "node:url", "node:https", "node:crypto"],
   category: "Utilities",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
@@ -138,10 +130,8 @@ module.exports = {
     const loginSystem = bridge.transf(values.loginSystem.type) || "basic";
 
     // Configs
-    const graphHistoryCount =
-      parseInt(bridge.transf(values.graphHistoryCount)) || 60;
-    const logsHistoryCount =
-      parseInt(bridge.transf(values.consoleHistoryCount)) || 100;
+    const graphHistoryCount = parseInt(bridge.transf(values.graphHistoryCount)) || 60;
+    const logsHistoryCount = parseInt(bridge.transf(values.consoleHistoryCount)) || 100;
     const interval = parseFloat(bridge.transf(values.interval)) * 1000 || 2500;
     const theme = bridge.transf(values.theme) || "default";
 
@@ -160,33 +150,10 @@ module.exports = {
     }
 
     let loginHtmlFilePath = path.join(workingPath, "statusPage", "login.html");
-    let htmlFilePath = path.join(
-      workingPath,
-      "statusPage",
-      "themes",
-      theme,
-      "index.html"
-    );
-    let icoFilePath = path.join(
-      workingPath,
-      "statusPage",
-      "themes",
-      theme,
-      "bmd.ico"
-    );
-    let cssFilePath = path.join(
-      workingPath,
-      "statusPage",
-      "themes",
-      theme,
-      "style.css"
-    );
-    let statusPageThemeDir = path.join(
-      workingPath,
-      "statusPage",
-      "themes",
-      theme
-    );
+    let htmlFilePath = path.join(workingPath, "statusPage", "themes", theme, "index.html");
+    let icoFilePath = path.join(workingPath, "statusPage", "themes", theme, "bmd.ico");
+    let cssFilePath = path.join(workingPath, "statusPage", "themes", theme, "style.css");
+    let statusPageThemeDir = path.join(workingPath, "statusPage", "themes", theme);
     if (!fs.existsSync(statusPageThemeDir)) {
       fs.mkdirSync(statusPageThemeDir, { recursive: true });
     }
@@ -239,9 +206,7 @@ module.exports = {
       const file = siteFiles[coreKey];
 
       if (!fs.existsSync(file.path)) {
-        console.log(
-          `Missing "${file.name}" in ${file.path}, downloading from GitHub.`
-        );
+        console.log(`Missing "${file.name}" in ${file.path}, downloading from GitHub.`);
 
         try {
           await new Promise((resolve, reject) => {
@@ -249,9 +214,7 @@ module.exports = {
               .get(file.github, (response) => {
                 if (response.statusCode !== 200) {
                   reject(
-                    new Error(
-                      `Failed to download "${file.name}" from GitHub. Status Code: ${response.statusCode}`
-                    )
+                    new Error(`Failed to download "${file.name}" from GitHub. Status Code: ${response.statusCode}`)
                   );
                   return;
                 }
@@ -264,9 +227,7 @@ module.exports = {
                   try {
                     const data = Buffer.concat(chunks);
                     fs.writeFileSync(file.path, data); // No encoding specified so it works for binary too
-                    console.log(
-                      `"${file.name}" downloaded from ${file.github}.`
-                    );
+                    console.log(`"${file.name}" downloaded from ${file.github}.`);
                     resolve();
                   } catch (err) {
                     reject(err);
@@ -278,10 +239,7 @@ module.exports = {
               });
           });
         } catch (err) {
-          console.error(
-            `Error while downloading "${file.name}" from GitHub:`,
-            err
-          );
+          console.error(`Error while downloading "${file.name}" from GitHub:`, err);
         }
       }
     }
@@ -422,12 +380,7 @@ module.exports = {
       if (!auth || !auth.startsWith("Basic ")) {
         return false;
       }
-      let [loginUsername, loginPassword] = Buffer.from(
-        auth.split(" ")[1],
-        "base64"
-      )
-        .toString()
-        .split(":");
+      let [loginUsername, loginPassword] = Buffer.from(auth.split(" ")[1], "base64").toString().split(":");
 
       if (
         typeof loginUsername === "string" &&
@@ -479,7 +432,10 @@ module.exports = {
           if (checkToken(request)) {
             return true;
           } else {
-            response.writeHead(301, { location: "/login" });
+            let urlComponents = new URL(request.url, `http://${request.headers.host}`);
+            response.writeHead(301, {
+              location: `/login?redirect=${encodeURIComponent(urlComponents.pathname)}`,
+            });
             response.end();
           }
           break;
@@ -496,13 +452,12 @@ module.exports = {
       }
     }
     if (missingSiteFiles.length > 0) {
-      return console.error(
-        `Files (${missingSiteFiles.join(", ")}) Are Missing To Serve The Page!`
-      );
+      return console.error(`Files (${missingSiteFiles.join(", ")}) Are Missing To Serve The Page!`);
     }
 
     const server = http.createServer((request, response) => {
-      let endPoint = request.url;
+      let baseUrl = new URL(request.url, `http://${request.headers.host}`);
+      let endPoint = baseUrl.pathname;
 
       switch (endPoint) {
         case "/favicon.ico": {
@@ -538,9 +493,17 @@ module.exports = {
         }
 
         case "/login": {
+          let redirectPath = baseUrl.searchParams.get("redirect") || `/monitor`;
+          if (!redirectPath.startsWith("/")) {
+            redirectPath = `/${redirectPath}`;
+          }
+          if (redirectPath.startsWith("//")) {
+            redirectPath = `/monitor`;
+          }
+
           if (loginSystem === "token" && request.method === "GET") {
             if (checkToken(request)) {
-              response.writeHead(301, { location: "/monitor" });
+              response.writeHead(301, { location: redirectPath });
               response.end();
             } else {
               response.writeHead(200, {
@@ -557,6 +520,7 @@ module.exports = {
               postBody = JSON.parse(postBody);
               let loginUsername = postBody.username;
               let loginPassword = postBody.password;
+              let successRedirect = postBody.redirect || redirectPath;
               if (
                 typeof loginUsername === "string" &&
                 typeof loginPassword === "string" &&
@@ -569,22 +533,16 @@ module.exports = {
                   "content-type": "application/json",
                   "set-cookie": `spToken=${newToken}; HttpOnly; Path=/; SameSite=Lax`,
                 });
-                response.end(JSON.stringify({ success: true }, null, 2));
+                response.end(JSON.stringify({ success: true, redirect: successRedirect }, null, 2));
               } else {
                 response.writeHead(401, {
                   "content-type": "application/json",
                 });
-                response.end(
-                  JSON.stringify(
-                    { success: false, error: "Invalid Login" },
-                    null,
-                    2
-                  )
-                );
+                response.end(JSON.stringify({ success: false, error: "Invalid Login" }, null, 2));
               }
             });
           } else if (loginSystem === "basic") {
-            response.writeHead(301, { location: "/monitor" });
+            response.writeHead(301, { location: redirectPath });
             response.end();
           }
           break;
@@ -595,9 +553,7 @@ module.exports = {
             response.writeHead(200, {
               "content-type": "text/html",
             });
-            fs.createReadStream(htmlFilePath, { encoding: "utf-8" }).pipe(
-              response
-            );
+            fs.createReadStream(htmlFilePath, { encoding: "utf-8" }).pipe(response);
           }
           break;
         }
