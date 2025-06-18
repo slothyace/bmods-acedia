@@ -31,23 +31,26 @@ module.exports = {
       element: "input",
       storeAs: "host",
       name: "Host",
-      placeholder: "0.0.0.0 (Available On Local Network)",
+      placeholder: "localhost",
     },
     {
       element: "input",
       storeAs: "port",
       name: "Port",
+      placeholder: "3000",
     },
     "-",
     {
       element: "input",
       storeAs: "username",
       name: "Login Username (Optional, defaults to: user)",
+      placeholder: "user",
     },
     {
       element: "input",
       storeAs: "password",
       name: "Login Password (Optional, defaults to: password)",
+      placeholder: "password",
     },
     {
       element: "typedDropdown",
@@ -78,7 +81,7 @@ module.exports = {
       element: "input",
       storeAs: "interval",
       name: "Update Interval (In Seconds)",
-      placeholder: 5,
+      placeholder: 2.5,
     },
     "-",
     {
@@ -126,7 +129,7 @@ module.exports = {
     const oceanic = require("oceanic.js");
 
     // Service
-    const host = bridge.transf(values.host) || "0.0.0.0";
+    const host = bridge.transf(values.host) || "localhost";
     const port = parseInt(bridge.transf(values.port), 10) || 3000;
 
     // Credentials
@@ -139,7 +142,7 @@ module.exports = {
       parseInt(bridge.transf(values.graphHistoryCount)) || 60;
     const logsHistoryCount =
       parseInt(bridge.transf(values.consoleHistoryCount)) || 100;
-    const interval = parseFloat(bridge.transf(values.interval)) * 1000 || 5000;
+    const interval = parseFloat(bridge.transf(values.interval)) * 1000 || 2500;
     const theme = bridge.transf(values.theme) || "default";
 
     // Data Fetching
@@ -341,18 +344,18 @@ module.exports = {
       }
     });
 
-    // Client Info
-    let guildCount = client.guilds.size;
-    let userCount = client.users.size;
-    let nodeJsVer = process.versions.node;
-    let ocncJsVer = oceanic.Constants.VERSION;
+    // Version Contants
+    const nodeJsVer = process.versions.node;
+    const ocncJsVer = oceanic.Constants.VERSION;
 
     // Creating Data For Graphs
     let dataHistory = [];
     function updateStats() {
-      const cpuUsagePercent = getProcessCpuPercent();
-      const ramUsageMb = getProcessRamMb();
-      const timestamp = new Date();
+      let cpuUsagePercent = getProcessCpuPercent();
+      let ramUsageMb = getProcessRamMb();
+      let timestamp = new Date();
+      let guildCount = client.guilds.size;
+      let userCount = client.users.size;
       if (dataHistory.length >= graphHistoryCount) {
         dataHistory.shift();
       }
@@ -411,21 +414,31 @@ module.exports = {
     updateStats();
 
     // Basic Authorization Method
-    function checkAuthorization(request) {
+    function checkBasic(request) {
       if (!password) {
         return true;
       }
-      const auth = request.headers.authorization;
+      let auth = request.headers.authorization;
       if (!auth || !auth.startsWith("Basic ")) {
         return false;
       }
-      const [loginUser, loginPassword] = Buffer.from(
+      let [loginUsername, loginPassword] = Buffer.from(
         auth.split(" ")[1],
         "base64"
       )
         .toString()
         .split(":");
-      return loginUser === username && loginPassword === password;
+
+      if (
+        typeof loginUsername === "string" &&
+        typeof loginPassword === "string" &&
+        loginUsername === username &&
+        loginPassword === password
+      ) {
+        return true;
+      } else {
+        return false;
+      }
     }
 
     // Token Authorization Method
@@ -447,6 +460,33 @@ module.exports = {
       }
     }
 
+    // Consolidated Function
+    function checkAuthenticated(request, response) {
+      switch (loginSystem) {
+        case "basic": {
+          if (checkBasic(request)) {
+            return true;
+          } else {
+            response.writeHead(401, {
+              "www-authenticate": `Basic realm="Status Page"`,
+            });
+            response.end("Unauthorized");
+          }
+          break;
+        }
+
+        case "token": {
+          if (checkToken(request)) {
+            return true;
+          } else {
+            response.writeHead(301, { location: "/login" });
+            response.end();
+          }
+          break;
+        }
+      }
+    }
+
     // Checking For Missing Files
     let missingSiteFiles = [];
     for (let key in siteFiles) {
@@ -463,17 +503,9 @@ module.exports = {
 
     const server = http.createServer((request, response) => {
       let endPoint = request.url;
-      if (loginSystem === "basic") {
-        if (!checkAuthorization(request)) {
-          response.writeHead(401, {
-            "www-authenticate": `Basic realm="Process Monitor"`,
-          });
-          return response.end("Unauthorized");
-        }
-      }
 
       switch (endPoint) {
-        case "/favicon.ico":
+        case "/favicon.ico": {
           if (fs.existsSync(icoFilePath)) {
             response.writeHead(200, {
               "content-type": "image/x-icon",
@@ -484,8 +516,9 @@ module.exports = {
             response.end("Favicon Not Found!");
           }
           break;
+        }
 
-        case "/style.css":
+        case "/style.css": {
           if (fs.existsSync(cssFilePath)) {
             response.writeHead(200, {
               "content-type": "text/css",
@@ -496,120 +529,81 @@ module.exports = {
             response.end("Style.css Not Found!");
           }
           break;
+        }
 
-        case "/":
+        case "/": {
           response.writeHead(301, { location: "/monitor" });
           response.end();
           break;
+        }
 
-        case "/login":
-          if (loginSystem === "token") {
-            if (request.method === "GET") {
-              if (checkToken(request) == false) {
-                response.writeHead(200, {
-                  "content-type": "text/html",
-                });
-                let loginPageHtml = fs.readFileSync(loginHtmlFilePath, "utf-8");
-                response.end(loginPageHtml);
-              } else {
-                response.writeHead(301, { location: "/monitor" });
-                response.end();
-              }
-            } else if (request.method === "POST") {
-              let postBody = "";
-              request.on("data", (dataChunk) => (postBody += dataChunk));
-              request.on("end", () => {
-                postBody = JSON.parse(postBody);
-                let loginUsername = postBody.username;
-                let loginPassword = postBody.password;
-                if (loginUsername === username && loginPassword === password) {
-                  const newToken = crypto.randomBytes(32).toString("hex");
-                  activeTokens.push(newToken);
-                  response.writeHead(302, {
-                    "content-type": "application/json",
-                    "set-cookie": `spToken=${newToken}; HttpOnly; Path=/; SameSite=Lax`,
-                    location: "/monitor",
-                  });
-                  response.end(JSON.stringify({ success: true }, null, 2));
-                } else {
-                  response.writeHead(401, {
-                    "content-type": "application/json",
-                  });
-                  response.end(
-                    JSON.stringify(
-                      { success: false, error: "Invalid Login" },
-                      null,
-                      2
-                    )
-                  );
-                }
-              });
-            }
-          } else if (loginSystem === "basic") {
-            response.writeHead(301, { location: "/monitor" });
-            response.end();
-          }
-          break;
-
-        case "/monitor":
-          if (loginSystem === "token") {
-            if (checkToken(request) == false) {
-              response.writeHead(301, { location: "/login" });
+        case "/login": {
+          if (loginSystem === "token" && request.method === "GET") {
+            if (checkToken(request)) {
+              response.writeHead(301, { location: "/monitor" });
               response.end();
             } else {
               response.writeHead(200, {
                 "content-type": "text/html",
               });
-              let htmlTemplate = fs.readFileSync(htmlFilePath, "utf-8");
-              response.end(htmlTemplate);
+              fs.createReadStream(loginHtmlFilePath, {
+                encoding: "utf-8",
+              }).pipe(response);
             }
+          } else if (loginSystem === "token" && request.method === "POST") {
+            let postBody = "";
+            request.on("data", (dataChunk) => (postBody += dataChunk));
+            request.on("end", () => {
+              postBody = JSON.parse(postBody);
+              let loginUsername = postBody.username;
+              let loginPassword = postBody.password;
+              if (
+                typeof loginUsername === "string" &&
+                typeof loginPassword === "string" &&
+                loginUsername === username &&
+                loginPassword === password
+              ) {
+                const newToken = crypto.randomBytes(32).toString("hex");
+                activeTokens.push(newToken);
+                response.writeHead(200, {
+                  "content-type": "application/json",
+                  "set-cookie": `spToken=${newToken}; HttpOnly; Path=/; SameSite=Lax`,
+                });
+                response.end(JSON.stringify({ success: true }, null, 2));
+              } else {
+                response.writeHead(401, {
+                  "content-type": "application/json",
+                });
+                response.end(
+                  JSON.stringify(
+                    { success: false, error: "Invalid Login" },
+                    null,
+                    2
+                  )
+                );
+              }
+            });
           } else if (loginSystem === "basic") {
+            response.writeHead(301, { location: "/monitor" });
+            response.end();
+          }
+          break;
+        }
+
+        case "/monitor": {
+          if (checkAuthenticated(request, response) == true) {
             response.writeHead(200, {
               "content-type": "text/html",
             });
-            let htmlTemplate = fs.readFileSync(htmlFilePath, "utf-8");
-            response.end(htmlTemplate);
+            fs.createReadStream(htmlFilePath, { encoding: "utf-8" }).pipe(
+              response
+            );
           }
           break;
+        }
 
-        case "/raw":
-          if (loginSystem === "token") {
-            if (checkToken(request) == false) {
-              response.writeHead(301, { location: "/login" });
-              response.end();
-            } else {
-              response.writeHead(200, {
-                "content-type": "application/json",
-              });
-              response.end(
-                JSON.stringify(
-                  {
-                    prjName: appName,
-                    data: dataHistory,
-                    updInterval: interval,
-                    uptime: process.uptime(),
-                    startTime: botStartTimestamp,
-                    logs: logHistory,
-                    commands: {
-                      slashCmd: slashCommands.length,
-                      textCmd: textCommands.length,
-                      msgCmd: msgCommands.length,
-                      userCmd: userCommands.length,
-                      msgCntCmd: msgContentCommands.length,
-                      anyMsgCmd: anyMessageCommands.length,
-                      event: events.length,
-                    },
-                    versions: {
-                      node: nodeJsVer,
-                      oceanic: ocncJsVer,
-                    },
-                  },
-                  null,
-                  2
-                )
-              );
-            }
-          } else if (loginSystem === "basic") {
+        case "/raw": {
+          if (checkAuthenticated(request, response) == true) {
             response.writeHead(200, {
               "content-type": "application/json",
             });
@@ -642,11 +636,13 @@ module.exports = {
             );
           }
           break;
+        }
 
-        default:
+        default: {
           response.writeHead(404);
           response.end("Page Not Found!");
           break;
+        }
       }
     });
 
