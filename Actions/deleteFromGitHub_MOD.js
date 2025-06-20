@@ -5,7 +5,7 @@ module.exports = {
     branch: "main"
   },
   aliases: [],
-  modules: ["node:fs", "node:path", "node:crypto"],
+  modules: ["node:fs", "node:path"],
   category: "WebAPIs",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
@@ -54,7 +54,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Delete Content (${remotePath}) To GitHub`
+    return `Delete Content (${values.remotePath}) From GitHub`
   },
 
   compatibility: ["Any"],
