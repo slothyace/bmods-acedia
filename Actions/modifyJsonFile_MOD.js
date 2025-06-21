@@ -1,4 +1,4 @@
-modVersion = "v1.0.2"
+modVersion = "v1.0.5"
 module.exports = {
   data: {
     name: "Modify JSON File"
@@ -17,11 +17,6 @@ module.exports = {
       storeAs: "pathToJson",
       name: "Path To JSON File",
       placeholder: "path/to/file.json"
-    },
-    {
-      element: "toggle",
-      storeAs: "createIfMissing",
-      name: "Create File If Missing",
     },
     {
       element: "typedDropdown",
@@ -76,9 +71,14 @@ module.exports = {
     },
     "-",
     {
-      element: "toggle",
-      storeAs: "prettyPrint",
-      name: "Pretty Print?",
+      element: "toggleGroup",
+      storeAs: ["createIfMissing", "prettyPrint"],
+      nameSchemes: ["Create File If Missing", "Pretty Print?"],
+    },
+    {
+      element: "store",
+      storeAs: "modifiedJson",
+      name: "Store Modified JSON As"
     },
     "-",
     {
@@ -94,15 +94,15 @@ module.exports = {
   script: (values) =>{
     function refelm(skipAnimation){
       if (values.data.jsonAction.type == "create"){
-        values.UI[3].element = "largeInput"
-        values.UI[4].element = "-"
-        values.UI[5].element = "html"
-        values.UI[6].element = "text"
+        values.UI[2].element = "largeInput"
+        values.UI[3].element = "-"
+        values.UI[4].element = "html"
+        values.UI[5].element = "text"
       } else {
+        values.UI[2].element = ""
         values.UI[3].element = ""
         values.UI[4].element = ""
         values.UI[5].element = ""
-        values.UI[6].element = ""
       }
 
       setTimeout(()=>{
@@ -125,7 +125,7 @@ module.exports = {
     }
 
     const path = require("node:path")
-    const fs = bridge.fs
+    const fs = require("node:fs")
     
     const botData = require("../data.json")
     const workingDir = path.normalize(process.cwd())
@@ -137,6 +137,8 @@ module.exports = {
     let pathToJson = path.normalize(bridge.transf(values.pathToJson))
 
     let fullPath = path.join(path.normalize(projectFolder), pathToJson)
+    let parsedPath = path.parse(fullPath)
+    fullPath = path.join(parsedPath.dir, parsedPath.name + ".json")
 
     const forbiddenFiles = [
       path.normalize("AppData/Toolkit/storedData.json"),
@@ -149,6 +151,12 @@ module.exports = {
     }
     if (!fs.existsSync(fullPath)){
       if (values.createIfMissing === true){
+
+        let dirName = path.dirname(fullPath)
+        if (!fs.existsSync(dirName)){
+          fs.mkdirSync(dirName, { recursive: true })
+        }
+
         fs.writeFileSync(fullPath, JSON.stringify({}, null))
       } else {
         return console.error(`File ${fullPath} Doesn't Exist!`)
@@ -251,5 +259,6 @@ module.exports = {
     } else {finalContent = JSON.stringify(jsonObject, null)}
 
     fs.writeFileSync(fullPath, finalContent)
+    bridge.store(values.modifiedJson, jsonObject)
   }
 }
