@@ -1,4 +1,4 @@
-modVersion = "v1.0.1"
+modVersion = "v1.0.2"
 module.exports = {
   data: {
     name: "Modify JSON File"
@@ -17,6 +17,11 @@ module.exports = {
       storeAs: "pathToJson",
       name: "Path To JSON File",
       placeholder: "path/to/file.json"
+    },
+    {
+      element: "toggle",
+      storeAs: "createIfMissing",
+      name: "Create File If Missing",
     },
     {
       element: "typedDropdown",
@@ -89,15 +94,15 @@ module.exports = {
   script: (values) =>{
     function refelm(skipAnimation){
       if (values.data.jsonAction.type == "create"){
-        values.UI[2].element = "largeInput"
-        values.UI[3].element = "-"
-        values.UI[4].element = "html"
-        values.UI[5].element = "text"
+        values.UI[3].element = "largeInput"
+        values.UI[4].element = "-"
+        values.UI[5].element = "html"
+        values.UI[6].element = "text"
       } else {
-        values.UI[2].element = ""
         values.UI[3].element = ""
         values.UI[4].element = ""
         values.UI[5].element = ""
+        values.UI[6].element = ""
       }
 
       setTimeout(()=>{
@@ -143,7 +148,11 @@ module.exports = {
       return console.error(`Essential Files Are Not To Be Messed With!!`)
     }
     if (!fs.existsSync(fullPath)){
-      return console.error(`File ${fullPath} Doesn't Exist!`)
+      if (values.createIfMissing === true){
+        fs.writeFileSync(fullPath, JSON.stringify({}, null))
+      } else {
+        return console.error(`File ${fullPath} Doesn't Exist!`)
+      }
     }
 
     const originalFileContent = fs.readFileSync(fullPath, "utf8")
