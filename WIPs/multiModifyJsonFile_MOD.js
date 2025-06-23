@@ -243,7 +243,7 @@ module.exports = {
 
     let jsonObjectClone = JSON.parse(JSON.stringify(jsonObject));
 
-    for (let modification of modifications) {
+    for (let modification of values.modifications) {
       modificationData = modification.data;
       let actionType = bridge.transf(modificationData.jsonAction.type);
       let objectPath = bridge.transf(modificationData.jsonAction.value);
