@@ -27,7 +27,7 @@ module.exports = {
     },
     "-",
     {
-      element: "",
+      element: "html",
       html: `
         <button
           style="width: fit-content"

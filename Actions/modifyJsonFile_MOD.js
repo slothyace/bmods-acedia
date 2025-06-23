@@ -28,13 +28,13 @@ module.exports = {
       },
     },
     {
-      element: "",
+      element: "largeInput",
       storeAs: "content",
       name: "Content",
     },
-    "",
+    "-",
     {
-      element: "",
+      element: "html",
       html: `
         <button
           style="width: fit-content"
