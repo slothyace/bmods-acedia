@@ -291,7 +291,7 @@ module.exports = {
 
         case "delete": {
           delete target[lastKey];
-          cleanEmpty(jsonObject, keys);
+          cleanEmpty(jsonObjectClone, keys);
           break;
         }
       }
@@ -299,9 +299,9 @@ module.exports = {
 
     let finalContent;
     if (values.prettyPrint === true) {
-      finalContent = JSON.stringify(jsonObject, null, 2);
+      finalContent = JSON.stringify(jsonObjectClone, null, 2);
     } else {
-      finalContent = JSON.stringify(jsonObject, null);
+      finalContent = JSON.stringify(jsonObjectClone, null);
     }
 
     fs.writeFileSync(fullPath, finalContent);
