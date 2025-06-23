@@ -305,6 +305,6 @@ module.exports = {
     }
 
     fs.writeFileSync(fullPath, finalContent);
-    bridge.store(values.modifiedJson, jsonObject);
+    bridge.store(values.modifiedJson, jsonObjectClone);
   },
 };
