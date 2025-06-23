@@ -33,7 +33,8 @@ module.exports = {
           style="width: fit-content"
           class="hoverablez"
           onclick="
-                  const content = document.getElementById('content').value;
+                  const textArea = document.getElementById('content');
+                  const content = textArea.value;
                   const btext = this.querySelector('#buttonText');
 
                   if (!this.dataset.fixedSize) {
@@ -43,13 +44,16 @@ module.exports = {
                   }
 
                   try {
-                    JSON.parse(content);
+                    let parsed = JSON.parse(content);
+                    let formatted = JSON.stringify(parsed, null, 2);
                     this.style.background = '#28a745';
                     btext.textContent = 'Valid';
-                    document.getElementById('content').value = JSON.stringify(JSON.parse(content), null, 2);
-                    let textLength = document.getElementById('content').value.length;
-                    document.getElementById('content').focus();
-                    document.getElementById('content').setSelectionRange(textLength, textLength);
+                    if (content !== formatted){
+                      textArea.value = formatted;
+                      let textLength = textArea.value.length;
+                      textArea.focus();
+                      textArea.setSelectionRange(textLength, textLength);
+                    }
                   } catch (error) {
                     this.style.background = '#dc3545';
                     btext.textContent = 'Invalid';

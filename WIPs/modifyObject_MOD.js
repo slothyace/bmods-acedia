@@ -14,7 +14,7 @@ module.exports = {
   UI: [,
     {
       element: "variable",
-      storeAs: "originalJSON",
+      storeAs: "original",
       name: "JSON",
     },
     {
@@ -48,13 +48,14 @@ module.exports = {
             },
             "-",
             {
-              element: "",
+              element: "html",
               html: `
                 <button
                   style="width: fit-content"
                   class="hoverablez"
                   onclick="
-                          const content = document.getElementById('content').value;
+                          const textArea = document.getElementById('content');
+                          const content = textArea.value;
                           const btext = this.querySelector('#buttonText');
 
                           if (!this.dataset.fixedSize) {
@@ -64,13 +65,16 @@ module.exports = {
                           }
 
                           try {
-                            JSON.parse(content);
+                            let parsed = JSON.parse(content);
+                            let formatted = JSON.stringify(parsed, null, 2);
                             this.style.background = '#28a745';
                             btext.textContent = 'Valid';
-                            document.getElementById('content').value = JSON.stringify(JSON.parse(content), null, 2);
-                            let textLength = document.getElementById('content').value.length;
-                            document.getElementById('content').focus();
-                            document.getElementById('content').setSelectionRange(textLength, textLength);
+                            if (content !== formatted){
+                              textArea.value = formatted;
+                              let textLength = textArea.value.length;
+                              textArea.focus();
+                              textArea.setSelectionRange(textLength, textLength);
+                            }
                           } catch (error) {
                             this.style.background = '#dc3545';
                             btext.textContent = 'Invalid';
@@ -96,7 +100,7 @@ module.exports = {
     "-",
     {
       element: "store",
-      storeAs: "modifiedJson",
+      storeAs: "modified",
       name: "Store Modified JSON As"
     },
     "-",
@@ -107,7 +111,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Make ${values.modifications.length} Modifications To JSON Object ${values.originalJSON.type}(${values.originalJSON.value})`
+    return `Make ${values.modifications.length} Modifications To JSON Object ${values.original.type}(${values.original.value})`
   },
 
   compatibility: ["Any"],
@@ -117,6 +121,108 @@ module.exports = {
       await client.getMods().require(moduleName)
     }
 
-    
+    let original = bridge.get(values.original)
+
+    function isJSON(testObject){
+      return (testObject != undefined && typeof testObject === "object" && testObject.constructor === Object)
+    }
+
+    function cleanEmpty(obj, keys) {
+      for (let i = keys.length - 1; i >= 0; i--) {
+        let key = keys[i]
+        let parent = keys.slice(0, i).reduce((o, k) => o?.[k], obj)
+        if (parent && Object.keys(parent[key] || {}).length === 0) {
+          delete parent[key]
+        } else {
+          break
+        }
+      }
+    }
+
+    const sanitizeArrays = (str) => {
+      return str.replace(/\[([^\]]*)\]/g, (match, inner) => {
+        const sanitized = inner
+          .split(',')
+          .map(el => {
+            el = el.trim()
+            if (el === '') return null
+            return '"' + el.replace(/^["']|["']$/g, '').replace(/"/g, '\\"') + '"'
+          })
+          .filter(el => el !== null)
+          .join(', ')
+        return `[${sanitized}]`
+      })
+    }
+
+    if (isJSON(original) !== true){
+      bridge.store(values.modified, original)
+      console.error(`Value ${original} Is Not A Valid JSON`)
+      return
+    }
+
+    let originalClone = JSON.parse(JSON.stringify(original))
+    for (let modification of values.modifications){
+      let modificationData = modification.data
+
+      let actionType = bridge.transf(modificationData.jsonAction.type)
+      let objectPath = bridge.transf(modificationData.jsonAction.value)
+      let rawContent = bridge.transf(modificationData.content)
+
+      if (objectPath.startsWith(".")) {
+        objectPath = objectPath.slice(1)
+      }
+
+      objectPath = objectPath.replaceAll("..", ".")
+
+      if (
+        objectPath === "" ||
+        objectPath.includes("..") ||
+        objectPath.startsWith(".") ||
+        objectPath.endsWith(".")
+      ){return console.error(`Invalid path: "${bridge.transf(values.jsonAction.values)}"`)}
+
+      let keys = objectPath.split(".")
+      let lastKey = keys.pop()
+      let target = originalClone
+
+      for (const key of keys){
+        if (typeof target[key] !== "object" || target[key] === null){
+          target[key] = {}
+        }
+        target = target[key]
+      }
+
+      let parsedContent = undefined
+
+      rawContent = sanitizeArrays(rawContent)
+      if (!/^\s*(\[|\{)/.test(rawContent)) {
+        rawContent = `"${rawContent.replace(/^["']|["']$/g, '').replace(/"/g, '\\"')}"`
+      }
+
+      if (actionType !== "delete"){
+        try {
+          parsedContent = JSON.parse(rawContent)
+        } catch (err) {
+          return console.error(`Invalid JSON for content: ${err.message}`)
+        }
+      }
+
+      if (original && isJSON(original)){
+        switch (actionType){
+          case "create":{
+            target[lastKey] = parsedContent
+            break
+          }
+
+          case "delete":{
+            delete target[lastKey]
+            cleanEmpty(originalClone, keys)
+            break
+          }
+        }
+      }
+    }
+
+    bridge.store(values.modified, originalClone)
   }
 }

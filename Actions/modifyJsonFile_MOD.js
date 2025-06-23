@@ -40,7 +40,8 @@ module.exports = {
           style="width: fit-content"
           class="hoverablez"
           onclick="
-                  const content = document.getElementById('content').value;
+                  const textArea = document.getElementById('content');
+                  const content = textArea.value;
                   const btext = this.querySelector('#buttonText');
 
                   if (!this.dataset.fixedSize) {
@@ -50,13 +51,16 @@ module.exports = {
                   }
 
                   try {
-                    JSON.parse(content);
+                    let parsed = JSON.parse(content);
+                    let formatted = JSON.stringify(parsed, null, 2);
                     this.style.background = '#28a745';
                     btext.textContent = 'Valid';
-                    document.getElementById('content').value = JSON.stringify(JSON.parse(content), null, 2);
-                    let textLength = document.getElementById('content').value.length;
-                    document.getElementById('content').focus();
-                    document.getElementById('content').setSelectionRange(textLength, textLength);
+                    if (content !== formatted){
+                      textArea.value = formatted;
+                      let textLength = textArea.value.length;
+                      textArea.focus();
+                      textArea.setSelectionRange(textLength, textLength);
+                    }
                   } catch (error) {
                     this.style.background = '#dc3545';
                     btext.textContent = 'Invalid';
@@ -172,6 +176,19 @@ module.exports = {
     const originalFileContent = fs.readFileSync(fullPath, "utf8")
     let jsonObject
     let isJson
+
+    function cleanEmpty(obj, keys) {
+      for (let i = keys.length - 1; i >= 0; i--) {
+        let key = keys[i]
+        let parent = keys.slice(0, i).reduce((o, k) => o?.[k], obj)
+        if (parent && Object.keys(parent[key] || {}).length === 0) {
+          delete parent[key]
+        } else {
+          break
+        }
+      }
+    }
+
     try {
       jsonObject = JSON.parse(originalFileContent)
       isJson = true
@@ -209,6 +226,8 @@ module.exports = {
       objectPath = objectPath.slice(1)
     }
 
+    objectPath = objectPath.replaceAll("..", ".")
+
     // Validate path
     if (
       objectPath === "" ||
@@ -240,22 +259,16 @@ module.exports = {
 
     if (jsonObject && isJson == true){
       switch(actionType){
-        case "create":
+        case "create":{
           target[lastKey] = parsedContent
           break
+        }
 
-        case "delete":
+        case "delete":{
           delete target[lastKey]
-          let cleanupObj = jsonObject
-          for (let i = 0; i < keys.length - 1; i++) {
-            const key = keys[i]
-            if (Object.keys(cleanupObj[key]).length === 0) {
-              delete cleanupObj[key]
-              break
-            }
-            cleanupObj = cleanupObj[key]
-          }
+          cleanEmpty(jsonObject, keys)
           break
+        }
       }
     }
 
