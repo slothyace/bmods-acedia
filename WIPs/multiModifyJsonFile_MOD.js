@@ -1,7 +1,7 @@
 modVersion = "v1.0.1";
 module.exports = {
   data: {
-    name: "Multi-Modify JSON File",
+    name: "Multi Modify JSON File",
   },
   aliases: ["Edit JSON File"],
   modules: ["node:path", "node:fs"],
