@@ -165,14 +165,13 @@ module.exports = {
       let modificationData = modification.data
 
       let actionType = bridge.transf(modificationData.jsonAction.type)
-      let objectPath = bridge.transf(modificationData.jsonAction.value)
+      let objectPath = bridge.transf(modificationData.jsonAction.value).trim()
       let rawContent = bridge.transf(modificationData.content)
 
+      objectPath = objectPath.replaceAll("..", ".")
       if (objectPath.startsWith(".")) {
         objectPath = objectPath.slice(1)
       }
-
-      objectPath = objectPath.replaceAll("..", ".")
 
       if (
         objectPath === "" ||

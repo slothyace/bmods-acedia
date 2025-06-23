@@ -159,6 +159,7 @@ module.exports = {
     if (forbiddenFiles.some(fp => fullPath.endsWith(fp))){
       return console.error(`Essential Files Are Not To Be Messed With!!`)
     }
+    
     if (!fs.existsSync(fullPath)){
       if (values.createIfMissing === true){
 
@@ -189,19 +190,6 @@ module.exports = {
       }
     }
 
-    try {
-      jsonObject = JSON.parse(originalFileContent)
-      isJson = true
-    } catch (err){
-      return console.error(`Invalid Original JSON Content: ${err.message}`)
-      jsonObject = originalFileContent
-      isJson = false
-    }
-
-    let actionType = bridge.transf(values.jsonAction.type)
-    let objectPath = bridge.transf(values.jsonAction.value).trim()
-    let rawContent = bridge.transf(values.content)
-
     const sanitizeArrays = (str) => {
       return str.replace(/\[([^\]]*)\]/g, (match, inner) => {
         const sanitized = inner
@@ -217,26 +205,38 @@ module.exports = {
       })
     }
 
+    try {
+      jsonObject = JSON.parse(originalFileContent)
+      isJson = true
+    } catch (err){
+      console.error(`Invalid Original JSON Content: ${err.message}`)
+      jsonObject = originalFileContent
+      isJson = false
+      return
+    }
+
+    let actionType = bridge.transf(values.jsonAction.type)
+    let objectPath = bridge.transf(values.jsonAction.value).trim()
+    let rawContent = bridge.transf(values.content)
+
+
     rawContent = sanitizeArrays(rawContent)
     if (!/^\s*(\[|\{)/.test(rawContent)) {
       rawContent = `"${rawContent.replace(/^["']|["']$/g, '').replace(/"/g, '\\"')}"`
     }
 
+    objectPath = objectPath.replaceAll("..", ".")
     if (objectPath.startsWith(".")) {
       objectPath = objectPath.slice(1)
     }
 
-    objectPath = objectPath.replaceAll("..", ".")
-
-    // Validate path
     if (
       objectPath === "" ||
       objectPath.includes("..") ||
       objectPath.startsWith(".") ||
       objectPath.endsWith(".")
-    ) {
-      return console.error(`Invalid path: "${bridge.transf(values.jsonAction.values)}"`)
-      }
+    ) {return console.error(`Invalid path: "${bridge.transf(values.jsonAction.values)}"`)}
+
     const keys = objectPath.split(".")
     const lastKey = keys.pop()
     let target = jsonObject
