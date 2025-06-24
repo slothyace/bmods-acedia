@@ -61,7 +61,7 @@ module.exports = {
         break
       }
 
-      case "includes":{
+      case "text":{
         regexExp = values.extraction.value
       }
     }
