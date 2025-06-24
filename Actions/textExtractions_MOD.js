@@ -49,23 +49,24 @@ module.exports = {
 
   subtitle: (values, constants, thisAction) => {
     let type = values.extraction.type
-    let regexExp
+    let subtitle
     switch (type){
       case "string":{
-        regexExp = values.extraction.value.replace("\\", "\\\\") || ""
+        let regexExp = values.extraction.value.replace("\\", "\\\\") || ""
+        subtitle = `Extract Regex(${regexExp})`
         break
       }
 
       case "number":{
-        regexExp = `-?\\d+(?:\\.\\d+)?`
+        subtitle = `Extract Numbers`
         break
       }
 
       case "text":{
-        regexExp = values.extraction.value
+        subtitle = `Extract Words That Includes "${values.extraction.value}"`
       }
     }
-    return `Extract ${thisAction.UI.find((e) => e.element == "typedDropdown").choices[values.extraction.type].name}(${regexExp})`
+    return subtitle
   },
 
   compatibility: ["Any"],
