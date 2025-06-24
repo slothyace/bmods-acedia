@@ -24,8 +24,8 @@ module.exports = {
       name: "Extract",
       choices: {
         string: {name: "Regex", field: true, placeholder: "Regex"},
-        number: {name: "Number", field: false},
-        text: {name: "Text", field: true, placeholder: "Words That Include"}
+        number: {name: "Numbers", field: false},
+        text: {name: "Words", field: true, placeholder: "Words That Include"}
       },
     },
     {
@@ -85,7 +85,7 @@ module.exports = {
       }
       
       case "number":{
-        extracts = (source.match(/-?\d+(?:\.\d+)?/g) || []).map(Number)
+        extracts = (source.match(/-?\d+(?:\.\d+)?/g) || [])
         break
       }
 
