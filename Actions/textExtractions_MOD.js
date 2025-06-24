@@ -23,9 +23,9 @@ module.exports = {
       storeAs: "extraction",
       name: "Extract",
       choices: {
-        string: {name: "String", field: true, placeholder: "Regex"},
+        string: {name: "Regex", field: true, placeholder: "Regex"},
         number: {name: "Number", field: false},
-        includes: {name: "Includes", field: true, placeholder: "Words That Include"}
+        text: {name: "Text", field: true, placeholder: "Words That Include"}
       },
     },
     {
@@ -88,7 +88,7 @@ module.exports = {
         break
       }
 
-      case "includes":{
+      case "text":{
         let lookFor = bridge.transf(values.extraction.value) || ""
         let words = source.split(" ")
         if (values.caseInsensitive){
