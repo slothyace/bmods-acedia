@@ -13,15 +13,31 @@ module.exports = {
   },
   UI: [
     {
-      element: "actions",
-      storeAs: "actionSet1",
-      name: "Action Set 1"
-    },
-    "-",
-    {
-      element: "actions",
-      storeAs: "actionSet2",
-      name: "Action Set 2"
+      element: "menu",
+      storeAs: "races",
+      name: "Races",
+      types: {
+        races: "races"
+      },
+      max: 1000,
+      UItypes: {
+        races: {
+          name: "Action Set",
+          preview: "`${option.data.label || ''}`",
+          UI: [
+            {
+              element: "input",
+              storeAs: "label",
+              name: "Label"
+            },
+            {
+              element: "actions",
+              storeAs: "actionSet",
+              name: "Actions"
+            },
+          ]
+        }
+      }
     },
     "-",
     {
@@ -31,7 +47,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Create Race Condition`
+    return `Create ${values.races.length} Race Condition(s)`
   },
 
   compatibility: ["Any"],
@@ -52,11 +68,13 @@ module.exports = {
       }
     }
 
+    let actionSets = values.races.map(race => race.data.actionSet)
+    if (actionSets.length < 2){
+      return console.log(`You Need Minimum 2 Sets Of Actions To Race Them!`)
+    }
+
     try{
-      await Promise.race([
-        runWithCancel(values.actionSet1),
-        runWithCancel(values.actionSet2)
-      ])
+      await Promise.race(actionSets.map(set => runWithCancel(set)))
       cancelled = true
     } catch (err){console.log(err)}
   }
