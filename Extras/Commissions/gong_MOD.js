@@ -68,7 +68,7 @@ module.exports = {
 
         jsonData[file] = {
           name: file,
-          relativePath: filePath.replace(projectFolder),
+          relativePath: filePath.replace(projectFolder, ""),
           duration
         }
       }
