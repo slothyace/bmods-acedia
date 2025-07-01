@@ -20,9 +20,6 @@ A dedicated repository for my modded actions for [BMD](https://store.steampowere
 
 ## Mod Versions
 All mods that is owned by me will have a mod version tag attached to it at the bottom.  
-| First Denoter | Second Denoter | Third Denoter |
-| --- | --- | --- |
-| `s` - stable<br>`u` - unstable<br>`b` - beta | Version Number | Patch Number |
 
 ## Documentation
 Some of my mods are documented [here](https://github.com/slothyace/bmods-acedia/tree/main/.documentation).
