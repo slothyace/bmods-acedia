@@ -1,4 +1,4 @@
-modVersion = "v1.0.0"
+modVersion = "v1.0.2"
 module.exports = {
   data: {
     name: "Create Stripe Checkout Session"
