@@ -28,7 +28,7 @@ module.exports = {
     {
       element: "input",
       storeAs: "price",
-      name: "Price (In Dollars)",
+      name: "Price (In US Dollars)",
       placeholder: "XX.xx",
     },
     "-",
