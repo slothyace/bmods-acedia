@@ -64,11 +64,13 @@ module.exports = {
       element: "input",
       storeAs: "successUrl",
       name: "Payment Success Redirect",
+      placeholder: "https://example.com/success"
     },
     {
       element: "input",
       storeAs: "cancelUrl",
       name: "Payment Cancel Redirect",
+      placeholder: "https://example.com/cancel"
     },
     "-",
     {
@@ -113,8 +115,8 @@ module.exports = {
     const stripe = Stripe(stripeKey)
     let productName = bridge.transf(values.productName) || `Unnamed Product`
     let price = Math.round(parseFloat(bridge.transf(values.price)) * 100) || "0"
-    let successUrl = bridge.transf(values.successUrl)
-    let cancelUrl = bridge.transf(values.cancelUrl)
+    let successUrl = bridge.transf(values.successUrl) || `https://example.com/success`
+    let cancelUrl = bridge.transf(values.cancelUrl) || `https://example.com/cancel`
     let metadata = {}
     for (let entry of values.metadatas){
       let dataName = bridge.transf(entry.data.dataName)
