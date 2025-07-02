@@ -90,7 +90,10 @@ module.exports = {
         objectPath.includes("..") ||
         objectPath.startsWith(".") ||
         objectPath.endsWith(".")
-      ){return console.error(`Invalid path: "${bridge.transf(values.jsonAction.values)}"`)}
+      ){
+        console.error(`Invalid path: "${objectPath}"`)
+        continue
+      }
 
       let keys = objectPath.split(".")
       let lastKey = keys.pop()
