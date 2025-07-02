@@ -80,7 +80,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Create JSON Object In ${values.jsonFilePath}`
+    return `Create JSON Object ${values.object.type}(${values.object.value})`
   },
 
   compatibility: ["Any"],
