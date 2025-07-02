@@ -2,7 +2,8 @@
   style="width: fit-content"
   class="hoverablez"
   onclick="
-          const content = document.getElementById('content').value;
+          const textArea = document.getElementById('code');
+          const content = textArea.value;
           const btext = this.querySelector('#buttonText');
 
           if (!this.dataset.fixedSize) {
@@ -11,23 +12,23 @@
             this.dataset.fixedSize = 'true';
           }
 
-          try {
-            JSON.parse(content);
-            this.style.background = '#28a745';
-            btext.textContent = 'Valid';
-            document.getElementById('content').value = JSON.stringify(JSON.parse(content), null, 2);
-            let textLength = document.getElementById('content').value.length;
-            document.getElementById('content').focus();
-            document.getElementById('content').setSelectionRange(textLength, textLength);
-          } catch (error) {
-            this.style.background = '#dc3545';
-            btext.textContent = 'Invalid';
+          const prettier = require('prettier')
+          const babel = require('prettier/parser-babel')
+          let formatted = prettier.format(content, {
+            parser: 'babel',
+            plugins: [babel],
+            semi: true,
+            tabWidth: 2,
+            useTabs: false
+          })
+
+          if (content !== formatted){
+            textArea.value = formatted;
+            let textLength = textArea.value.length;
+            textArea.focus();
+            textArea.setSelectionRange(textLength, textLength);
           }
-          setTimeout(() => {
-            this.style.background = '';
-            btext.textContent = 'Validate JSON';
-          }, 500);
         "
 >
-  <btext id="buttonText"> Validate JSON </btext>
+  <btext id="buttonText"> Run Prettier </btext>
 </button>
