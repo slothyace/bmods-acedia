@@ -134,7 +134,7 @@ module.exports = {
     })
 
     server.listen(port, host, ()=>{
-      console.log(`Upload Endpoint Started On http://${host}:${port}/upload.`)
+      console.log(`[HTML Upload Webpage] Upload Endpoint Started On http://${host}:${port}/upload.`)
     })
   }
 }
