@@ -82,6 +82,12 @@ module.exports = {
     },
     "-",
     {
+      element: "toggle",
+      storeAs: "log",
+      name: "Log Requests?"
+    },
+    "-",
+    {
       element: "text",
       text: modVersion
     }
@@ -138,10 +144,10 @@ module.exports = {
         actions: endpoint.data.actions,
         respondWith: endpoint.data.respondWith
       }
-      console.log(`[Create Web API] ${endpointPath} [${method}] Has Been Registered.`)
+      console.log(`[Create Web API] ${endpointPath} [${method}] Has Been Registered.\n`)
     }
 
-    console.log(`[Create Web API] All Endpoints Registered.`)
+    console.log(`[Create Web API] All Endpoints Registered.\n`)
     fs.writeFileSync(routesFilePath, JSON.stringify(routeMap, null, 2))
 
     const server = http.createServer(async (request, response) =>{
@@ -152,6 +158,16 @@ module.exports = {
       if (!endPointActions){
         response.writeHead(404)
         return response.end("Page Not Found!")
+      }
+
+      if (values.log) {
+          let safeLog = {
+          url: request.url,
+          method: request.method,
+          headers: request.headers,
+          remoteAddress: request.socket?.remoteAddress
+        }
+        console.log(`[Create Web API] The ${pathName} [${method}] Endpoint Has Been Called. ${JSON.stringify(safeLog, null, 2)}\n`)
       }
 
       let body = ""
@@ -180,7 +196,7 @@ module.exports = {
     })
 
     server.listen(port, host, ()=>{
-      console.log(`[Create Web API] Listening For Requests.`)
+      console.log(`[Create Web API] Listening For Requests.\n`)
     })
   }
 }
