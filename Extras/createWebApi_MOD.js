@@ -131,7 +131,7 @@ module.exports = {
       let method = bridge.transf(endpoint.data.method.type).toUpperCase()
 
       if (!endpointPath.startsWith("/")){
-        endpointPath = `/${endpointPath}}`
+        endpointPath = `/${endpointPath}`
       }
 
       endpointPath = endpointPath.replaceAll("//", "/")
