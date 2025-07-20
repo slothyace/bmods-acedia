@@ -31,6 +31,12 @@ module.exports = {
       name: "Store Request Body As"
     },
     {
+      element: "store",
+      storeAs: "headers",
+      name: "Store Request Headers As"
+    },
+    "-",
+    {
       element: "menu",
       storeAs: "endpoints",
       name: "Endpoints",
@@ -184,6 +190,7 @@ module.exports = {
         }
 
         bridge.store(values.body, body)
+        bridge.store(values.headers, request.headers)
 
         await bridge.runner(endPointActions.actions, message, client, bridge.variables)
         let respondWith = bridge.get(endPointActions.respondWith)
