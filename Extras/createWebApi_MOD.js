@@ -146,6 +146,11 @@ module.exports = {
         routeMap[endpointPath] = {}
       }
 
+      if (routeMap[endpointPath] && routeMap[endpointPath][method]){
+        console.log(`[Create Web API] ${endpointPath} [${method}] Has Already Been Registered.\n`)
+        continue
+      }
+
       routeMap[endpointPath][method] = {
         actions: endpoint.data.actions,
         respondWith: endpoint.data.respondWith
