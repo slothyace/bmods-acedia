@@ -173,6 +173,16 @@ module.exports = {
       let body = ""
       request.on("data", (chunk) => (body += chunk))
       request.on("end", async ()=>{
+        if (values.log){
+          console.log(`[Create Web API] ${body}`)
+        }
+
+        try {
+          body = JSON.parse(body)
+        } catch (err){
+          body = body
+        }
+
         bridge.store(values.body, body)
 
         await bridge.runner(endPointActions.actions, message, client, bridge.variables)
