@@ -1,7 +1,7 @@
 modVersion = "v1.0.0"
 module.exports = {
   data: {
-    name: "Create Scheduled Actions V2"
+    name: "Create Independent Scheduled Actions"
   },
   aliases: [],
   modules: [],
