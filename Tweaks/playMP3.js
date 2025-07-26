@@ -82,7 +82,7 @@ module.exports = {
         name: bridge.guild.id,
       });
 
-      let fileName = path.basename(fullPath) || "Unknown File"
+      let fileName = path.basename(fullPath, path.extname(fullPath)) || "Unknown File"
 
       switch (values.queuing) {
         case `Don't Queue, Just Play`:
