@@ -1,4 +1,4 @@
-modVersion = "v1.0.0"
+modVersion = "v1.0.2"
 module.exports = {
   data: {
     name: "Loop Thru Files In Folder"
@@ -90,7 +90,8 @@ module.exports = {
     for(let file of files){
       let fullPath = path.join(folderPath, file)
       let storedRelativePath = fullPath.replace(projectFolder, "")
-      bridge.store(values.fileName, file)
+      let fileName = path.basename(fullPath)
+      bridge.store(values.fileName, fileName)
       bridge.store(values.relativePath, storedRelativePath)
       await bridge.runner(values.actions, message, client, bridge.variables)
     }
