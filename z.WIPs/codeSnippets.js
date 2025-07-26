@@ -1,3 +1,4 @@
+// Switch To Project Dir If Running From BMD
 const botData = require("../data.json")
 const workingDir = path.normalize(process.cwd())
 let projectFolder
