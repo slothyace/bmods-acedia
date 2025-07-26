@@ -48,7 +48,7 @@ module.exports = {
         endpoint: {
           data: {},
           name: "Endpoint",
-          preview: "`${option.data.path} | ${option.data.method.type}`",
+          preview: "`${option.data.path||'/endpoint'} | ${option.data.method.type||'GET'}`",
           UI: [
             {
               element: "input",
@@ -88,9 +88,9 @@ module.exports = {
     },
     "-",
     {
-      element: "toggle",
-      storeAs: "log",
-      name: "Log Requests?"
+      element: "toggleGroup",
+      storeAs: ["logRequests", "logSetup"],
+      nameSchemes: ["Log Requests?", "Log Setup?"]
     },
     "-",
     {
@@ -133,8 +133,8 @@ module.exports = {
     let routeMap = {}
 
     for (let endpoint of endpoints){
-      let endpointPath = bridge.transf(endpoint.data.path)
-      let method = bridge.transf(endpoint.data.method.type).toUpperCase()
+      let endpointPath = bridge.transf(endpoint.data.path) || "/endpoint"
+      let method = bridge.transf(endpoint.data.method.type).toUpperCase() || "GET"
 
       if (!endpointPath.startsWith("/")){
         endpointPath = `/${endpointPath}`
@@ -147,7 +147,9 @@ module.exports = {
       }
 
       if (routeMap[endpointPath] && routeMap[endpointPath][method]){
-        console.log(`[Create Web API] ${endpointPath} [${method}] Has Already Been Registered.\n`)
+        if(values.logSetup){
+          console.log(`[Create Web API] ${endpointPath} [${method}] Has Already Been Registered.\n`)
+        }
         continue
       }
 
@@ -155,12 +157,18 @@ module.exports = {
         actions: endpoint.data.actions,
         respondWith: endpoint.data.respondWith
       }
-      console.log(`[Create Web API] ${endpointPath} [${method}] Has Been Registered.\n`)
+      if(values.logSetup){
+        console.log(`[Create Web API] ${endpointPath} [${method}] Has Been Registered.\n`)
+      }
     }
 
-    console.log(`[Create Web API] All Endpoints Registered.\n`)
-    fs.writeFileSync(routesFilePath, JSON.stringify(routeMap, null, 2))
+    if(values.logSetup){
+      console.log(`[Create Web API] All Endpoints Registered.\n`)
+      console.log(`[Create Web API] webapiRoutes.json Generated.\n`)
+    }
+    
 
+    fs.writeFileSync(routesFilePath, JSON.stringify(routeMap, null, 2))
     const server = http.createServer(async (request, response) =>{
       let method = request.method.toUpperCase()
       let pathName = parse(request.url).pathname
@@ -171,7 +179,7 @@ module.exports = {
         return response.end("Page Not Found!")
       }
 
-      if (values.log) {
+      if (values.logRequests) {
           let safeLog = {
           url: request.url,
           method: request.method,
@@ -184,7 +192,7 @@ module.exports = {
       let body = ""
       request.on("data", (chunk) => (body += chunk))
       request.on("end", async ()=>{
-        if (values.log){
+        if (values.logRequests){
           console.log(`[Create Web API] ${body}`)
         }
 
