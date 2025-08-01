@@ -1,4 +1,4 @@
-modVersion = "v1.0.2"
+modVersion = "v1.0.3"
 module.exports = {
   data: {
     name: "Create Stripe Checkout Session"
@@ -28,8 +28,22 @@ module.exports = {
     {
       element: "input",
       storeAs: "price",
-      name: "Price (In US Dollars)",
-      placeholder: "XX.xx",
+      name: "Price",
+      placeholder: "XX.xx || XXXX",
+    },
+    {
+      element: "typedDropdown",
+      storeAs: "currency",
+      name: "Currency",
+      choices: (()=>{
+        let currencies = {}
+        currencies["iso4217"] = {name: "Currency TriCode", field: true, placeholder: "e.g: USD"}
+        let supportedCurrencies = Intl.supportedValuesOf("currency")
+        supportedCurrencies.forEach(currency =>{
+          currencies[currency] = {name: `${currency.toUpperCase()}`, field:false}
+        })
+        return currencies
+      })
     },
     "-",
     {
@@ -118,6 +132,7 @@ module.exports = {
     let successUrl = bridge.transf(values.successUrl) || `https://example.com/success`
     let cancelUrl = bridge.transf(values.cancelUrl) || `https://example.com/cancel`
     let metadata = {}
+    let currency = bridge.transf(values.currency).toLowerCase() || "usd"
     for (let entry of values.metadatas){
       let dataName = bridge.transf(entry.data.dataName)
       let dataVal = bridge.transf(entry.data.dataVal)
@@ -132,7 +147,7 @@ module.exports = {
         line_items: [
           {
             price_data: {
-              currency: "usd",
+              currency,
               unit_amount: price,
               product_data: {
                 name: productName
