@@ -1,7 +1,31 @@
 modVersion = "v1.0.0"
 module.exports = {
   data: {
-    name: "Create PayPal Checkout Session"
+    name: "Create PayPal Checkout Session",
+    applicationContext: [
+      {
+        "type": "context",
+        "data": {
+          "brandName": "",
+          "landingPage": {
+            "type": "billing",
+            "value": ""
+          },
+          "userAction": {
+            "type": "payNow",
+            "value": ""
+          },
+          "shippingPref": {
+            "type": "noShipping",
+            "value": ""
+          },
+          "paymentTimeline": {
+            "type": "immediate",
+            "value": ""
+          }
+        }
+      }
+    ]
   },
   aliases: [],
   modules: [],
