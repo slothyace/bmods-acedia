@@ -43,7 +43,7 @@ module.exports = {
           currencies[currency] = {name: `${currency.toUpperCase()}`, field:false}
         })
         return currencies
-      })
+      })()
     },
     "-",
     {
