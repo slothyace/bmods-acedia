@@ -132,7 +132,10 @@ module.exports = {
     let successUrl = bridge.transf(values.successUrl) || `https://example.com/success`
     let cancelUrl = bridge.transf(values.cancelUrl) || `https://example.com/cancel`
     let metadata = {}
-    let currency = bridge.transf(values.currency).toLowerCase() || "usd"
+    let currency = bridge.transf(values.currency.type).toLowerCase() || "usd"
+    if (currency == "iso4217"){
+      currency = bridge.transf(values.currency.value).toLowerCase() || "usd"
+    }
     for (let entry of values.metadatas){
       let dataName = bridge.transf(entry.data.dataName)
       let dataVal = bridge.transf(entry.data.dataVal)
