@@ -5,7 +5,7 @@ module.exports = {
   },
   aliases: [],
   modules: ["stripe"],
-  category: "Stripe",
+  category: "Payment",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
     creator: "Acedia",
