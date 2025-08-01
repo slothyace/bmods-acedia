@@ -74,6 +74,7 @@ module.exports = {
       name: "Payment Cancel Redirect",
       placeholder: "https://example.com/cancel"
     },
+    "-",
     {
       element: "menu",
       storeAs: "applicationContext",
@@ -90,6 +91,7 @@ module.exports = {
               storeAs: "brandName",
               name: "Brand Name",
             },
+            "-",
             {
               element: "typedDropdown",
               storeAs: "landingPage",
@@ -99,6 +101,7 @@ module.exports = {
                 login: {name: "Login Page", field:false}
               },
             },
+            "-",
             {
               element: "typedDropdown",
               storeAs: "userAction",
@@ -108,6 +111,7 @@ module.exports = {
                 continue: {name: "Continue", field:false}
               },
             },
+            "-",
             {
               element: "typedDropdown",
               storeAs: "shippingPref",
@@ -118,6 +122,7 @@ module.exports = {
                 setProvAddr: {name: "Set Provided Address", field:false}
               },
             },
+            "-",
             {
               element: "typedDropdown",
               storeAs: "paymentTimeline",
