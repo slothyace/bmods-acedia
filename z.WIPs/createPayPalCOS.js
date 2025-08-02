@@ -104,6 +104,7 @@ module.exports = {
       storeAs: "applicationContext",
       name: "Checkout Customisations",
       max: 1,
+      required: true,
       types: {context: "context"},
       UItypes: {
         context: {
@@ -129,7 +130,7 @@ module.exports = {
             {
               element: "typedDropdown",
               storeAs: "userAction",
-              name: "Checkout Button Text",
+              name: "Call To Action",
               choices: {
                 payNow: {name: "Pay Now", field:false},
                 continue: {name: "Continue", field:false}
@@ -153,12 +154,17 @@ module.exports = {
               name: "Payment Timeline",
               choices: {
                 immediate: {name: "Immediate Payment Required", field:false},
-                eCheck: {name: "Unrestricted (Allows eChecks)", field:false},
+                unrestricted: {name: "Unrestricted (Allows eChecks)", field:false},
               },
             }
           ]
         }
       }
+    },
+    {
+      element: "input",
+      storeAs: "referenceId",
+      name: "Reference ID (Optional)",
     },
     "-",
     {
@@ -230,6 +236,90 @@ module.exports = {
 
     await new Promise(resolve => setTimeout(resolve, 500))
 
+    let application_context = {}
+
+    application_context["return_url"] = successUrl
+    application_context["cancel_url"] = cancelUrl
+
+    if (values.applicationContext[0].data.brandName !== ""){
+      application_context["brand_name"] = bridge.transf(values.applicationContext[0].data.brandName)
+    }
+
+    switch(values.applicationContext[0].data.landingPage.type){
+      case "billing": {
+        application_context["landing_page"] = "BILLING"
+        break
+      }
+
+      case "login": {
+        application_context["landing_page"] = "LOGIN"
+        break
+      }
+    }
+
+    switch(values.applicationContext[0].data.userAction.type){
+      case "payNow": {
+        application_context["user_action"] = "PAY_NOW"
+        break
+      }
+
+      case "continue": {
+        application_context["user_action"] = "CONTINUE"
+        break
+      }
+    }
+
+    switch(values.applicationContext[0].data.shippingPref.type){
+      case "noShipping": {
+        application_context["shipping_preference"] = "NO_SHIPPING"
+        break
+      }
+
+      case "getFromFile": {
+        application_context["shipping_preference"] = "GET_FROM_FILE"
+        break
+      }
+
+      case "setProvAddr": {
+        application_context["shipping_preference"] = "SET_PROVIDED_ADDRESS"
+        break
+      }
+    }
+
+    switch(values.applicationContext[0].data.paymentTimeline.type){
+      case "immediate": {
+        application_context["payment_method"] = {
+          payee_preferred: "IMMEDIATE_PAYMENT_REQUIRED",
+          payer_selected: "PAYPAL"
+        }
+        break
+      }
+
+      case "unrestricted": {
+        application_context["payment_method"] = {
+          payee_preferred: "UNRESTRICTED",
+          payer_selected: "PAYPAL"
+        }
+      }
+    }
+
+    let orderBody = {
+      intent: "CAPTURE",
+      purchase_units: [
+        {
+          amount: {
+            currency_code: currency,
+            value: price,
+          },
+        },
+      ],
+      application_context
+    }
+
+    if (values.referenceId !== ""){
+      orderBody.purchase_units[0].reference_id = bridge.transf(values.referenceId).trim().slice(0,127)
+    }
+
     // Initiating A Checkout
     let orderResponse = await fetch(`${apiUrl}/v2/checkout/orders`, {
       method: "POST",
@@ -237,21 +327,7 @@ module.exports = {
         "Authorization": `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        intent: "CAPTURE",
-        purchase_units: [
-          {
-            amount: {
-              currency_code: currency,
-              value: price,
-            },
-          },
-        ],
-        application_context: {
-          return_url: successUrl,
-          cancel_url: cancelUrl
-        }
-      })
+      body: JSON.stringify(orderBody)
     })
 
     let orderData = await orderResponse.json()
