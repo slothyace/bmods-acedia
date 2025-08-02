@@ -29,7 +29,19 @@ module.exports = {
       element: "input",
       storeAs: "price",
       name: "Price",
-      placeholder: "XX.xx || XXXX",
+      placeholder: "XX.xx || If Currency Isn't Decimal Based, Divide By 100",
+      help: {
+        title: "Pricing",
+        UI: [
+          {
+            element: "text",
+            text: `<div style="font-size:20px">
+              The Behavior Of Pricing Is That It Will Always Multiply The Value By 100. So For A Charge Of 5.00, It Will Become 500 During The Processing<br></br>
+              For Currencies Like JPY Where It There Is No Decimal Point, If You Want To Charge 567 YEN, Put The Price As 5.67
+            </div>`
+          }
+        ]
+      }
     },
     {
       element: "typedDropdown",
