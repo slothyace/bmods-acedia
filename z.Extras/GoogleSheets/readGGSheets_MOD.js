@@ -1,4 +1,4 @@
-modVersion = "v1.0.0"
+modVersion = "v1.0.1"
 module.exports = {
   data: {
     name: "Read Google Sheet"
@@ -25,31 +25,60 @@ module.exports = {
       choices: {
         keyFile: {name: "Key File", field:true, placeholder:"path/to/keyfile.json"},
         apiKey: {name: "API Key", field:true, placeholder:"API Key"}
+      },
+      help: {
+        title: "Which To Use",
+        UI:[
+          {
+            element: "text",
+            text: `<div style="font-size:20px">
+              A Key File Would Be Better In This Case As Using A API Key Would Require The Sheet To Be Both Public And Editable.
+            </div>`
+          }
+        ]
       }
     },
     "-",
     {
-      element: "input",
-      storeAs: "tab",
-      name: "Tab",
-      placeholder: "Sheet1"
-    },
-    {
-      element: "input",
-      storeAs: "range",
-      name: "Range",
-      placeholder: "A1:C3 or A1"
-    },
-    "-",
-    {
-      element: "toggle",
-      storeAs: "parseResults",
-      name: "Parse Results (Convert It To Matrix Form)",
-    },
-    {
-      element: "store",
-      storeAs: "result",
-      name: "Store Result As"
+      element: "menu",
+      storeAs: "rangeList",
+      name: "Ranges",
+      types: {
+        range: "range",
+      },
+      max: 1000,
+      UItypes: {
+        range: {
+          data: {},
+          name: "Range",
+          preview: "`${option.data.tab||'Sheet1'}!${option.data.cellRange||'A1'}`",
+          UI: [
+            {
+              element: "input",
+              storeAs: "tab",
+              name: "Tab",
+              placeholder: "Sheet1"
+            },
+            {
+              element: "input",
+              storeAs: "cellRange",
+              name: "Cell",
+              placeholder: "A1 or A1:C3"
+            },
+            "-",
+            {
+              element: "toggle",
+              storeAs: "parseResults",
+              name: "Parse Results (Convert It To Matrix Form)",
+            },
+            {
+              element: "store",
+              storeAs: "result",
+              name: "Store Range Result As"
+            }
+          ]
+        }
+      }
     },
     "-",
     {
@@ -59,7 +88,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Read ${values.range} From Sheet: ${values.sheetLink}`
+    return `Read ${values.ranges.length} Range(s) From Sheet: ${values.sheetLink}`
   },
 
   compatibility: ["Any"],
@@ -105,34 +134,51 @@ module.exports = {
 
     
     let sheetLink = bridge.transf(values.sheetLink)
-    let tab = bridge.transf(values.tab).trim()
-    let range = bridge.transf(values.range).trim().toUpperCase()
-    if (!tab || !range){
-      console.log(`A Tab And Range Is Needed!`)
-      bridge.store(values.result, `A Tab And Range Is Needed!`)
-    }
-    let tabRange = `${tab}!${range}`
     let match = sheetLink.match(/\/d\/([a-zA-Z0-9-_]+)/)
     let spreadsheetId = match[1]
+
 
     let sheets = google.sheets({
       version: "v4",
       auth: ggClient
     })
 
-    let response = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range
-    })
+    let rangeList = []
+    let rangeMap = {}
 
-    let responseData = response.data.values
-    let parsedText
-    if (values.parseResults == true){
-      parsedText = responseData.map(row => row.join(" | ")).join("\n")
-    } else {
-      parsedText = response.data.values
+    for (let range of values.rangeList){
+      let rangeData = range.data
+      let tab = bridge.transf(rangeData.tab).trim()
+      let cellRange = bridge.transf(rangeData.cellRange).trim()
+      if (!tab || !cellRange) continue
+
+      let rangeString = `${tab}!${cellRange}`
+      rangeList.push(rangeString)
+      rangeMap[rangeString] = {
+        parseResults: rangeData.parseResults,
+        result: rangeData.result
+      }
     }
 
-    bridge.store(values.result, parsedText)
+    let batchResponse = await sheets.spreadsheets.values.batchGet({
+      spreadsheetId,
+      ranges: rangeList
+    })
+
+    for (let rangeResult of batchResponse.data.valueRanges){
+      let rangeId = rangeResult.range
+      let rowData = rangeResult.values || []
+
+      let meta = rangeMap[rangeId]
+      let parsedText
+
+      if (meta.parseResults){
+        parsedText = rowData.map(row => row.join(" | ")).join("\n")
+      } else {
+        parsedText = rowData
+      }
+
+      bridge.store(meta.result, parsedText)
+    }
   }
 }
