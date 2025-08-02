@@ -215,8 +215,8 @@ module.exports = {
 
     switch(amount){
       case "single":{
-        let tab = bridge.transf(values.tab)
-        let cell = bridge.transf(values.cell).split(":")[0].toUpperCase()
+        let tab = bridge.transf(values.tab).trim()
+        let cell = bridge.transf(values.cell).trim().split(":")[0].toUpperCase()
         let tabCell = `${tab}!${cell}`
 
         let updateSnippet = {
