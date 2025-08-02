@@ -149,7 +149,7 @@ module.exports = {
     for (let range of values.rangeList){
       let rangeData = range.data
       let tab = bridge.transf(rangeData.tab).trim()
-      let cellRange = bridge.transf(rangeData.cellRange).trim()
+      let cellRange = bridge.transf(rangeData.cellRange).trim().toUpperCase()
       if (!tab || !cellRange) continue
 
       let rangeString = `${tab}!${cellRange}`
