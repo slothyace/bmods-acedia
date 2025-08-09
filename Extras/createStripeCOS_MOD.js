@@ -1,7 +1,13 @@
 modVersion = "v2.0.0"
 module.exports = {
   data: {
-    name: "Create Stripe Checkout Session"
+    name: "Create Stripe Checkout Session",
+    items: [
+      {
+        "type": "item",
+        "data": {}
+      }
+    ]
   },
   aliases: [],
   modules: ["stripe"],
