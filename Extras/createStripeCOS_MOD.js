@@ -1,4 +1,4 @@
-modVersion = "v1.0.3"
+modVersion = "v2.0.0"
 module.exports = {
   data: {
     name: "Create Stripe Checkout Session"
@@ -20,42 +20,75 @@ module.exports = {
     },
     "-",
     {
-      element: "input",
-      storeAs: "productName",
-      name: "Product Name",
-      placeholder: "A Product",
-    },
-    {
-      element: "input",
-      storeAs: "price",
-      name: "Price",
-      placeholder: "XX.xx || If Currency Isn't Decimal Based, Divide By 100",
-      help: {
-        title: "Pricing",
-        UI: [
-          {
-            element: "text",
-            text: `<div style="font-size:20px">
-              The Behavior Of Pricing Is That It Will Always Multiply The Value By 100. So For A Charge Of 5.00, It Will Become 500 During The Processing<br></br>
-              For Currencies Like JPY Where It There Is No Decimal Point, If You Want To Charge 567 YEN, Put The Price As 5.67
-            </div>`
-          }
-        ]
+      element: "menu",
+      storeAs: "items",
+      name: "Items",
+      max: 100,
+      required: true,
+      types: {
+        item: "item",
+      },
+      UItypes: {
+        item: {
+          data: {},
+          name: "Item",
+          preview: "`${option.data.count || '1'}x ${option.data.name || 'Unnamed Product'} @ $${option.data.price || '0.00'}ea`",
+          UI: [
+            {
+              element: "input",
+              storeAs: "name",
+              name: "Product Name",
+              placeholder: "A Product",
+            },
+            {
+              element: "input",
+              storeAs: "description",
+              name: "Description",
+              placeholder: "A Product"
+            },
+            "-",
+            {
+              element: "input",
+              storeAs: "price",
+              name: "Price",
+              placeholder: "XX.xx || If Currency Isn't Decimal Based, Divide By 100",
+              help: {
+                title: "Pricing",
+                UI: [
+                  {
+                    element: "text",
+                    text: `<div style="font-size:20px">
+                      The Behavior Of Pricing Is That It Will Always Multiply The Value By 100. So For A Charge Of 5.00, It Will Become 500 During The Processing<br></br>
+                      For Currencies Like JPY Where It There Is No Decimal Point, If You Want To Charge 567 YEN, Put The Price As 5.67
+                    </div>`
+                  }
+                ]
+              }
+            },
+            {
+              element: "typedDropdown",
+              storeAs: "currency",
+              name: "Currency",
+              choices: (()=>{
+                let currencies = {}
+                currencies["iso4217"] = {name: "Currency TriCode", field: true, placeholder: "e.g: USD"}
+                let supportedCurrencies = Intl.supportedValuesOf("currency")
+                supportedCurrencies.forEach(currency =>{
+                  currencies[currency] = {name: `${currency.toUpperCase()}`, field:false}
+                })
+                return currencies
+              })()
+            },
+            "-",
+            {
+              element: "input",
+              storeAs: "count",
+              name: "Count",
+              placeholder: "1",
+            }
+          ]
+        },
       }
-    },
-    {
-      element: "typedDropdown",
-      storeAs: "currency",
-      name: "Currency",
-      choices: (()=>{
-        let currencies = {}
-        currencies["iso4217"] = {name: "Currency TriCode", field: true, placeholder: "e.g: USD"}
-        let supportedCurrencies = Intl.supportedValuesOf("currency")
-        supportedCurrencies.forEach(currency =>{
-          currencies[currency] = {name: `${currency.toUpperCase()}`, field:false}
-        })
-        return currencies
-      })()
     },
     "-",
     {
@@ -86,6 +119,7 @@ module.exports = {
         },
       },
     },
+    "-",
     {
       element: "input",
       storeAs: "successUrl",
@@ -111,6 +145,11 @@ module.exports = {
     },
     {
       element: "store",
+      storeAs: "subtotal",
+      name: "Store Subtotal As",
+    },
+    {
+      element: "store",
       storeAs: "fullSession",
       name: "Store Full Session Object As"
     },
@@ -122,7 +161,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Create Stripe Checkout Session For ${values.productName || "Unnamed Product"} @ $${values.price || "0.00"}`
+    return `Create ${values.items.length} Item Stripe Checkout Session`
   },
 
   compatibility: ["Any"],
@@ -131,7 +170,7 @@ module.exports = {
     for (const moduleName of this.modules){
       await client.getMods().require(moduleName)
     }
-
+    
     const Stripe = require("stripe")
     let stripeKey = bridge.transf(values.stripeKey)
     if (stripeKey == undefined){
@@ -139,46 +178,84 @@ module.exports = {
     }
 
     const stripe = Stripe(stripeKey)
-    let productName = bridge.transf(values.productName) || `Unnamed Product`
-    let price = Math.round(parseFloat(bridge.transf(values.price)) * 100) || "0"
-    let successUrl = bridge.transf(values.successUrl) || `https://example.com/success`
-    let cancelUrl = bridge.transf(values.cancelUrl) || `https://example.com/cancel`
-    let metadata = {}
-    let currency = bridge.transf(values.currency.type).toLowerCase() || "usd"
-    if (currency == "iso4217"){
-      currency = bridge.transf(values.currency.value).toLowerCase() || "usd"
+
+    let successUrl = (bridge.transf(values.successUrl) || `https://example.com/success`).trim()
+    let cancelUrl = (bridge.transf(values.cancelUrl) || `https://example.com/cancel`).trim()
+
+    let line_items = []
+    if (values.items.length == 0){
+      return console.log(`Number Of Items In Checkout Can't Be 0!`)
     }
+
+    console.log(typeof values.items, values.items)
+
+    for (let item of values.items){
+      let itemData = item.data
+
+      let name = (bridge.transf(itemData.name) || "Unnamed Product").trim()
+      let description = (bridge.transf(itemData.description) || "").trim()
+
+      let rawPrice = parseFloat(bridge.transf(itemData.price))
+      let price = isNaN(rawPrice) ? 100 : Math.round(rawPrice*100)
+      let currency = bridge.transf(itemData.currency.type).toLowerCase() || "usd"
+      let rawQuantity = parseFloat(bridge.transf(itemData.count))
+      let quantity = (isNaN(rawQuantity) || rawQuantity < 1) ? 1 : Math.ceil(rawQuantity)
+
+      if (currency == "iso4217"){
+        currency = bridge.transf(itemData.currency.value).toLowerCase().trim() || "usd"
+      }
+
+      let product_data = {
+        name
+      }
+      if (description !== ""){
+        product_data.description = description
+      }
+
+      line_items.push(
+        {
+          price_data: {
+            currency,
+            unit_amount: price,
+            product_data
+          },
+          quantity
+        }
+      )
+    }
+
+    let metadata = {}
     for (let entry of values.metadatas){
       let dataName = bridge.transf(entry.data.dataName)
-      let dataVal = bridge.transf(entry.data.dataVal)
+      let dataVal = bridge.transf(entry.data.dataVal) || "No Metadata"
 
-      metadata[dataName] = dataVal
+      if (dataName){
+        metadata[dataName] = dataVal
+      }
     }
 
     try {
       const session = await stripe.checkout.sessions.create({
         payment_method_types: ["card"],
         mode: "payment",
-        line_items: [
-          {
-            price_data: {
-              currency,
-              unit_amount: price,
-              product_data: {
-                name: productName
-              }
-            },
-            quantity: 1
-          }
-        ],
+        line_items,
         success_url: successUrl,
         cancel_url: cancelUrl,
         metadata
       })
 
+      console.log(JSON.stringify(session))
+
+      let subtotal = 0
+      const sessionLineItems = await stripe.checkout.sessions.listLineItems(session.id)
+      sessionLineItems.data.forEach(item =>{
+        subtotal += item.amount_subtotal
+      })
+
       bridge.store(values.paymentUrl, session.url)
       bridge.store(values.sessionId, session.id)
       bridge.store(values.fullSession, session)
+      bridge.store(values.subtotal, subtotal)
     } catch (error){
       return console.error(`An Error Occured When Trying To Create A Checkout Session: ${error.message}`)
     }

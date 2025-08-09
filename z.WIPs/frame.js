@@ -29,6 +29,5 @@ module.exports = {
       await client.getMods().require(moduleName)
     }
     
-    
   }
 }
