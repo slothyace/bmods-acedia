@@ -187,8 +187,6 @@ module.exports = {
       return console.log(`Number Of Items In Checkout Can't Be 0!`)
     }
 
-    console.log(typeof values.items, values.items)
-
     for (let item of values.items){
       let itemData = item.data
 
@@ -243,8 +241,6 @@ module.exports = {
         cancel_url: cancelUrl,
         metadata
       })
-
-      console.log(JSON.stringify(session))
 
       let subtotal = 0
       const sessionLineItems = await stripe.checkout.sessions.listLineItems(session.id)
