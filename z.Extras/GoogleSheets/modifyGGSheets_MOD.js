@@ -149,6 +149,10 @@ module.exports = {
       let tab = bridge.transf(modificationData.tab).trim()
       let cell = bridge.transf(modificationData.cell).trim().split(":")[0].toUpperCase()
 
+      if(!tab || !cell){
+        continue
+      }
+
       let tabCell = `${tab}!${cell}`
 
       let updateSnippet = {
