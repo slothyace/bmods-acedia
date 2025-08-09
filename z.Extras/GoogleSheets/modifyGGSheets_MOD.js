@@ -1,4 +1,4 @@
-modVersion = "v1.0.1"
+modVersion = "v1.0.2"
 module.exports = {
   data: {
     name: "Modify Google Sheet"
@@ -52,7 +52,7 @@ module.exports = {
         modification: {
           data: {},
           name: "Modification",
-          preview: "`${option.data.tab||'Sheet1!'}${option.data.cell||'A1'} -> ${option.data.newValue||'newValue'}`",
+          preview: "`${option.data.tab + '!'||'Sheet1!'}${option.data.cell||'A1'} -> ${option.data.newValue||'newValue'}`",
           UI: [
             {
               element: "input",
@@ -91,20 +91,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    let subtitle
-    switch (values.amount.type){
-      case "single":{
-        subtitle = `Update Cell ${values.tab||"Sheet1"}!${values.cell||"A1"} To ${values.newValue} For Sheet: ${values.sheetLink}`
-        break
-      }
-
-      case "multi":{
-        subtitle = `Update ${values.modifications.length} Cells In Sheet ${values.sheetLink}`
-        break
-      }
-    }
-
-    return subtitle
+    return `Update ${values.modifications.length} Cells In Sheet ${values.sheetLink}`
   },
 
   compatibility: ["Any"],
