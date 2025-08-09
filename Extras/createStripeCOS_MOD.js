@@ -242,11 +242,14 @@ module.exports = {
         metadata
       })
 
-      let subtotal = 0
-      const sessionLineItems = await stripe.checkout.sessions.listLineItems(session.id)
-      sessionLineItems.data.forEach(item =>{
-        subtotal += item.amount_subtotal
-      })
+      let subtotal
+      if (values.subtotal.value !== ""){
+        subtotal = 0
+        const sessionLineItems = await stripe.checkout.sessions.listLineItems(session.id)
+        sessionLineItems.data.forEach(item =>{
+          subtotal += item.amount_subtotal
+        })
+      }
 
       bridge.store(values.paymentUrl, session.url)
       bridge.store(values.sessionId, session.id)
