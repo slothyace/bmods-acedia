@@ -52,7 +52,7 @@ module.exports = {
         modification: {
           data: {},
           name: "Modification",
-          preview: "`${option.data.tab + '!'||'Sheet1!'}${option.data.cell||'A1'} -> ${option.data.newValue||'newValue'}`",
+          preview: "`${option.data.tab||'Sheet1!'}!${option.data.cell||'A1'} -> ${option.data.newValue||'newValue'}`",
           UI: [
             {
               element: "input",

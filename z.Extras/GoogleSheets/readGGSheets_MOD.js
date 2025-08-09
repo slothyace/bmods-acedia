@@ -52,7 +52,7 @@ module.exports = {
         range: {
           data: {},
           name: "Range",
-          preview: "`${option.data.tab + '!'||'Sheet1!'}${option.data.cellRange||'A1'}`",
+          preview: "`${option.data.tab||'Sheet1!'}!${option.data.cellRange||'A1'}`",
           UI: [
             {
               element: "input",
@@ -89,7 +89,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Read ${values.ranges.length} Range(s) From Sheet: ${values.sheetLink}`
+    return `Read ${values.rangesList.length} Range(s) From Sheet: ${values.sheetLink}`
   },
 
   compatibility: ["Any"],
