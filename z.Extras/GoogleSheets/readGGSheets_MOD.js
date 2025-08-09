@@ -52,7 +52,7 @@ module.exports = {
         range: {
           data: {},
           name: "Range",
-          preview: "`${option.data.tab||'Sheet1!'}!${option.data.cellRange||'A1'}`",
+          preview: "`${option.data.tab||'Sheet1'}!${option.data.cellRange||'A1'}`",
           UI: [
             {
               element: "input",
