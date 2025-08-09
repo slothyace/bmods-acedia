@@ -28,7 +28,7 @@ module.exports = {
     for (const moduleName of this.modules){
       await client.getMods().require(moduleName)
     }
-
+    
     
   }
 }
