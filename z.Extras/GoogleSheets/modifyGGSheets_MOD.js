@@ -139,8 +139,6 @@ module.exports = {
     let match = sheetLink.match(/\/d\/([a-zA-Z0-9-_]+)/)
     let spreadsheetId = match[1]
 
-    let amount = bridge.transf(values.amount.type)
-
     let updateData = []
 
     for (let modification of values.modifications){
