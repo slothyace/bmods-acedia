@@ -41,7 +41,7 @@ module.exports = {
     },
     "-",
     {
-      element: "",
+      element: "menu",
       storeAs: "modifications",
       name: "Modifications",
       types: {
