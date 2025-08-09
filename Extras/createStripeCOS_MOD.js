@@ -24,7 +24,6 @@ module.exports = {
       storeAs: "items",
       name: "Items",
       max: 100,
-      required: true,
       types: {
         item: "item",
       },
