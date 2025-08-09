@@ -1,4 +1,4 @@
-modVersion = "v1.0.0"
+modVersion = "v1.0.1"
 module.exports = {
   data: {
     name: "Modify Google Sheet"
@@ -32,22 +32,14 @@ module.exports = {
           {
             element: "text",
             text: `<div style="font-size:20px">
-              A Key File Would Be Better In This Case As Using A API Key Would Require The Sheet To Be Both Public And Editable.
+              A Key File Would Be Better In This Case As Using A API Key Would Require The Sheet To Be Both Public And Editable.<br></br>
+              Set The Sheet Permissions To Allow Anyone With The Link To Edit The Sheet.
             </div>`
           }
         ]
       }
     },
     "-",
-    {
-      element: "typedDropdown",
-      storeAs: "amount",
-      name: "Modification Count",
-      choices: {
-        single: {name: "Update 1 Cell", field:false},
-        multi: {name: "Update Multiple Cells", field:false}
-      }
-    },
     {
       element: "",
       storeAs: "modifications",
@@ -60,7 +52,7 @@ module.exports = {
         modification: {
           data: {},
           name: "Modification",
-          preview: "`${option.data.tab||'Sheet1'}!${option.data.cell||'A1'} -> ${option.data.newValue||'newValue'}`",
+          preview: "`${option.data.tab||'Sheet1!'}${option.data.cell||'A1'} -> ${option.data.newValue||'newValue'}`",
           UI: [
             {
               element: "input",
@@ -85,25 +77,6 @@ module.exports = {
         },
       },
     },
-    {
-      element: "",
-      storeAs: "tab",
-      name: "Tab",
-      placeholder: "Sheet1"
-    },
-    {
-      element: "",
-      storeAs: "cell",
-      name: "Cell",
-      placeholder: "A1"
-    },
-    "-",
-    {
-      element: "",
-      storeAs: "newValue",
-      name: "New Value",
-      placeholder: "New Value"
-    },
     "-",
     {
       element: "store",
@@ -116,36 +89,6 @@ module.exports = {
       text: modVersion
     }
   ],
-
-  script: (values) =>{
-    function refElm(skipAnimation){
-      let cellsToUpdate = values.data.amount.type
-
-      if (cellsToUpdate == "single"){
-        values.UI[4].element = ""
-        values.UI[5].element = "input"
-        values.UI[6].element = "input"
-        values.UI[7].element = "-"
-        values.UI[8].element = "largeInput"
-      } else if(cellsToUpdate == "multi"){
-        values.UI[4].element = "menu"
-        values.UI[5].element = ""
-        values.UI[6].element = ""
-        values.UI[7].element = ""
-        values.UI[8].element = ""
-      }
-
-      setTimeout(()=>{
-        values.updateUI()
-      }, skipAnimation?1: values.commonAnimation*100)
-    }
-
-    refElm(true)
-
-    values.events.on("change", ()=>{
-      refElm()
-    })
-  },
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
     let subtitle
@@ -213,42 +156,21 @@ module.exports = {
 
     let updateData = []
 
-    switch(amount){
-      case "single":{
-        let tab = bridge.transf(values.tab).trim()
-        let cell = bridge.transf(values.cell).trim().split(":")[0].toUpperCase()
-        let tabCell = `${tab}!${cell}`
+    for (let modification of values.modifications){
+      let modificationData = modification.data
 
-        let updateSnippet = {
-          range: tabCell,
-          values: [[bridge.transf(values.newValue)]]
-        }
+      let tab = bridge.transf(modificationData.tab).trim()
+      let cell = bridge.transf(modificationData.cell).trim().split(":")[0].toUpperCase()
 
-        updateData.push(updateSnippet)
-        break
+      let tabCell = `${tab}!${cell}`
+
+      let updateSnippet = {
+        range: tabCell,
+        values: [[bridge.transf(modificationData.newValue)]]
       }
 
-      case "multi":{
-        for (let modification of values.modifications){
-          let modificationData = modification.data
-
-          let tab = bridge.transf(modificationData.tab)
-          let cell = bridge.transf(modificationData.cell).split(":")[0].toUpperCase()
-
-          let tabCell = `${tab}!${cell}`
-
-          let updateSnippet = {
-            range: tabCell,
-            values: [[bridge.transf(modificationData.newValue)]]
-          }
-
-          updateData.push(updateSnippet)
-        }
-        break
-      }
+      updateData.push(updateSnippet)
     }
-
-    
 
     let sheets = google.sheets({
       version: "v4",

@@ -32,7 +32,8 @@ module.exports = {
           {
             element: "text",
             text: `<div style="font-size:20px">
-              A Key File Would Be Better In This Case As Using A API Key Would Require The Sheet To Be Both Public And Editable.
+              A Key File Would Be Better In This Case As Using A API Key Would Require The Sheet To Be Public.<br></br>
+              Set The Sheet Permissions To Allow Anyone With The Link To View The Sheet.
             </div>`
           }
         ]
@@ -51,7 +52,7 @@ module.exports = {
         range: {
           data: {},
           name: "Range",
-          preview: "`${option.data.tab||'Sheet1'}!${option.data.cellRange||'A1'}`",
+          preview: "`${option.data.tab||'Sheet1!'}${option.data.cellRange||'A1'}`",
           UI: [
             {
               element: "input",
