@@ -89,7 +89,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Read ${values.rangesList.length} Range(s) From Sheet: ${values.sheetLink}`
+    return `Read ${values.rangeList.length} Range(s) From Sheet: ${values.sheetLink}`
   },
 
   compatibility: ["Any"],
