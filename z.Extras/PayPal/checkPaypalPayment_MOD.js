@@ -138,7 +138,6 @@ module.exports = {
     if (values.autoCapture === true){
       if (paymentStatus === "APPROVED"){
         let captureUrl = statusData.links?.find(link => link.rel === "capture")?.href
-        console.log(captureUrl)
         let captureResponse = await fetch(captureUrl, {
           method: "POST",
           headers: {

@@ -1,4 +1,4 @@
-modVersion = "v2.0.0"
+modVersion = "v2.0.1"
 module.exports = {
   data: {
     name: "Create Stripe Checkout Session",
@@ -70,20 +70,6 @@ module.exports = {
                 ]
               }
             },
-            {
-              element: "typedDropdown",
-              storeAs: "currency",
-              name: "Currency",
-              choices: (()=>{
-                let currencies = {}
-                currencies["iso4217"] = {name: "Currency TriCode", field: true, placeholder: "e.g: USD"}
-                let supportedCurrencies = Intl.supportedValuesOf("currency")
-                supportedCurrencies.forEach(currency =>{
-                  currencies[currency] = {name: `${currency.toUpperCase()}`, field:false}
-                })
-                return currencies
-              })()
-            },
             "-",
             {
               element: "input",
@@ -94,6 +80,20 @@ module.exports = {
           ]
         },
       }
+    },
+    {
+      element: "typedDropdown",
+      storeAs: "currency",
+      name: "Currency",
+      choices: (()=>{
+        let currencies = {}
+        currencies["iso4217"] = {name: "Currency TriCode", field: true, placeholder: "e.g: USD"}
+        let supportedCurrencies = Intl.supportedValuesOf("currency")
+        supportedCurrencies.forEach(currency =>{
+          currencies[currency] = {name: `${currency.toUpperCase()}`, field:false}
+        })
+        return currencies
+      })()
     },
     "-",
     {
@@ -108,7 +108,7 @@ module.exports = {
         metadata: {
           data: {},
           name: "Metadata",
-          preview: "`${option.data.dataName}: ${option.data.dataVal}`",
+          preview: "`${option.data.dataName || 'Name'}: ${option.data.dataVal || 'Value'}`",
           UI: [
             {
               element: "input",
@@ -177,8 +177,8 @@ module.exports = {
     }
     
     const Stripe = require("stripe")
-    let stripeKey = bridge.transf(values.stripeKey)
-    if (stripeKey == undefined){
+    let stripeKey = bridge.transf(values.stripeKey).trim()
+    if (stripeKey == undefined || stripeKey == ""){
       return console.error(`A Stripe API Key Is Required, You Can Get One At https://dashboard.stripe.com/apikeys`)
     }
 
@@ -192,6 +192,11 @@ module.exports = {
       return console.log(`Number Of Items In Checkout Can't Be 0!`)
     }
 
+    let currency = bridge.transf(values.currency.type).toLowerCase() || "usd"
+    if (currency == "iso4217"){
+      currency = bridge.transf(values.currency.value).toLowerCase().trim() || "usd"
+    }
+
     for (let item of values.items){
       let itemData = item.data
 
@@ -200,17 +205,14 @@ module.exports = {
 
       let rawPrice = parseFloat(bridge.transf(itemData.price))
       let price = isNaN(rawPrice) ? 100 : Math.round(rawPrice*100)
-      let currency = bridge.transf(itemData.currency.type).toLowerCase() || "usd"
+      
       let rawQuantity = parseFloat(bridge.transf(itemData.count))
       let quantity = (isNaN(rawQuantity) || rawQuantity < 1) ? 1 : Math.ceil(rawQuantity)
-
-      if (currency == "iso4217"){
-        currency = bridge.transf(itemData.currency.value).toLowerCase().trim() || "usd"
-      }
 
       let product_data = {
         name
       }
+
       if (description !== ""){
         product_data.description = description
       }

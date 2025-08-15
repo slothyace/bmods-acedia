@@ -1,4 +1,4 @@
-modVersion = "v1.0.0"
+modVersion = "v1.0.1"
 module.exports = {
   data: {
     name: "Check Stripe Payment Status"
@@ -53,8 +53,8 @@ module.exports = {
     }
 
     const Stripe = require("stripe")
-    let stripeKey = bridge.transf(values.stripeKey)
-    let sessionId = bridge.transf(values.sessionId)
+    let stripeKey = bridge.transf(values.stripeKey).trim()
+    let sessionId = bridge.transf(values.sessionId).trim()
 
     if (!stripeKey || !sessionId){
       return console.error(`A Stripe Key And Session Id Is Required!`)
