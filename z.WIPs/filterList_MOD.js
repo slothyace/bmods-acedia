@@ -49,7 +49,7 @@ module.exports = {
     {
       element: "store",
       storeAs: "modifiedList",
-      name: "Store Modified List As"
+      name: "Store Filtered List As"
     },
     "-",
     {
@@ -59,8 +59,23 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return ``
-  },
+    let filterType = values.filterType.type === "for" ? "For" : "Out"
+    let filter = values.filter.type
+    let filterValue = values.filter.value
+
+    let phrases = {
+      startsWith: `Starts With ${filterValue}`,
+      endsWith: `Ends With ${filterValue}`,
+      includes: `Includes ${filterValue}`,
+      equals: `Equals ${filterValue}`,
+      strings: `Are Strings`,
+      numbers: `Are Numbers`,
+    }
+
+    let subtitle = `Filter ${filterType} Elements That ${phrases[filter]} From List ${values.list.type}(${values.list.value})`
+
+    return subtitle
+    },
 
   script: (values) =>{
     function reflem(skipAnimation){
@@ -103,31 +118,56 @@ module.exports = {
     let filter = bridge.transf(values.filter.type)
     let filterValue = bridge.transf(values.filter.value)
     let caseSens = values.caseSens
-    if (caseSens == true){
-      list = list.map(el => el.toLowerCase())
-    }
 
-    let masterFilter = `${filterType}_${filter}`
-    let filteredList
+    const normalize = el => (typeof el === "string" && caseSens === false) ? el.toLowerCase() : el
 
-    switch (filterType){
-      case "for_startsWith":{
-        if (caseSens == true){
-          filteredList = list.filter(el => el.startsWith(filterValue))
-        } else {
-          filteredList = list.filter(el => el.toLowerCase().startsWith(filterValue.toLowerCase()))
-        }
+    let testFunction
+
+    switch(filter){
+      case "startsWith":{
+        testFunction = el => normalize(el).startsWith(normalize(filterValue))
         break
       }
 
-      case "out_startsWith":{
-        if (caseSens == true){
-          filteredList = list.filter(el => !el.startsWith(filterValue))
-        } else {
-          filteredList = list.filter(el => !el.toLowerCase().startsWith(filterValue.toLowerCase()))
+      case "endsWith":{
+        testFunction = el => normalize(el).endsWith(normalize(filterValue))
+        break
+      }
+
+      case "includes":{
+        testFunction = el => normalize(el).includes(normalize(filterValue))
+        break
+      }
+
+      case "equals":{
+        testFunction = el => normalize(el) == normalize(filterValue)
+        break
+      }
+
+      case "strings":{
+        testFunction = el => (typeof el === "string" && isNaN(Number(el)))
+        break
+      }
+
+      case "numbers":{
+        testFunction = el => {
+          if (typeof el === "number" && !isNaN(el)){
+            return true
+          } else if (typeof el === "string" && el.trim() !== "" && !isNaN(Number(el))){
+            return true
+          } else {
+            return false
+          }
         }
         break
       }
     }
+
+    let filteredList = list.filter(el => {
+      let matchResult = testFunction(el)
+      return filterType === "for" ? matchResult : !matchResult
+    })
+
+    bridge.store(values.modifiedList, filteredList)
   }
 }
