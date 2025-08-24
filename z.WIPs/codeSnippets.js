@@ -5,3 +5,8 @@ let projectFolder
 if (workingDir.includes(path.join("common", "Bot Maker For Discord"))){
   projectFolder = botData.prjSrc
 } else {projectFolder = workingDir}
+
+// Checks If Something Is A JSON Object
+function isJSON(testObject){
+  return (testObject != undefined && typeof testObject === "object" && testObject.constructor === Object)
+}
