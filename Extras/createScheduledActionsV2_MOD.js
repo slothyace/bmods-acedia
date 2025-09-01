@@ -1,7 +1,7 @@
-modVersion = "v1.0.0"
+modVersion = "v1.0.0";
 module.exports = {
   data: {
-    name: "Create Independent Scheduled Actions"
+    name: "Create Independent Scheduled Actions",
   },
   aliases: [],
   modules: [],
@@ -24,7 +24,7 @@ module.exports = {
         days: { name: "In # Days", field: true },
         weeks: { name: "In # Weeks", field: true },
         months: { name: "In # Months", field: true },
-      }
+      },
     },
     "_",
     {
@@ -32,7 +32,7 @@ module.exports = {
       max: 1,
       required: false,
       types: {
-        customID: "Custom ID"
+        customID: "Custom ID",
       },
       name: "Custom ID",
       storeAs: "customID",
@@ -44,11 +44,11 @@ module.exports = {
             {
               element: "input",
               name: "Custom ID",
-              storeAs: "customID"
+              storeAs: "customID",
             },
-          ]
-        }
-      }
+          ],
+        },
+      },
     },
     "-",
     {
@@ -57,8 +57,8 @@ module.exports = {
       optional: true,
       storeAs: "associatedInfo",
       additionalOptions: {
-        text: { name: "Text", field: true }
-      }
+        text: { name: "Text", field: true },
+      },
     },
     "-",
     {
@@ -67,7 +67,7 @@ module.exports = {
       required: true,
       storeAs: "scheduled",
       types: {
-        scheduleActions: "Schedule Actions"
+        scheduleActions: "Schedule Actions",
       },
       UItypes: {
         scheduleActions: {
@@ -85,78 +85,81 @@ module.exports = {
                   {
                     element: "text",
                     header: true,
-                    text: "Why is this an option?"
+                    text: "Why is this an option?",
                   },
                   {
                     element: "text",
                     text: `
                     This is an option because the scheduled actions work similar to persistent components. They work across restarts but they cannot access variables created outside of them. You can assign some information via the "Associated Information" option outside of this menu, in the action. It will allow you to use that information you stored when the scheduled actions run.
-                    `
-                  }
-                ]
-              }
+                    `,
+                  },
+                ],
+              },
             },
             "-",
             {
               element: "actions",
               name: "Scheduled Actions",
-              storeAs: "actions"
+              storeAs: "actions",
             },
-          ]
-        }
-      }
+          ],
+        },
+      },
     },
     "-",
     {
       element: "store",
       name: "Store ID As",
-      storeAs: "storeID"
+      storeAs: "storeID",
     },
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `${values.actions.length} Actions - Store ID As ${constants.variable(values.storeID)}`
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
+    return `${values.actions.length} Actions - Store ID As ${constants.variable(values.storeID)}`;
   },
 
   compatibility: ["Any"],
 
   startup: (bridge) => {
-    const altPath = require("node:path")
-    const altFs = require("node:fs")
+    const altPath = require("node:path");
+    const altFs = require("node:fs");
 
-    const botData = require("../data.json")
-    const workingDir = altPath.normalize(process.cwd())
-    let projectFolder
-    if (workingDir.includes(altPath.join("common", "Bot Maker For Discord"))){
-      projectFolder = botData.prjSrc
-    } else {projectFolder = workingDir}
-
-    let schedulesJsonFilePath = altPath.join(projectFolder, "schedules.json")
-    
-    if (!altFs.existsSync(schedulesJsonFilePath)){
-      altFs.writeFileSync(schedulesJsonFilePath, "{}")
+    const botData = require("../data.json");
+    const workingDir = altPath.normalize(process.cwd());
+    let projectFolder;
+    if (workingDir.includes(altPath.join("common", "Bot Maker For Discord"))) {
+      projectFolder = botData.prjSrc;
+    } else {
+      projectFolder = workingDir;
     }
 
-    var cache = JSON.parse(altFs.readFileSync(schedulesJsonFilePath, 'utf8'));
+    let schedulesJsonFilePath = altPath.join(projectFolder, "schedules.json");
+
+    if (!altFs.existsSync(schedulesJsonFilePath)) {
+      altFs.writeFileSync(schedulesJsonFilePath, "{}");
+    }
+
+    var cache = JSON.parse(altFs.readFileSync(schedulesJsonFilePath, "utf8"));
 
     let getData = () => {
       return bridge.data.IO.schedules.cache;
-    }
+    };
     let writeData = (data) => {
       bridge.data.IO.schedules.cache = JSON.parse(JSON.stringify(data));
       altFs.writeFileSync(schedulesJsonFilePath, JSON.stringify(data, null, 2));
-    }
+    };
 
     bridge.data.IO.schedules = {
       get: getData,
       write: writeData,
-      cache
-    }
+      cache,
+    };
   },
   init: (values, bridge) => {
     setInterval(async () => {
@@ -164,13 +167,17 @@ module.exports = {
       let currentTime = Date.now();
       for (let schedule in schedules) {
         if (schedules[schedule].time < currentTime && schedules[schedule].id == bridge.data.id) {
-          bridge.store(bridge.actions[bridge.atAction].data.store, schedules[schedule].associatedInfo);
+          if (schedules[schedule].store) {
+            bridge.store(schedules[schedule].store, schedules[schedule].associatedInfo);
+          } else {
+            bridge.store(bridge.actions[bridge.atAction].data.store, schedules[schedule].associatedInfo);
+          }
           await bridge.runActions(schedules[schedule].actions);
           delete schedules[schedule];
           bridge.data.IO.schedules.write(schedules);
         }
       }
-    }, 5000)
+    }, 5000);
   },
   run(values, message, client, bridge) {
     let time;
@@ -185,7 +192,7 @@ module.exports = {
     };
 
     if (timeUnits[values.time.type]) {
-      time = Date.now() + (timeUnits[values.time.type] * bridge.transf(values.time.value));
+      time = Date.now() + timeUnits[values.time.type] * bridge.transf(values.time.value);
     } else {
       time = bridge.transf(values.time.value);
     }
@@ -193,18 +200,22 @@ module.exports = {
     let data = bridge.data.IO.schedules.get() || {};
     let assignedID = `${time}#${bridge.data.id}`;
     if (values.customID && values.customID[0]?.data.customID) {
-      assignedID = bridge.transf(values.customID[0].data.customID)
+      assignedID = bridge.transf(values.customID[0].data.customID);
     }
 
     data[assignedID] = {
       id: bridge.data.id,
-      associatedInfo: values.associatedInfo.type == 'text' ? bridge.transf(values.associatedInfo.value) : bridge.get(values.associatedInfo),
+      associatedInfo:
+        values.associatedInfo.type == "text"
+          ? bridge.transf(values.associatedInfo.value)
+          : bridge.get(values.associatedInfo),
       time,
       createdAt: new Date().getTime(),
-      actions: values.actions
-    }
+      actions: values.actions,
+      store: values.store,
+    };
 
     bridge.data.IO.schedules.write(data);
     bridge.store(values.storeID, assignedID);
   },
-}
+};
