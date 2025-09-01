@@ -39,6 +39,7 @@ module.exports = {
       UItypes: {
         customID: {
           name: "Custom ID",
+          data: {},
           UI: [
             {
               element: "input",
