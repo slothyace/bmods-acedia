@@ -1,4 +1,4 @@
-modVersion = "v1.0.0";
+modVersion = "v1.1.0";
 module.exports = {
   data: {
     name: "Catbox.moe",
@@ -37,6 +37,7 @@ module.exports = {
       choices: {
         uploadFile: { name: "Upload File", field: true, placeholder: "path/to/file.ext" },
         uploadUrl: { name: "Upload URL", field: true, placeholder: "http://example.com/url" },
+        uploadBuffer: { name: "Upload Buffer", field: true, placeholder: "fileName.ext" },
         deleteFile: { name: "Delete File(s)", field: true, placeholder: "fileName.ext" },
       },
       help: {
@@ -47,6 +48,7 @@ module.exports = {
             text: `
             Upload File: The Path To The File To Upload, Relative To The Project Folder.<br><br>
             Upload URL: The URL Of The Content To Upload.<br><br>
+            Upload Buffer: The File Name
             Delete File: The Filename On catbox.moe.<br>
             For Example:<br>
             If My File Is Uploaded To catbox And It Returns "https://files.catbox.moe/6px9c6.html", The Filename Is "6px9c6.html"<br>
@@ -55,6 +57,12 @@ module.exports = {
           },
         ],
       },
+    },
+    "_",
+    {
+      element: "variable",
+      storeAs: "buffer",
+      name: "Buffer"
     },
     "-",
     {
@@ -80,13 +88,42 @@ module.exports = {
 
       case "uploadUrl": {
         subtitle = `Upload URL "${values.action.value}" To catbox.moe`;
+        break
+      }
+
+      case "uploadBuffer": {
+        subtitle = `Upload Buffer ${values.buffer.type}(${values.buffer.value}) To catbox.moe`;
+        break
       }
 
       case "deleteFile": {
         subtitle = `Delete File(s) "${values.action.value}" From catbox.moe`;
+        break
       }
     }
     return subtitle;
+  },
+
+  script: (values) => {
+    function reflem(skipAnimation) {
+      if (values.action.type == "uploadBuffer") {
+        values.UI[3].element = "_"
+        values.UI[4].element = "variable"
+      } else {
+        values.UI[3].element = ""
+        values.UI[4].element = ""
+      }
+
+      setTimeout(() => {
+        values.updateUI()
+      }, skipAnimation ? 1 : values.commonAnimation * 100)
+    }
+
+    reflem(true)
+
+    values.events.on("change", () => {
+      reflem()
+    })
   },
 
   compatibility: ["Any"],
@@ -117,9 +154,9 @@ module.exports = {
     }
 
     async function sendForm(form) {
-      for (const [key, val] of form) {
-        console.log(key, val);
-      }
+      // for (const [key, val] of form) {
+      //   console.log(key, val);
+      // }
       const response = await fetch(catBoxApi, {
         method: "POST",
         body: form,
@@ -139,7 +176,7 @@ module.exports = {
         try {
           const parsed = JSON.parse(input);
           if (Array.isArray(parsed)) return parsed;
-        } catch {}
+        } catch { }
       }
       return Array.isArray(input) ? input : [input];
     }
@@ -147,10 +184,19 @@ module.exports = {
     function extractFileName(actionDataString) {
       try {
         let parsed = new URL(actionDataString);
-        return parsed.pathname.split("/").pop;
+        return parsed.pathname.split("/").pop();
       } catch {
         return actionDataString;
       }
+    }
+
+    function randomString(length) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let result = '';
+      for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
     }
 
     let result;
@@ -170,6 +216,22 @@ module.exports = {
           let form = new FormData();
           let fileBuffer = fs.readFileSync(filePath);
           let fileName = path.basename(filePath);
+          form.append("reqtype", "fileupload");
+          if (userHash) {
+            form.append("userhash", userHash);
+          }
+          form.append("fileToUpload", new Blob([fileBuffer]), fileName);
+          result = await sendForm(form);
+          break;
+        }
+
+        case "uploadBuffer": {
+          let form = new FormData();
+          let fileBuffer = bridge.get(values.buffer)
+          if (!Buffer.isBuffer(fileBuffer)) {
+            throw new Error(`Variable Provided Isn't A Buffer!`)
+          }
+          let fileName = actionData.trim() || `upload-${randomString(16)}.bin`
           form.append("reqtype", "fileupload");
           if (userHash) {
             form.append("userhash", userHash);
