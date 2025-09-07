@@ -48,7 +48,7 @@ module.exports = {
             text: `
             Upload File: The Path To The File To Upload, Relative To The Project Folder.<br><br>
             Upload URL: The URL Of The Content To Upload.<br><br>
-            Upload Buffer: The File Name
+            Upload Buffer: The Filename Of The Buffer.<br><br>
             Delete File: The Filename On catbox.moe.<br>
             For Example:<br>
             If My File Is Uploaded To catbox And It Returns "https://files.catbox.moe/6px9c6.html", The Filename Is "6px9c6.html"<br>
