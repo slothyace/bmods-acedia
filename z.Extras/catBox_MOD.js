@@ -106,7 +106,7 @@ module.exports = {
 
   script: (values) => {
     function reflem(skipAnimation) {
-      if (values.action.type == "uploadBuffer") {
+      if (values.data.action.type == "uploadBuffer") {
         values.UI[3].element = "_"
         values.UI[4].element = "variable"
       } else {
