@@ -48,7 +48,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Loop Thru ${values.folderPath.startsWith("/") ? values.folderPath : "/${values.folderPath}"}`
+    return `Loop Thru ${values.folderPath.startsWith("/") ? values.folderPath : "/" + (values.folderPath||"")}`
   },
 
   compatibility: ["Any"],
