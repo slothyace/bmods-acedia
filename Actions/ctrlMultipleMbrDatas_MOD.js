@@ -61,7 +61,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants) => {
-    return `Control ${values.retrieveList.length} Member Datas.`
+    return `Control ${values.editList.length} Member Datas.`
   },
 
   compatibility: ["Any"],
@@ -71,43 +71,51 @@ module.exports = {
     let dataType = "members"
 
     for (let edit of values.editList) {
-      let editData = edit.data
-      let editObject = await bridge.getUser(editData.user)
-      let id = `${editObject.member.guild.id}${editObject.id}`
+      try{
+        let editData = edit.data
+        let editObject = await bridge.getUser(editData.user)
+        let id = `${editObject.member.guild.id}${editObject.id}`
 
-      let currentData = ""
-      let dataName = bridge.transf(editData.dataName)
-      if(storedData[dataType][id][dataName]){
-        currentData = storedData[dataType][id][dataName]
-      }
+        let currentData = ""
+        let dataName = bridge.transf(editData.dataName)
+        if(!storedData[dataType][id]){
+          storedData[dataType][id] = {}
+        }
+        if(storedData[dataType][id][dataName]){
+          currentData = storedData[dataType][id][dataName]
+        }
 
-      let controlType = bridge.transf(values.control.type)
-      switch(controlType){
-        case "add":{
-          let controlValue = bridge.transf(editData.control.value)
-          if(parseFloat(currentData) != NaN && parseFloat(controlValue) != NaN && currentData && editData.control.value){
-            currentData = Number(currentData) + Number(controlValue)
-          } else {
-            currentData = `${currentData}${controlValue}`
+        let controlType = bridge.transf(editData.control.type)
+        switch(controlType){
+          case "add":{
+            let controlValue = bridge.transf(editData.control.value)
+            if(parseFloat(currentData) != NaN && parseFloat(controlValue) != NaN && currentData && editData.control.value){
+              currentData = Number(currentData) + Number(controlValue)
+            } else {
+              currentData = `${currentData}${controlValue}`
+            }
+            break
           }
-          break
+
+          case "overwrite":{
+            let controlValue = bridge.transf(editData.control.value)
+            currentData = controlValue
+            break
+          }
+
+          case "overwriteList":{
+            let controlValue = bridge.get(editData.variable)
+            currentData = controlValue
+            break
+          }
         }
 
-        case "overwrite":{
-          let controlValue = bridge.transf(editData.control.value)
-          currentData = controlValue
-          break
-        }
-
-        case "overwriteList":{
-          let controlValue = bridge.get(editData.variable)
-          currentData = controlValue
-          break
-        }
+        storedData[dataType][id][dataName] = currentData 
+      } catch (err){
+        console.log(err)
+        continue
       }
-
-      storedData[dataType][id][dataName] = currentData
-      bridge.data.IO.write(storedData)
     }
+    bridge.data.IO.write(storedData)
   }
 }
