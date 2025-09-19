@@ -43,7 +43,7 @@ module.exports = {
             {
               element: "store",
               storeAs: "store",
-              name: "Stored Value As"
+              name: "Store Value As"
             }
           ],
         },
