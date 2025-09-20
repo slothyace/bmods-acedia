@@ -4,10 +4,9 @@ xcopy /y "Tweaks" "./Actions"
 xcopy /y "Extras" "./Actions"
 echo Merging Done.
 timeout /t 5
-cls
 rmdir /s /q "Fixes"
 rmdir /s /q "QOLs"
 rmdir /s /q "Tweaks"
 rmdir /s /q "Extras"
-echo Clean Up Done.
+echo Cleanup Done.
 timeout /t 5

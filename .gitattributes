@@ -1,9 +1,7 @@
 .assets/ export-ignore
-.documentation/ export-ignore
 .github/ export-ignore
+z.Abandoned/ export-ignore
+z.Extras/ export-ignore
+z.WIPs/ export-ignore
 .gitattributes export-ignore
-.abandoned/ export-ignore
-
-WIPs/ export-ignore
-
 README.md export-ignore
