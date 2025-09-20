@@ -1,7 +1,7 @@
-modVersion = "v1.0.0"
+modVersion = "v1.0.0";
 module.exports = {
   data: {
-    name: "Console Forwarder"
+    name: "Console Forwarder",
   },
   aliases: [],
   modules: [],
@@ -14,39 +14,41 @@ module.exports = {
   UI: [
     {
       element: "text",
-      text: "This Mod Is Activated On Startup, Allowing Console Events To Be Forwarded."
+      text: "This Mod Is Activated On Startup, Allowing Console Events To Be Forwarded.",
     },
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  startup: async (bridge, client)=>{
-    const EventEmitter = require("events")
-    const consoleEmitter = new EventEmitter()
+  startup: async (bridge, client) => {
+    const EventEmitter = require("events");
+    const consoleEmitter = new EventEmitter();
 
-    const methods = ["log", "info", "warn", "error", "debug"]
+    const methods = ["log", "info", "warn", "error", "debug"];
     methods.forEach((method) => {
       const originalFunc = console[method];
       console[method] = (...args) => {
-        originalFunc.apply(console, args);       // prints normally
-        client.emit("consoleEvent", ...args); // emits exact same args
+        originalFunc.apply(console, args);
+        client.emit("consoleEvent", ...args);
       };
     });
   },
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `This Mod Is Activated On Startup`
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
+    return `This Mod Is Activated On Startup`;
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
-      await client.getMods().require(moduleName)
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
+      await client.getMods().require(moduleName);
     }
-    
-    console.log(`This Mod Is Already Activated On Startup!`)
-  }
-}
+
+    console.log(`This Mod Is Already Activated On Startup!`);
+  },
+};
