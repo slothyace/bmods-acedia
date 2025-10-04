@@ -10,3 +10,6 @@ if (workingDir.includes(path.join("common", "Bot Maker For Discord"))){
 function isJSON(testObject){
   return (testObject != undefined && typeof testObject === "object" && testObject.constructor === Object)
 }
+
+// Title Cases Text
+const titleCase = string => string.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
