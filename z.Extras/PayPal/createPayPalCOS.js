@@ -6,7 +6,7 @@ module.exports = {
       {
         "type": "context",
         "data": {
-          "brandName": "",
+          "brandName": "Acedia PayPal Mods",
           "landingPage": {
             "type": "billing",
             "value": ""
