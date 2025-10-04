@@ -160,7 +160,7 @@ module.exports = {
       projectFolder = workingDir;
     }
 
-    let restrictionsFilePath = altPath.join(projectFolder, "AppData", "Toolkit", "restrictions.json")
+    let restrictionsFilePath = altPath.join(projectFolder, "aceModsJSON", "restrictions.json")
 
     if (!altFs.existsSync(restrictionsFilePath)){
       altFs.mkdirSync(altPath.dirname(restrictionsFilePath), {recursive: true})
@@ -255,12 +255,21 @@ module.exports = {
       }
 
       default:{
-        targetId = "GLBL"
+        targetId = "GLOBAL"
         break
       }
     }
 
     let restrictionId = `${targetType}${targetId}-${commandId}`
+
+    async function notOngoing(){
+      let expireTimestamp = Number(currentTime) + Number(timeUnits[values.time.type] * bridge.transf(values.time.value))
+      restrictionData[restrictionId] = {
+        expiresAt: expireTimestamp
+      }
+      bridge.data.IO.restrictions.write(restrictionData)
+      await bridge.call(values.ifNotOngoing, values.ifNotOngoingActions)
+    }
 
     if (restrictionData[restrictionId]){
       let timeTillExpiry = Number(restrictionData[restrictionId].expiresAt) - Number(currentTime)
@@ -268,20 +277,10 @@ module.exports = {
         bridge.store(values.timeTillExpiry, timeTillExpiry)
         await bridge.call(values.ifOngoing, values.ifOngoingActions)
       } else {
-        let expireTimestamp = Number(currentTime) + Number(timeUnits[values.time.type] * bridge.transf(values.time.value))
-        restrictionData[restrictionId] = {
-          expiresAt: expireTimestamp
-        }
-        bridge.data.IO.restrictions.write(restrictionData)
-        await bridge.call(values.ifNotOngoing, values.ifNotOngoingActions)
+        notOngoing()
       }
     } else {
-      let expireTimestamp = Number(currentTime) + Number(timeUnits[values.time.type] * bridge.transf(values.time.value))
-      restrictionData[restrictionId] = {
-        expiresAt: expireTimestamp
-      }
-      bridge.data.IO.restrictions.write(restrictionData)
-      await bridge.call(values.ifNotOngoing, values.ifNotOngoingActions)
+      notOngoing()
     }
   }
 }
