@@ -5,7 +5,7 @@ module.exports = {
   },
   aliases: [],
   modules: [],
-  category: "",
+  category: "Schedules",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
     creator: "Acedia",
