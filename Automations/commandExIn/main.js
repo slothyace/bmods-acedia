@@ -8,7 +8,20 @@ module.exports = {
     const dataJSONPath = path.join(process.cwd(), "AppData", "data.json");
     const botData = require(dataJSONPath);
     const commands = botData.commands;
-    const downloadsDir = path.join(os.homedir(), "Downloads");
+    let downloadsDir = path.join(os.homedir(), "Downloads");
+    let automationDataJSONPath = path.join(process.cwd(), "Automations", "commandExIn", "preferences.json");
+    if (!fs.existsSync(automationDataJSONPath)) {
+      fs.mkdirSync(path.dirname(automationDataJSONPath), { recursive: true });
+      let defaultDataStructure = {
+        export: "",
+      };
+      fs.writeFileSync(automationDataJSONPath, JSON.stringify(defaultDataStructure, null, 2));
+    }
+
+    let automationPreferances = JSON.parse(fs.readFileSync(automationDataJSONPath));
+    if (automationPreferances.export !== "" && automationPreferances.export !== "undefined") {
+      downloadsDir = automationPreferances.export;
+    }
 
     const commandTypes = {
       textCommand: "Text Cmd",
@@ -33,15 +46,51 @@ module.exports = {
       "-",
       {
         element: "text",
-        text: modVersion
-      }
+        text: modVersion,
+      },
     ]);
 
     // =========================
     // EXPORT SECTION
     // =========================
     if (data.action.type === "export") {
-      const exportUI = [];
+      let defaultData = {
+        exportPath: downloadsDir,
+      };
+
+      let exportUI = [];
+      exportUI.push({
+        element: "input",
+        storeAs: "exportPath",
+        name: "Export Path",
+      });
+
+      exportUI.push("_");
+
+      exportUI.push({
+        element: "html",
+        html: `
+          <button
+            style="width: fit-content; margin-left: auto; margin-right: auto"
+            class="hoverablez flexbox"
+            onclick="
+              let inputPath = awaitIPCResponse({channel: 'saveDialog'}, 'saveDialogResult').then(path => {
+                let inputPath = path[0]
+                let inputArea = document.getElementById('exportPath')
+                if (inputPath == undefined) {
+                  inputArea.focus()
+                  return
+                }
+                inputArea.value = inputPath
+                inputArea.focus()
+              })"
+          >
+            <btext id="buttonText"> Choose Export Path </btext>
+          </button>
+          `,
+      });
+
+      exportUI.push("-");
 
       commands.forEach((command) => {
         exportUI.push({
@@ -53,14 +102,9 @@ module.exports = {
           UItypes: {
             command: {
               name: command.name,
-              UI: [
-                { element: "input", storeAs: "name", name: "Name" },
-                "-",
-                { element: "actions", storeAs: "actions", name: "Actions" },
-              ],
+              UI: [{ element: "input", storeAs: "name", name: "Name" }],
               data: {
                 name: command.name,
-                actions: command.actions,
                 data: command,
               },
             },
@@ -69,9 +113,19 @@ module.exports = {
         exportUI.push("_");
       });
 
-      options.showInterface(exportUI).then((resultData) => {
+      options.showInterface(exportUI, defaultData).then((resultData) => {
+        if (resultData.exportPath !== path.join(os.homedir(), "Downloads")) {
+          automationPreferances.export = path.normalize(resultData.exportPath);
+          fs.writeFileSync(automationDataJSONPath, JSON.stringify(automationPreferances, null, 2));
+        }
+
         let exportedCount = 0;
-        const selectedIds = Object.keys(resultData).filter((k) => resultData[k]?.length && k !== "name");
+        downloadsDir = path.normalize(resultData.exportPath);
+        delete resultData["exportPath"];
+        const selectedIds = Object.keys(resultData).filter((k) => resultData[k]?.length);
+        if (!fs.existsSync(downloadsDir)) {
+          fs.mkdirSync(downloadsDir, { recursive: true });
+        }
 
         if (selectedIds.length === 0) return options.result(`⚠️ No Commands Were Selected For Export`);
 
@@ -92,15 +146,45 @@ module.exports = {
     // IMPORT SECTION
     // =========================
     else if (data.action.type === "import") {
-      const defaultData = { path: "", generateBackup: true };
+      let defaultData = { path: "", generateBackup: true };
 
-      const importUI = [
+      let importUI = [
         {
           element: "input",
           storeAs: "path",
           name: "Path Of File / Folder",
           placeholder: "C:\\Path\\To\\file.json | C:\\Path\\To\\JSONfolder",
         },
+        // "_",
+        // {
+        //   element: "html",
+        //   html: `
+        //     <div
+        //     id="dropArea"
+        //     style="width: fit-content; margin-left: auto; margin-right: auto; padding: 20px;border: 2px dashed #555;border-radius: 6px;text-align: center;"
+        //     class="hoverablez flexbox"
+        //     ondragover="event.preventDefault(); this.style.borderColor='#00b4d8';"
+        //     ondragleave="this.style.borderColor='#555';"
+        //     ondrop="
+        //       event.preventDefault();
+        //       this.style.borderColor='#555';
+        //       const file = event.dataTransfer.files[0];
+        //       console.log(file)
+        //       if (!file || !file.path) return;
+        //       const filePath = file.path;
+        //       if (!filePath.endsWith('.json') && !file.type && !file.isDirectory) {
+        //         alert('Only JSON Files Or Folders Are Allowed.');
+        //         return;
+        //       }
+        //       const inputArea = document.getElementById('path');
+        //       inputArea.value = filePath;
+        //       inputArea.focus();
+        //     "
+        //   >
+        //     Drop a JSON file or folder here
+        //   </div>
+        //     `,
+        // },
         "-",
         {
           element: "toggle",
@@ -143,7 +227,6 @@ module.exports = {
         if (generateBackup) {
           const projectDir = botData.prjSrc;
           const backupPath = path.join(projectDir, "backup_data.json");
-          console.log(backupPath);
           fs.writeFileSync(backupPath, JSON.stringify(botData, null, 2), "utf8");
           options.burstInform({ element: "text", text: `✅ Backup Saved To ${backupPath}` });
         }
@@ -175,7 +258,7 @@ module.exports = {
         fs.writeFileSync(dataJSONPath, JSON.stringify(botData, null, 2), "utf8");
 
         options.result(`✅ ${commandsMerged} Command(s) Imported Successfully, Reloading...`);
-        setTimeout(()=>location.reload(), 1000)
+        setTimeout(() => location.reload(), 1000);
       });
     }
   },
