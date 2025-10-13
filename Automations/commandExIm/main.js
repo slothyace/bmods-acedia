@@ -138,7 +138,7 @@ module.exports = {
           exportedCount++;
         }
 
-        options.result(`✅ Exported ${exportedCount} command(s) to ${downloadsDir}`);
+        options.result(`✅ Exported ${exportedCount} Command(s) To ${downloadsDir}`);
       });
     }
 
