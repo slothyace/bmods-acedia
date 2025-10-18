@@ -1,10 +1,11 @@
 modVersion = "v1.0.0"
 const titleCase = string => string.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
+
 module.exports = {
   data: {
-    name: titleCase("Check If Text Includes List Of Words")
+    name: titleCase("Check Text For Word")
   },
-  aliases: [],
+  aliases: ["Check For Word", "Check For Phrase"],
   modules: [],
   category: "Text",
   info: {
