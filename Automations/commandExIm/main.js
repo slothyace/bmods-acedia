@@ -1,9 +1,9 @@
 modVersion = "v1.0.0";
 module.exports = {
   run: async (options) => {
-    let fs = require("node:fs");
-    let path = require("node:path");
-    let os = require("node:os");
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const os = require("node:os");
 
     let dataJSONPath = path.join(process.cwd(), "AppData", "data.json");
     let downloadsDir = path.join(os.homedir(), "Downloads");
@@ -164,36 +164,6 @@ module.exports = {
           name: "Path Of File / Folder",
           placeholder: "C:\\Path\\To\\file.json | C:\\Path\\To\\JSONfolder",
         },
-        // "_",
-        // {
-        //   element: "html",
-        //   html: `
-        //     <div
-        //     id="dropArea"
-        //     style="width: fit-content; margin-left: auto; margin-right: auto; padding: 20px;border: 2px dashed #555;border-radius: 6px;text-align: center;"
-        //     class="hoverablez flexbox"
-        //     ondragover="event.preventDefault(); this.style.borderColor='#00b4d8';"
-        //     ondragleave="this.style.borderColor='#555';"
-        //     ondrop="
-        //       event.preventDefault();
-        //       this.style.borderColor='#555';
-        //       let file = event.dataTransfer.files[0];
-        //       console.log(file)
-        //       if (!file || !file.path) return;
-        //       let filePath = file.path;
-        //       if (!filePath.endsWith('.json') && !file.type && !file.isDirectory) {
-        //         alert('Only JSON Files Or Folders Are Allowed.');
-        //         return;
-        //       }
-        //       let inputArea = document.getElementById('path');
-        //       inputArea.value = filePath;
-        //       inputArea.focus();
-        //     "
-        //   >
-        //     Drop a JSON file or folder here
-        //   </div>
-        //     `,
-        // },
         "-",
         {
           element: "toggle",
