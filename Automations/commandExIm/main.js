@@ -209,6 +209,10 @@ module.exports = {
                   continue
                 }
 
+                if (file.type !== 'application/json'){
+                  continue
+                }
+
                 file.text().then(fileContent => {
                   try {
                     commandJSON = JSON.parse(fileContent)
