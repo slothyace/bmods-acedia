@@ -1,4 +1,4 @@
-modVersion = "v1.0.0";
+modVersion = "v1.1.0";
 module.exports = {
   run: async (options) => {
     const fs = require("node:fs");
@@ -23,7 +23,7 @@ module.exports = {
 
     let titleCase = (string) => string.split(" ").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
 
-    let readAndPush = (fileLocation) => {
+    let readAndPush = (fileLocation, commands) => {
       let rawCommandJson;
       try {
         rawCommandJson = fs.readFileSync(fileLocation, "utf8");
@@ -181,14 +181,53 @@ module.exports = {
     else if (data.action.type === "import") {
       let botData = JSON.parse(fs.readFileSync(dataJSONPath));
       let commands = botData.commands;
-      let defaultData = { path: "", generateBackup: true };
+      let defaultImportFolderPath = path.join(process.cwd(), "Automations", "commandExIm", "ImportCache")
+      let defaultData = { path: defaultImportFolderPath, generateBackup: true };
 
       let importUI = [
         {
-          element: "input",
-          storeAs: "path",
-          name: "Path Of File / Folder",
-          placeholder: "C:\\Path\\To\\file.json | C:\\Path\\To\\JSONfolder",
+          element: "html",
+          html: `
+            <div
+            id="dropArea"
+            style="width: fit-content; margin-left: auto; margin-right: auto; padding: 20px;border: 2px dashed #555;border-radius: 6px;text-align: center;"
+            class="hoverablez flexbox"
+            ondragover="event.preventDefault(); this.style.borderColor='#00b4d8';"
+            ondragleave="this.style.borderColor='#555';"
+            ondrop="
+              event.preventDefault();
+              this.style.borderColor='#555';
+              let files = event.dataTransfer.files;
+              for (let file of files){
+                if (!file.name.toLowerCase().endsWith('.json')){
+                  continue
+                }
+
+                file.text().then(fileContent => {
+                  try {
+                    commandJSON = JSON.parse(fileContent)
+                    if (commandJSON.name && commandJSON.type && commandJSON.trigger && commandJSON.actions && commandJSON.customId){
+                      const fs = require('fs')
+                      const path = require('path')
+                      let automationDir = path.join(process.cwd(), 'Automations', 'commandExIm')
+                      let tempImportDir = path.join(automationDir, 'importCache')
+                      if (!fs.existsSync(tempImportDir)){
+                        fs.mkdirSync(tempImportDir, {recursive:true})
+                      }
+                      let fileName = (commandJSON.name + '_' + commandJSON.type + Date.now()).replace(/[^\\w\\-]+/g, '_') + '.json'
+                      let importFilePath = path.join(tempImportDir, fileName)
+                      console.log(importFilePath)
+                      fs.writeFileSync(importFilePath, JSON.stringify(commandJSON, null, 2))
+                    }
+                  } catch (err) {
+                  }
+                })
+              }
+            "
+          >
+            Drop JSON File(s) Here
+          </div>
+            `,
         },
         "-",
         {
@@ -222,16 +261,17 @@ module.exports = {
           for (let file of files) {
             if (path.extname(file).toLowerCase() !== ".json") continue;
             let fileLocation = path.join(resultDataPath, file);
-            if (readAndPush(fileLocation)) commandsMerged++;
+            if (readAndPush(fileLocation, commands)) commandsMerged++;
           }
         } else if (stats.isFile()) {
-          if (readAndPush(resultDataPath)) commandsMerged++;
+          if (readAndPush(resultDataPath, commands)) commandsMerged++;
         } else {
           return options.result(titleCase(`⚠️ ${resultDataPath} Is Neither A File Nor A Folder`));
         }
 
         botData.commands = commands;
         fs.writeFileSync(dataJSONPath, JSON.stringify(botData, null, 2), "utf8");
+        fs.rm(defaultImportFolderPath, {recursive:true, force:true})
 
         options.result(titleCase(`✅ ${commandsMerged} Command(s) Imported Successfully, Reloading...`));
         setTimeout(() => location.reload(), 1000);
