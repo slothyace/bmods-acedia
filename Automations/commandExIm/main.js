@@ -108,7 +108,7 @@ module.exports = {
         element: "html",
         html: `
           <button
-            style="width: fit-content; margin-left: auto; margin-right: auto"
+            style="width: 95%; margin-left: auto; margin-right: auto"
             class="hoverablez flexbox"
             onclick="
               let inputPath = awaitIPCResponse({channel: 'saveDialog'}, 'saveDialogResult').then(path => {
@@ -196,7 +196,7 @@ module.exports = {
           html: `
             <div
             id="dropArea"
-            style="width: fit-content; margin-left: auto; margin-right: auto; padding: 20px;border: 2px dashed #555;border-radius: 6px;text-align: center;"
+            style="width: 93%; margin-left: auto; margin-right: auto; padding: 20px;border: 2px dashed #555;border-radius: 6px;text-align: center;"
             class="hoverablez flexbox"
             ondragover="event.preventDefault(); this.style.borderColor='#00b4d8';"
             ondragleave="this.style.borderColor='#555';"
