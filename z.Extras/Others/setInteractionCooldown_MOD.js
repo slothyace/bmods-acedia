@@ -5,7 +5,7 @@ module.exports = {
   data: {
     name: "Set Interaction Restriction"
   },
-  aliases: ["Set Cooldown", "Cooldown", "Command Cooldown"],
+  aliases: ["Set Cooldown", "Cooldown", "Interaction Cooldown"],
   modules: [],
   category: "Control",
   info: {
