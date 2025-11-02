@@ -255,7 +255,7 @@ module.exports = {
       }
     }
 
-    let restrictionId = `${targetType}${targetId}-${commandId}`
+    let restrictionId = `command-${targetType}${targetId}-${commandId}`
 
     async function notOngoing(){
       let expireTimestamp = Number(currentTime) + Number(timeUnits[values.time.type] * bridge.transf(values.time.value))
