@@ -1,8 +1,9 @@
-modVersion = "v1.2.0"
+modVersion = "v1.0.0"
+const { Interaction, InteractionTypes } = require("oceanic.js")
 
 module.exports = {
   data: {
-    name: "Set Tracked Time Restriction"
+    name: "Set Interaction Restriction"
   },
   aliases: ["Set Cooldown", "Cooldown", "Command Cooldown"],
   modules: [],
@@ -13,6 +14,18 @@ module.exports = {
     donate: "https://ko-fi.com/slothyacedia",
   },
   UI: [
+    {
+      element: "interaction",
+      storeAs: "interaction",
+      name: "Interaction",
+    },
+    "_",
+    {
+      element: "toggle",
+      storeAs: "replyToInteraction",
+      name: "If Possible, Use The Current Interaction"
+    },
+    "-",
     {
       element: "typedDropdown",
       storeAs: "time",
@@ -44,6 +57,17 @@ module.exports = {
       storeAs: "user",
       name: "User To Restrict",
     },
+    {
+      element: "input",
+      storeAs: "identifier",
+      name: "Identifier",
+    },
+    "_",
+    {
+      element: "toggle",
+      storeAs: "useType",
+      name: "Restrict To Same Interaction Type"
+    },
     "-",
     {
       element: "store",
@@ -71,7 +95,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    let subtitle = `Restrict Command For ${values.target.type} For ${values.time.value} ${values.time.type}`
+    let subtitle = `Restrict Iteraction For ${values.target.type} For ${values.time.value} ${values.time.type}`
     const titleCase = string => string.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
     return titleCase(subtitle)
   },
@@ -109,7 +133,7 @@ module.exports = {
         global: "_"
       }
 
-      values.UI[4] = elementMap[targetType]
+      values.UI[8] = elementMap[targetType]
 
       setTimeout(()=>{
         values.updateUI()
@@ -204,6 +228,16 @@ module.exports = {
       await client.getMods().require(moduleName)
     }
 
+    /**
+     * @type {Interaction}
+     */
+    var interaction = await bridge.getInteraction(values.interaction)
+    
+    let replyInteraction = bridge.getTemporary({class: "interactionStuff", name: "current"});
+    if (values.replyToInteraction && replyInteraction?.getOriginal) {
+      interaction = replyInteraction;
+    }
+
     let timeUnits = {
       seconds: 1000,
       minutes: 1000 * 60,
@@ -212,12 +246,15 @@ module.exports = {
     }
     
     let restrictionData = bridge.data.IO.restrictions.get() || {}
+
     let currentTime = Date.now()
     let targetType = values.target.type
-    let commandId = bridge.data.commandID
+    let identifier = bridge.transf(values.identifier).trim()
+    if (!identifier){
+      return console.log(`A Identifier Is Required For Interaction Cooldown To Work!`)
+    }
 
     let targetId
-
     switch(targetType){
       case "user":{
         let user = await bridge.getUser(values.user)
@@ -255,7 +292,19 @@ module.exports = {
       }
     }
 
-    let restrictionId = `${targetType}${targetId}-${commandId}`
+
+
+    let restrictionId = `interaction-${targetType}${targetId}-id:${identifier}`
+    if (values.useType == true){
+      let typeMap = {
+        [InteractionTypes.APPLICATION_COMMAND]: "cmd",
+        [InteractionTypes.MESSAGE_COMPONENT]: "msgcomp",
+        [InteractionTypes.MODAL_SUBMIT]: "modal",
+        [InteractionTypes.PING]: "ping",
+      }
+      let interactionType = typeMap[interaction.type] || "Unknown"
+      restrictionId = restrictionId + `-type:${interactionType}`
+    }
 
     async function notOngoing(){
       let expireTimestamp = Number(currentTime) + Number(timeUnits[values.time.type] * bridge.transf(values.time.value))
