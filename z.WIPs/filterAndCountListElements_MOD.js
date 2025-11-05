@@ -61,7 +61,7 @@ module.exports = {
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Look And Count For ${values.elements.length} Elements`
+    return `Look And Count For ${values.listElements.length} Elements`
   },
 
   compatibility: ["Any"],
@@ -72,6 +72,18 @@ module.exports = {
     }
     
     let inputList = bridge.get(values.inputList)
-    
+    for (let listElement of values.listElements){
+      listElementData = listElement.data
+      let elementValue = listElementData.elementValue
+      let comparisonValue = elementValue
+      let filteredList = inputList.filter(e => {
+        if (listElementData.caseSens == false){
+          e = e.toLowerCase()
+          comparisonValue = elementValue.toLowerCase()
+        }
+        return e == comparisonValue
+      })
+      bridge.store(listElementData.store, filteredList.length)
+    }
   }
 }
