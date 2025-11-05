@@ -73,7 +73,7 @@ module.exports = {
     
     let inputList = bridge.get(values.inputList)
     for (let listElement of values.listElements){
-      listElementData = listElement.data
+      let listElementData = listElement.data
       let elementValue = listElementData.elementValue
       let comparisonValue = elementValue
       let filteredList = inputList.filter(e => {
