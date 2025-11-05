@@ -81,6 +81,7 @@ module.exports = {
       let currentData = dataInput[keyData.key]
       bridge.store(keyData.oldValue, currentData)
       let controlType = keyData.newValue.type
+      let dataOverwrite
       switch(controlType){
           case "add":{
             let controlValue = bridge.transf(keyData.newValue.value)
