@@ -26,7 +26,7 @@ module.exports = {
         key: "key"
       },
       max: 250,
-      UITypes: {
+      UItypes: {
         key: {
           data: {},
           name: "Key",
