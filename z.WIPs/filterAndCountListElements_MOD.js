@@ -1,7 +1,7 @@
 modVersion = "v1.0.0"
 module.exports = {
   data: {
-    name: "Filter And Count List Elements"
+    name: "Count Repeated List Elements"
   },
   aliases: [],
   modules: [],
@@ -47,7 +47,7 @@ module.exports = {
             {
               element: "store",
               storeAs: "store",
-              name: "Store Number Of Occurences As"
+              name: "Store Number Of Occurrences As"
             }
           ]
         }
@@ -60,29 +60,32 @@ module.exports = {
     }
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Look And Count For ${values.listElements.length} Elements`
+  subtitle: (values, constants, thisAction) => {
+    return `Count ${values.listElements.length} Element${values.listElements.length !== 1 ? "s" : ""} In List`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
-    
-    let inputList = bridge.get(values.inputList)
-    for (let listElement of values.listElements){
-      let listElementData = listElement.data
-      let elementValue = listElementData.elementValue
-      let comparisonValue = elementValue
-      let filteredList = inputList.filter(e => {
-        if (listElementData.caseSens == false){
-          e = e.toLowerCase()
-          comparisonValue = elementValue.toLowerCase()
-        }
-        return e == comparisonValue
+
+    const inputList = bridge.get(values.inputList)
+    if (!Array.isArray(inputList)) return
+
+    for (const listElement of values.listElements) {
+      const listElementData = listElement.data
+      const elementValue = String(listElementData.elementValue)
+      const caseSensitive = listElementData.caseSens
+
+      const comparisonValue = caseSensitive ? elementValue : elementValue.toLowerCase()
+
+      const filteredList = inputList.filter(e => {
+        const val = String(e)
+        return (caseSensitive ? val : val.toLowerCase()) === comparisonValue
       })
+
       bridge.store(listElementData.store, filteredList.length)
     }
   }
