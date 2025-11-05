@@ -44,11 +44,12 @@ module.exports = {
               name: "Store Old Value As"
             },
             {
-              element: "var",
+              element: "typedDropdown",
               storeAs: "newValue",
               name: "Element Value",
-              also: {
-                string: "Text",
+              choices: {
+                add: {name: "Add To Value", field:true, placeholder: "Value To Add"},
+                overwrite: {name: "Overwrite", field:true, placeholder: "Value"},
               },
             },
           ]
@@ -77,13 +78,26 @@ module.exports = {
 
     for (let key of values.keys){
       let keyData = key.data
-      let dataOverwrite
-      bridge.store(keyData.oldValue, dataInput[keyData.key])
-      if (keyData.newValue.type == "string"){
-        dataOverwrite = bridge.transf(keyData.newValue.value)
-      } else {
-        dataOverwrite = bridge.get(keyData.newValue)
-      }
+      let currentData = dataInput[keyData.key]
+      bridge.store(keyData.oldValue, currentData)
+      let controlType = keyData.newValue.type
+      switch(controlType){
+          case "add":{
+            let controlValue = bridge.transf(keyData.newValue.value)
+            if(parseFloat(currentData) != NaN && parseFloat(controlValue) != NaN && currentData && keyData.newValue.value){
+              dataOverwrite = Number(currentData) + Number(controlValue)
+            } else {
+              dataOverwrite = `${currentData}${controlValue}`
+            }
+            break
+          }
+
+          case "overwrite":{
+            let controlValue = bridge.transf(keyData.newValue.value)
+            dataOverwrite = controlValue
+            break
+          }
+        }
       dataInput[keyData.key] = dataOverwrite
     }
   }
