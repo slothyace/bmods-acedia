@@ -57,10 +57,12 @@ module.exports = {
       storeAs: "user",
       name: "User To Restrict",
     },
+    "_",
     {
       element: "input",
       storeAs: "identifier",
       name: "Identifier",
+      placeholder: "Use A Unique Identifier, Do Not Use Interaction Id"
     },
     "_",
     {
