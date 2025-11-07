@@ -294,7 +294,9 @@ module.exports = {
       }
     }
 
-
+    if (identifier == interaction.id){
+      return console.log(`A Interaction ID Is Unique To Each Interaction And Thus, Can't Be Used As A Identifier For Cooldown`)
+    }
 
     let restrictionId = `interaction-${targetType}${targetId}-id:${identifier}`
     if (values.useType == true){
