@@ -78,7 +78,7 @@ module.exports = {
         isNumber: "Is Number",
         matchesRegex: "Matches Regex",
     }
-    return `Check If ${values.guild}[${values.dataName}] ${phraseMap[values.comparisonType.type]} ${values.comparisonType.value}`
+    return `Check If ${values.message}[${values.dataName}] ${phraseMap[values.comparisonType.type]} ${values.comparisonType.value}`
   },
 
   compatibility: ["Any"],
