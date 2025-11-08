@@ -78,7 +78,7 @@ module.exports = {
         isNumber: "Is Number",
         matchesRegex: "Matches Regex",
     }
-    return `Check If ${constants.channel(values.channel)}[${values.dataName}] ${phraseMap[values.comparisonType.type]} ${values.comparisonType.value}`
+    return `Check If ${values.channel}[${values.dataName}] ${phraseMap[values.comparisonType.type]} ${values.comparisonType.value}`
   },
 
   compatibility: ["Any"],
