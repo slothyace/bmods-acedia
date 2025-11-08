@@ -348,7 +348,7 @@ module.exports = {
           setTimeout(() => location.reload(), 1000);
         } else {
           try {
-            options.result(titleCase(`⚠️ No Commands Were Cached For Import`));
+            options.result(titleCase(`⚠️ No Commands Were Imported`));
           } catch {}
         }
       });
