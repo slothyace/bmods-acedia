@@ -42,7 +42,9 @@ module.exports = {
       try {
         rawCommandJson = fs.readFileSync(fileLocation, "utf8");
       } catch {
-        // options.burstInform({ element: "text", text: titleCase(`⚠️ Could Not Read File ${fileLocation}`) });
+        try {
+          options.burstInform({ element: "text", text: titleCase(`⚠️ Could Not Read File ${fileLocation}`) });
+        } catch {}
         return false;
       }
 
@@ -50,20 +52,29 @@ module.exports = {
       try {
         commandJson = JSON.parse(rawCommandJson);
       } catch {
-        // options.burstInform({ element: "text", text: titleCase(`⚠️ ${fileLocation} Contains Invalid JSON`) });
+        try {
+          options.burstInform({ element: "text", text: titleCase(`⚠️ ${fileLocation} Contains Invalid JSON`) });
+        } catch {}
         return false;
       }
 
       if (commandJson.name && commandJson.type && commandJson.trigger && commandJson.actions && commandJson.customId) {
       } else {
-        // options.burstInform({ element: "text", text: titleCase(`⚠️ Command Validation Failed`) });
+        try {
+          options.burstInform({ element: "text", text: titleCase(`⚠️ Command Validation Failed`) });
+        } catch {}
         return false;
       }
 
-      if (Array.isArray(commandJson)) commands.push(...commandJson);
-      else commands.push(commandJson);
+      if (Array.isArray(commandJson)) {
+        commands.push(...commandJson);
+      } else {
+        commands.push(commandJson);
+      }
 
-      // options.burstInform({ element: "text", text: titleCase(`✅ Imported ${fileLocation}`) });
+      try {
+        options.burstInform({ element: "text", text: titleCase(`✅ Imported ${fileLocation}`) });
+      } catch {}
       return true;
     };
 
@@ -95,39 +106,37 @@ module.exports = {
         exportPath: downloadsDir,
       };
 
-      let exportUI = [];
-      exportUI.push({
-        element: "input",
-        storeAs: "exportPath",
-        name: "Export Path",
-      });
-
-      exportUI.push("_");
-
-      exportUI.push({
-        element: "html",
-        html: `
-          <button
-            style="width: var(--width-in-editor); margin-left: auto; margin-right: auto"
-            class="hoverablez flexbox"
-            onclick="
-              let inputPath = awaitIPCResponse({channel: 'saveDialog'}, 'saveDialogResult').then(path => {
-                let inputPath = path[0]
-                let inputArea = document.getElementById('exportPath')
-                if (inputPath == undefined) {
+      let exportUI = [
+        {
+          element: "input",
+          storeAs: "exportPath",
+          name: "Export Path",
+        },
+        "_",
+        {
+          element: "html",
+          html: `
+            <button
+              style="width: var(--width-in-editor); margin-left: auto; margin-right: auto"
+              class="hoverablez flexbox"
+              onclick="
+                let inputPath = awaitIPCResponse({channel: 'saveDialog'}, 'saveDialogResult').then(path => {
+                  let inputPath = path[0]
+                  let inputArea = document.getElementById('exportPath')
+                  if (inputPath == undefined) {
+                    inputArea.focus()
+                    return
+                  }
+                  inputArea.value = inputPath
                   inputArea.focus()
-                  return
-                }
-                inputArea.value = inputPath
-                inputArea.focus()
-              })"
-          >
-            <btext id="buttonText"> Choose Export Path </btext>
-          </button>
-          `,
-      });
-
-      exportUI.push("-");
+                })"
+            >
+              <btext id="buttonText"> Choose Export Path </btext>
+            </button>
+            `,
+        },
+        "-",
+      ];
 
       commands.forEach((command) => {
         exportUI.push({
@@ -177,7 +186,7 @@ module.exports = {
 
         try {
           options.result(titleCase(`✅ Exported ${exportedCount} Command(s) To ${downloadsDir}`));
-        } catch (err) {}
+        } catch {}
       });
     }
 
@@ -188,8 +197,11 @@ module.exports = {
       let botData = JSON.parse(fs.readFileSync(dataJSONPath));
       let commands = botData.commands;
       let defaultImportFolderPath = path.join(process.cwd(), "Automations", "commandExIm", "ImportCache");
-      if (!fs.existsSync(defaultImportFolderPath)){
-        fs.mkdirSync(defaultImportFolderPath, {recursive:true})
+      if (fs.existsSync(defaultImportFolderPath)) {
+        fs.rm(defaultImportFolderPath, { recursive: true, force: true });
+      }
+      if (!fs.existsSync(defaultImportFolderPath)) {
+        fs.mkdirSync(defaultImportFolderPath, { recursive: true });
       }
       let defaultData = { path: defaultImportFolderPath, generateBackup: true };
 
@@ -252,7 +264,7 @@ module.exports = {
                       logToConsole('File Cached For Import: ' + file.name, '#00ff00')
                     } else {
                       throw new error('Content Not Valid JSON')}
-                  } catch (err) {logToConsole('Invalid File (Invalid JSON): ' + file.name, '#ff0000')}
+                  } catch {logToConsole('Invalid File (Invalid JSON): ' + file.name, '#ff0000')}
                 })
               }
             "
@@ -270,7 +282,7 @@ module.exports = {
         "_",
         {
           element: "html",
-          html:`
+          html: `
           <div
             id="console"
             class="noanims hoverablez"
@@ -287,8 +299,8 @@ module.exports = {
           >
             <div style='color:#979797;'>Logs</div>
           </div>
-          `
-        }
+          `,
+        },
       ];
 
       options.showInterface(importUI, defaultData).then((resultData) => {
@@ -300,7 +312,9 @@ module.exports = {
           let projectDir = botData.prjSrc;
           let backupPath = path.join(projectDir, "backup_data.json");
           fs.writeFileSync(backupPath, JSON.stringify(botData, null, 2), "utf8");
-          // options.burstInform({ element: "text", text: titleCase(`✅ Backup Saved To ${backupPath}`) });
+          try {
+            options.burstInform({ element: "text", text: titleCase(`✅ Backup Saved To ${backupPath}`) });
+          } catch {}
         }
 
         let stats;
@@ -327,15 +341,17 @@ module.exports = {
         fs.writeFileSync(dataJSONPath, JSON.stringify(botData, null, 2), "utf8");
         fs.rm(defaultImportFolderPath, { recursive: true, force: true });
 
-        try {
-          options.result(titleCase(`✅ ${commandsMerged} Command(s) Imported Successfully, Reloading...`));
-        } catch (err) {}
-
-        if(commandsMerged > 0){
+        if (commandsMerged > 0) {
+          try {
+            options.result(titleCase(`✅ ${commandsMerged} Command(s) Imported Successfully, Reloading...`));
+          } catch {}
           setTimeout(() => location.reload(), 1000);
+        } else {
+          try {
+            options.result(titleCase(`⚠️ No Commands Were Cached For Import`));
+          } catch {}
         }
       });
     }
   },
 };
-
