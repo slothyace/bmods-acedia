@@ -198,11 +198,9 @@ module.exports = {
       let commands = botData.commands;
       let defaultImportFolderPath = path.join(process.cwd(), "Automations", "commandExIm", "ImportCache");
       if (fs.existsSync(defaultImportFolderPath)) {
-        fs.rm(defaultImportFolderPath, { recursive: true, force: true });
+        fs.rmSync(defaultImportFolderPath, { recursive: true, force: true });
       }
-      if (!fs.existsSync(defaultImportFolderPath)) {
-        fs.mkdirSync(defaultImportFolderPath, { recursive: true });
-      }
+      fs.mkdirSync(defaultImportFolderPath, { recursive: true });
       let defaultData = { path: defaultImportFolderPath, generateBackup: true };
 
       let importUI = [
@@ -339,7 +337,7 @@ module.exports = {
 
         botData.commands = commands;
         fs.writeFileSync(dataJSONPath, JSON.stringify(botData, null, 2), "utf8");
-        fs.rm(defaultImportFolderPath, { recursive: true, force: true });
+        fs.rmSync(defaultImportFolderPath, { recursive: true, force: true });
 
         if (commandsMerged > 0) {
           try {
