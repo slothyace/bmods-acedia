@@ -1,11 +1,21 @@
 modVersion = "v1.0.0"
 module.exports = {
   data: {
-    name: ""
+    name: "Get JSON From WebAPI v2",
+    headers: [
+      {
+        headerKey: "Accept",
+        headerValue: "application/json"
+      },
+      {
+        headerKey: "user-agent",
+        headerValue: "bmd/bmods"
+      }
+    ]
   },
   aliases: [],
   modules: [],
-  category: "",
+  category: "WebAPIs",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
     creator: "Acedia",
@@ -13,13 +23,53 @@ module.exports = {
   },
   UI: [
     {
+      element: "input",
+      storeAs: "url",
+      name: "URL",
+    },
+    "_",
+    {
+      element: "menu",
+      storeAs: "headers",
+      name: "Headers",
+      types: {header: "header"},
+      max: 100,
+      UItypes: {
+        header: {
+          data: {},
+          name: "Header:",
+          preview: "`${option.data.headerKey || ''}`",
+          UI: [
+            {
+              element: "input",
+              storeAs: "headerKey",
+              name: "Header Key",
+            },
+            "-",
+            {
+              element: "largeInput",
+              storeAs: "headerValue",
+              name: "Value",
+            },
+          ],
+        },
+      },
+    },
+    "-",
+    {
+      element: "store",
+      storeAs: "response",
+      name: "Store Response As",
+    },
+    "-",
+    {
       element: "text",
       text: modVersion
     }
   ],
 
   subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return ``
+    return `Get JSON Response From ${values.url}`
   },
 
   compatibility: ["Any"],
@@ -29,5 +79,34 @@ module.exports = {
       await client.getMods().require(moduleName)
     }
     
+    let url = bridge.transf(values.url)
+    let headers = {}
+
+    for (let header of values.headers){
+      let headerData = header.data
+      let headerKey = bridge.transf(headerData.headerKey).trim() || undefined
+      let headerValue = bridge.transf(headerData.headerValue).trim() || undefined
+      if (headerKey !== undefined && headerValue !== undefined && !headers[headerKey]){
+        header[headerKey] = headerValue
+      }
+    }
+
+    let response = await fetch(url, {
+      method: "GET",
+      headers,
+    })
+
+    let responseResult
+    if(!response.ok){
+      console.log(`Fetch Error: ${url}`)
+    } else {
+      try{
+        responseResult = await response.json()
+      } catch {
+        responseResult = await response.text()
+      }
+    }
+
+    bridge.store(values.response, responseResult)
   }
 }
