@@ -87,7 +87,7 @@ module.exports = {
       let headerKey = bridge.transf(headerData.headerKey).trim() || undefined
       let headerValue = bridge.transf(headerData.headerValue).trim() || undefined
       if (headerKey !== undefined && headerValue !== undefined && !headers[headerKey]){
-        header[headerKey] = headerValue
+        headers[headerKey] = headerValue
       }
     }
 
