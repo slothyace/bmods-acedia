@@ -5,13 +5,13 @@ module.exports = {
     headers: [
       {
         headerKey: "Accept",
-        headerValue: "application/json"
+        headerValue: "application/json",
       },
       {
         headerKey: "user-agent",
-        headerValue: "bmd/bmods"
-      }
-    ]
+        headerValue: "bmd/bmods",
+      },
+    ],
   },
   aliases: [],
   modules: [],
@@ -32,7 +32,7 @@ module.exports = {
       element: "menu",
       storeAs: "headers",
       name: "Headers",
-      types: {header: "header"},
+      types: { header: "header" },
       max: 100,
       UItypes: {
         header: {
@@ -64,29 +64,31 @@ module.exports = {
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
     return `Get JSON Response From ${values.url}`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
-    
+
     let url = bridge.transf(values.url)
     let headers = {}
 
-    for (let header of values.headers){
+    for (let header of values.headers) {
       let headerData = header.data
       let headerKey = bridge.transf(headerData.headerKey).trim() || undefined
       let headerValue = bridge.transf(headerData.headerValue).trim() || undefined
-      if (headerKey !== undefined && headerValue !== undefined && !headers[headerKey]){
+      if (headerKey !== undefined && headerValue !== undefined && !headers[headerKey]) {
         headers[headerKey] = headerValue
       }
     }
@@ -97,10 +99,10 @@ module.exports = {
     })
 
     let responseResult
-    if(!response.ok){
+    if (!response.ok) {
       console.log(`Fetch Error: [${response.status}] ${url}: ${response.statusText}`)
     } else {
-      try{
+      try {
         responseResult = await response.json()
       } catch {
         responseResult = await response.text()
@@ -108,5 +110,5 @@ module.exports = {
     }
 
     bridge.store(values.response, responseResult)
-  }
+  },
 }
