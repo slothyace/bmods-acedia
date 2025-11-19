@@ -98,7 +98,7 @@ module.exports = {
 
     let responseResult
     if(!response.ok){
-      console.log(`Fetch Error: ${url}`)
+      console.log(`Fetch Error: [${response.status}] ${url}: ${response.statusText}`)
     } else {
       try{
         responseResult = await response.json()
