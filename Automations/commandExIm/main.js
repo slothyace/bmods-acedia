@@ -1,31 +1,31 @@
-modVersion = "v1.2.1";
+modVersion = "v1.2.1"
 module.exports = {
   run: async (options) => {
-    const fs = require("node:fs");
-    const path = require("node:path");
-    const os = require("node:os");
+    const fs = require("node:fs")
+    const path = require("node:path")
+    const os = require("node:os")
 
-    let dataJSONPath = path.join(process.cwd(), "AppData", "data.json");
-    let downloadsDir = path.join(os.homedir(), "Downloads");
-    let automationDataJSONPath = path.join(process.cwd(), "Automations", "commandExIm", "preferences.json");
+    let dataJSONPath = path.join(process.cwd(), "AppData", "data.json")
+    let downloadsDir = path.join(os.homedir(), "Downloads")
+    let automationDataJSONPath = path.join(process.cwd(), "Automations", "commandExIm", "preferences.json")
     if (!fs.existsSync(automationDataJSONPath)) {
-      fs.mkdirSync(path.dirname(automationDataJSONPath), { recursive: true });
+      fs.mkdirSync(path.dirname(automationDataJSONPath), { recursive: true })
       let defaultDataStructure = {
         export: "",
-      };
-      fs.writeFileSync(automationDataJSONPath, JSON.stringify(defaultDataStructure, null, 2));
+      }
+      fs.writeFileSync(automationDataJSONPath, JSON.stringify(defaultDataStructure, null, 2))
     }
 
-    let automationPreferances = JSON.parse(fs.readFileSync(automationDataJSONPath));
+    let automationPreferances = JSON.parse(fs.readFileSync(automationDataJSONPath))
     if (automationPreferances.export !== "" && automationPreferances.export !== "undefined") {
-      downloadsDir = automationPreferances.export;
+      downloadsDir = automationPreferances.export
     }
 
     let titleCase = (string) =>
       string
         .split(" ")
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
+        .join(" ")
 
     let commandTypes = {
       textCommand: "Text Cmd",
@@ -35,48 +35,48 @@ module.exports = {
       message: "Message Cmd",
       user: "User Cmd",
       event: "Event",
-    };
+    }
 
     let readAndPush = (fileLocation, commands) => {
-      let rawCommandJson;
+      let rawCommandJson
       try {
-        rawCommandJson = fs.readFileSync(fileLocation, "utf8");
+        rawCommandJson = fs.readFileSync(fileLocation, "utf8")
       } catch {
         try {
-          options.burstInform({ element: "text", text: titleCase(`⚠️ Could Not Read File ${fileLocation}`) });
+          options.burstInform({ element: "text", text: titleCase(`⚠️ Could Not Read File ${fileLocation}`) })
         } catch {}
-        return false;
+        return false
       }
 
-      let commandJson;
+      let commandJson
       try {
-        commandJson = JSON.parse(rawCommandJson);
+        commandJson = JSON.parse(rawCommandJson)
       } catch {
         try {
-          options.burstInform({ element: "text", text: titleCase(`⚠️ ${fileLocation} Contains Invalid JSON`) });
+          options.burstInform({ element: "text", text: titleCase(`⚠️ ${fileLocation} Contains Invalid JSON`) })
         } catch {}
-        return false;
+        return false
       }
 
       if (commandJson.name && commandJson.type && commandJson.trigger && commandJson.actions && commandJson.customId) {
       } else {
         try {
-          options.burstInform({ element: "text", text: titleCase(`⚠️ Command Validation Failed`) });
+          options.burstInform({ element: "text", text: titleCase(`⚠️ Command Validation Failed`) })
         } catch {}
-        return false;
+        return false
       }
 
       if (Array.isArray(commandJson)) {
-        commands.push(...commandJson);
+        commands.push(...commandJson)
       } else {
-        commands.push(commandJson);
+        commands.push(commandJson)
       }
 
       try {
-        options.burstInform({ element: "text", text: titleCase(`✅ Imported ${fileLocation}`) });
+        options.burstInform({ element: "text", text: titleCase(`✅ Imported ${fileLocation}`) })
       } catch {}
-      return true;
-    };
+      return true
+    }
 
     let data = await options.showInterface([
       {
@@ -93,18 +93,18 @@ module.exports = {
         element: "text",
         text: modVersion,
       },
-    ]);
+    ])
 
     // =========================
     // EXPORT SECTION
     // =========================
     if (data.action.type === "export") {
-      let botData = JSON.parse(fs.readFileSync(dataJSONPath));
-      let commands = botData.commands;
+      let botData = JSON.parse(fs.readFileSync(dataJSONPath))
+      let commands = botData.commands
 
       let defaultData = {
         exportPath: downloadsDir,
-      };
+      }
 
       let exportUI = [
         {
@@ -136,7 +136,7 @@ module.exports = {
             `,
         },
         "-",
-      ];
+      ]
 
       commands.forEach((command) => {
         exportUI.push({
@@ -155,53 +155,53 @@ module.exports = {
               },
             },
           },
-        });
-        exportUI.push("_");
-      });
+        })
+        exportUI.push("_")
+      })
 
       options.showInterface(exportUI, defaultData).then((resultData) => {
         if (resultData.exportPath !== automationPreferances.export) {
-          automationPreferances.export = path.normalize(resultData.exportPath);
-          fs.writeFileSync(automationDataJSONPath, JSON.stringify(automationPreferances, null, 2));
+          automationPreferances.export = path.normalize(resultData.exportPath)
+          fs.writeFileSync(automationDataJSONPath, JSON.stringify(automationPreferances, null, 2))
         }
 
-        let exportedCount = 0;
-        downloadsDir = path.normalize(resultData.exportPath);
-        delete resultData["exportPath"];
-        let selectedIds = Object.keys(resultData).filter((k) => resultData[k]?.length);
+        let exportedCount = 0
+        downloadsDir = path.normalize(resultData.exportPath)
+        delete resultData["exportPath"]
+        let selectedIds = Object.keys(resultData).filter((k) => resultData[k]?.length)
         if (!fs.existsSync(downloadsDir)) {
-          fs.mkdirSync(downloadsDir, { recursive: true });
+          fs.mkdirSync(downloadsDir, { recursive: true })
         }
 
-        if (selectedIds.length === 0) return options.result(titleCase(`⚠️ No Commands Were Selected For Export`));
+        if (selectedIds.length === 0) return options.result(titleCase(`⚠️ No Commands Were Selected For Export`))
 
         for (let id of selectedIds) {
-          let selectedData = resultData[id][0].data;
-          let fileName = (selectedData.name || "Unnamed_Command").replace(/[^\w\-]+/g, "_");
-          let exportPath = path.join(downloadsDir, `${fileName}.json`);
+          let selectedData = resultData[id][0].data
+          let fileName = (selectedData.name || "Unnamed_Command").replace(/[^\w\-]+/g, "_")
+          let exportPath = path.join(downloadsDir, `${fileName}.json`)
 
-          fs.writeFileSync(exportPath, JSON.stringify(selectedData.data, null, 2));
-          exportedCount++;
+          fs.writeFileSync(exportPath, JSON.stringify(selectedData.data, null, 2))
+          exportedCount++
         }
 
         try {
-          options.result(titleCase(`✅ Exported ${exportedCount} Command(s) To ${downloadsDir}`));
+          options.result(titleCase(`✅ Exported ${exportedCount} Command(s) To ${downloadsDir}`))
         } catch {}
-      });
+      })
     }
 
     // =========================
     // IMPORT SECTION
     // =========================
     else if (data.action.type === "import") {
-      let botData = JSON.parse(fs.readFileSync(dataJSONPath));
-      let commands = botData.commands;
-      let defaultImportFolderPath = path.join(process.cwd(), "Automations", "commandExIm", "ImportCache");
+      let botData = JSON.parse(fs.readFileSync(dataJSONPath))
+      let commands = botData.commands
+      let defaultImportFolderPath = path.join(process.cwd(), "Automations", "commandExIm", "ImportCache")
       if (fs.existsSync(defaultImportFolderPath)) {
-        fs.rmSync(defaultImportFolderPath, { recursive: true, force: true });
+        fs.rmSync(defaultImportFolderPath, { recursive: true, force: true })
       }
-      fs.mkdirSync(defaultImportFolderPath, { recursive: true });
-      let defaultData = { path: defaultImportFolderPath, generateBackup: true };
+      fs.mkdirSync(defaultImportFolderPath, { recursive: true })
+      let defaultData = { path: defaultImportFolderPath, generateBackup: true }
 
       let importUI = [
         {
@@ -299,57 +299,57 @@ module.exports = {
           </div>
           `,
         },
-      ];
+      ]
 
       options.showInterface(importUI, defaultData).then((resultData) => {
-        let resultDataPath = resultData.path.replaceAll(`"`, "").replaceAll(`'`, "");
-        let generateBackup = resultData.generateBackup;
-        let commandsMerged = 0;
+        let resultDataPath = resultData.path.replaceAll(`"`, "").replaceAll(`'`, "")
+        let generateBackup = resultData.generateBackup
+        let commandsMerged = 0
 
         if (generateBackup) {
-          let projectDir = botData.prjSrc;
-          let backupPath = path.join(projectDir, "backup_data.json");
-          fs.writeFileSync(backupPath, JSON.stringify(botData, null, 2), "utf8");
+          let projectDir = botData.prjSrc
+          let backupPath = path.join(projectDir, "backup_data.json")
+          fs.writeFileSync(backupPath, JSON.stringify(botData, null, 2), "utf8")
           try {
-            options.burstInform({ element: "text", text: titleCase(`✅ Backup Saved To ${backupPath}`) });
+            options.burstInform({ element: "text", text: titleCase(`✅ Backup Saved To ${backupPath}`) })
           } catch {}
         }
 
-        let stats;
+        let stats
         try {
-          stats = fs.statSync(resultDataPath);
+          stats = fs.statSync(resultDataPath)
         } catch {
-          return options.result(titleCase(`⚠️ Path ${resultDataPath} Doesn't Exist`));
+          return options.result(titleCase(`⚠️ Path ${resultDataPath} Doesn't Exist`))
         }
 
         if (stats.isDirectory()) {
-          let files = fs.readdirSync(resultDataPath);
+          let files = fs.readdirSync(resultDataPath)
           for (let file of files) {
-            if (path.extname(file).toLowerCase() !== ".json") continue;
-            let fileLocation = path.join(resultDataPath, file);
-            if (readAndPush(fileLocation, commands)) commandsMerged++;
+            if (path.extname(file).toLowerCase() !== ".json") continue
+            let fileLocation = path.join(resultDataPath, file)
+            if (readAndPush(fileLocation, commands)) commandsMerged++
           }
         } else if (stats.isFile()) {
-          if (readAndPush(resultDataPath, commands)) commandsMerged++;
+          if (readAndPush(resultDataPath, commands)) commandsMerged++
         } else {
-          return options.result(titleCase(`⚠️ ${resultDataPath} Is Neither A File Nor A Folder`));
+          return options.result(titleCase(`⚠️ ${resultDataPath} Is Neither A File Nor A Folder`))
         }
 
-        botData.commands = commands;
-        fs.writeFileSync(dataJSONPath, JSON.stringify(botData, null, 2), "utf8");
-        fs.rmSync(defaultImportFolderPath, { recursive: true, force: true });
+        botData.commands = commands
+        fs.writeFileSync(dataJSONPath, JSON.stringify(botData, null, 2), "utf8")
+        fs.rmSync(defaultImportFolderPath, { recursive: true, force: true })
 
         if (commandsMerged > 0) {
           try {
-            options.result(titleCase(`✅ ${commandsMerged} Command(s) Imported Successfully, Reloading...`));
+            options.result(titleCase(`✅ ${commandsMerged} Command(s) Imported Successfully, Reloading...`))
           } catch {}
-          setTimeout(() => location.reload(), 1000);
+          setTimeout(() => location.reload(), 1000)
         } else {
           try {
-            options.result(titleCase(`⚠️ No Commands Were Imported`));
+            options.result(titleCase(`⚠️ No Commands Were Imported`))
           } catch {}
         }
-      });
+      })
     }
   },
-};
+}
