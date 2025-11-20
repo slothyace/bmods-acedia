@@ -1,7 +1,7 @@
 modVersion = "v1.0.6"
 module.exports = {
   data: {
-    name: "Map And Sort Object Data"
+    name: "Map And Sort Object Data",
   },
   aliases: [],
   modules: [],
@@ -22,7 +22,7 @@ module.exports = {
       element: "input",
       storeAs: "elementPath",
       name: "Path To Comparison Value",
-      placeholder: "path.to.value"
+      placeholder: "path.to.value",
     },
     {
       element: "input",
@@ -35,10 +35,10 @@ module.exports = {
       storeAs: "sortType",
       name: "Sort By",
       choices: {
-        numberInc: {name: "Numbers Increasing 0 -> 9", field: false},
-        numberDec: {name: "Numbers Decreasing 9 -> 0", field: false},
-        alphabInc: {name: "Alphabet A -> Z", field: false},
-        alphabDec: {name: "Alphabet Z -> A", field: false},
+        numberInc: { name: "Numbers Increasing 0 -> 9", field: false },
+        numberDec: { name: "Numbers Decreasing 9 -> 0", field: false },
+        alphabInc: { name: "Alphabet A -> Z", field: false },
+        alphabDec: { name: "Alphabet Z -> A", field: false },
       },
     },
     "-",
@@ -47,8 +47,8 @@ module.exports = {
       storeAs: "returnAmount",
       name: "Store Amount",
       choices: {
-        all: {name: "All", field: false},
-        topN: {name: "Top #", field: true, placeholder: 10},
+        all: { name: "All", field: false },
+        topN: { name: "Top #", field: true, placeholder: 10 },
       },
     },
     {
@@ -56,9 +56,9 @@ module.exports = {
       storeAs: "returnType",
       name: "Return Sorted JSON Data As",
       choices: {
-        json: {name: "JSON Object", field: false},
-        list: {name: "List", field: false}
-      }
+        json: { name: "JSON Object", field: false },
+        list: { name: "List", field: false },
+      },
     },
     "-",
     {
@@ -69,18 +69,20 @@ module.exports = {
     "-",
     {
       element: "text",
-      text: modVersion
+      text: modVersion,
     },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
     return `Map And Sort Data ${values.data.type}(${values.data.value})`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
 
@@ -91,84 +93,81 @@ module.exports = {
     let returnAmount = bridge.transf(values.returnAmount.type)
     let returnType = bridge.transf(values.returnType.type)
 
-    if (dataObject == undefined){
+    if (dataObject == undefined) {
       return console.error(`Please Provide Data!`)
     }
 
-    if (objectPath.startsWith(".")){
+    if (objectPath.startsWith(".")) {
       objectPath = objectPath.slice(1)
     }
 
-    if (
-      objectPath === "" || 
-      objectPath.includes("..") || 
-      objectPath.startsWith(".") || 
-      objectPath.endsWith(".")
-    ){
+    if (objectPath === "" || objectPath.includes("..") || objectPath.startsWith(".") || objectPath.endsWith(".")) {
       return console.error(`Invalid Path: "${objectPath}"`)
     }
 
-    const getValueByPath = (object, path) =>{
-      let objectValue = path.split(".").reduce((acc, key)=>acc?.[key], object)
-      if (objectValue === undefined){
+    const getValueByPath = (object, path) => {
+      let objectValue = path.split(".").reduce((acc, key) => acc?.[key], object)
+      if (objectValue === undefined) {
         return defaultValue
       } else {
         return objectValue
       }
     }
-    
-    if (typeof dataObject !== "object"){
+
+    if (typeof dataObject !== "object") {
       return console.error(`Provided Data Is Not A Valid JSON Object.`)
     }
 
-    let objectArray = Object.entries(dataObject).map(([id, data])=>({
-      id, data, sortValue: getValueByPath(data, objectPath)
+    let objectArray = Object.entries(dataObject).map(([id, data]) => ({
+      id,
+      data,
+      sortValue: getValueByPath(data, objectPath),
     }))
 
-    switch(sortType){
+    switch (sortType) {
       case "numberInc":
-        objectArray.sort((a,b)=> {
-          return (Number(a.sortValue)||0) - (Number(b.sortValue)||0)
+        objectArray.sort((a, b) => {
+          return (Number(a.sortValue) || 0) - (Number(b.sortValue) || 0)
         })
         break
 
       case "numberDec":
-        objectArray.sort((a,b)=> {
-          return (Number(b.sortValue)||0) - (Number(a.sortValue)||0)
+        objectArray.sort((a, b) => {
+          return (Number(b.sortValue) || 0) - (Number(a.sortValue) || 0)
         })
         break
 
       case "alphabInc":
-        objectArray.sort((a,b)=> {
+        objectArray.sort((a, b) => {
           return String(a.sortValue).localeCompare(String(b.sortValue))
         })
         break
 
       case "alphabDec":
-        objectArray.sort((a,b)=> {
+        objectArray.sort((a, b) => {
           return String(b.sortValue).localeCompare(String(a.sortValue))
         })
         break
     }
 
-    if (returnAmount === "topN"){
-      objectArray = objectArray.slice(0, (Number(bridge.transf(values.returnAmount.value))||10))
+    if (returnAmount === "topN") {
+      objectArray = objectArray.slice(0, Number(bridge.transf(values.returnAmount.value)) || 10)
     }
 
     let result
-    switch (returnType){
+    switch (returnType) {
       case "list":
         result = objectArray
         break
 
       case "json":
         result = {}
-        for (let object of objectArray){
+        for (let object of objectArray) {
           result[object.id] = object.data
         }
         break
     }
 
     bridge.store(values.sorted, result)
-  }
+  },
 }

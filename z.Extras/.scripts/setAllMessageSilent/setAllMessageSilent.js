@@ -28,10 +28,7 @@ function modifyFile(filePath) {
 
     setSilentTrue(data)
 
-    const outputFilePath = path.join(
-      path.dirname(filePath),
-      "modified_" + path.basename(filePath)
-    )
+    const outputFilePath = path.join(path.dirname(filePath), "modified_" + path.basename(filePath))
 
     fs.writeFileSync(outputFilePath, JSON.stringify(data, null, 2), "utf-8")
     console.log(`Modified File Saved As: ${outputFilePath}`)

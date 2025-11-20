@@ -1,7 +1,7 @@
 modVersion = "v1.0.0"
 module.exports = {
   data: {
-    name: "Generate Multiple Random Numbers"
+    name: "Generate Multiple Random Numbers",
   },
   aliases: [],
   modules: [],
@@ -17,7 +17,7 @@ module.exports = {
       storeAs: "randomNumbers",
       name: "Random Numbers",
       types: {
-        random: "random"
+        random: "random",
       },
       max: 250,
       UITypes: {
@@ -29,41 +29,43 @@ module.exports = {
             {
               element: "inputGroup",
               storeAs: ["min", "max"],
-              nameSchemes: ["Minimum", "Maximum"]
+              nameSchemes: ["Minimum", "Maximum"],
             },
             "-",
             {
               element: "store",
               storeAs: "store",
-              name: "Store Random Number As"
-            }
-          ]
-        }
-      }
+              name: "Store Random Number As",
+            },
+          ],
+        },
+      },
     },
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
     return `Generate ${values.randomNumbers.length} Random Numbers`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
-    
-    for (let entry of values.randomNumbers){
+
+    for (let entry of values.randomNumbers) {
       let entryData = entry.data
       let min = Number(bridge.transf(entryData.min))
       let max = Number(bridge.transf(entryData.max))
-      if (isNaN(min) || isNaN(max)){
+      if (isNaN(min) || isNaN(max)) {
         continue
       }
 
@@ -73,5 +75,5 @@ module.exports = {
       let randomNumber = Math.floor(Math.random() * (high - low + 1)) + low
       bridge.store(entryData.store, randomNumber)
     }
-  }
+  },
 }

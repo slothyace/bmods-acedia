@@ -4,28 +4,28 @@ module.exports = {
     name: "Create PayPal Checkout Session",
     applicationContext: [
       {
-        "type": "context",
-        "data": {
-          "brandName": "Acedia PayPal Mods",
-          "landingPage": {
-            "type": "billing",
-            "value": ""
+        type: "context",
+        data: {
+          brandName: "Acedia PayPal Mods",
+          landingPage: {
+            type: "billing",
+            value: "",
           },
-          "userAction": {
-            "type": "payNow",
-            "value": ""
+          userAction: {
+            type: "payNow",
+            value: "",
           },
-          "shippingPref": {
-            "type": "noShipping",
-            "value": ""
+          shippingPref: {
+            type: "noShipping",
+            value: "",
           },
-          "paymentTimeline": {
-            "type": "immediate",
-            "value": ""
-          }
-        }
-      }
-    ]
+          paymentTimeline: {
+            type: "immediate",
+            value: "",
+          },
+        },
+      },
+    ],
   },
   aliases: [],
   modules: [],
@@ -60,10 +60,10 @@ module.exports = {
             text: `<div style="font-size:20px">
               Sandbox Mode Is For Testing Purposes And Doesn't Make Actual Charges.<br><br>
               Live Mode On The Other Hand, Does Actually Make Charges And Should Be Enabled When You're Ready To Ask For Money.
-            </div>`
+            </div>`,
           },
         ],
-      } ,
+      },
     },
     "-",
     {
@@ -76,27 +76,27 @@ module.exports = {
       element: "typedDropdown",
       storeAs: "currency",
       name: "Currency",
-      choices: (()=>{
+      choices: (() => {
         let currencies = {}
-        currencies["iso4217"] = {name: "Currency TriCode", field: true, placeholder: "e.g: USD"}
+        currencies["iso4217"] = { name: "Currency TriCode", field: true, placeholder: "e.g: USD" }
         let supportedCurrencies = Intl.supportedValuesOf("currency")
-        supportedCurrencies.forEach(currency =>{
-          currencies[currency] = {name: `${currency.toUpperCase()}`, field:false}
+        supportedCurrencies.forEach((currency) => {
+          currencies[currency] = { name: `${currency.toUpperCase()}`, field: false }
         })
         return currencies
-      })()
+      })(),
     },
     {
       element: "input",
       storeAs: "successUrl",
       name: "Payment Success Redirect",
-      placeholder: "https://example.com/success"
+      placeholder: "https://example.com/success",
     },
     {
       element: "input",
       storeAs: "cancelUrl",
       name: "Payment Cancel Redirect",
-      placeholder: "https://example.com/cancel"
+      placeholder: "https://example.com/cancel",
     },
     "-",
     {
@@ -105,7 +105,7 @@ module.exports = {
       name: "Checkout Customisations",
       max: 1,
       required: true,
-      types: {context: "context"},
+      types: { context: "context" },
       UItypes: {
         context: {
           data: {},
@@ -122,8 +122,8 @@ module.exports = {
               storeAs: "landingPage",
               name: "Landing Page",
               choices: {
-                billing: {name: "Billing Page", field:false},
-                login: {name: "Login Page", field:false}
+                billing: { name: "Billing Page", field: false },
+                login: { name: "Login Page", field: false },
               },
             },
             "-",
@@ -132,8 +132,8 @@ module.exports = {
               storeAs: "userAction",
               name: "Call To Action",
               choices: {
-                payNow: {name: "Pay Now", field:false},
-                continue: {name: "Continue", field:false}
+                payNow: { name: "Pay Now", field: false },
+                continue: { name: "Continue", field: false },
               },
             },
             "-",
@@ -142,9 +142,9 @@ module.exports = {
               storeAs: "shippingPref",
               name: "Shipping Preference",
               choices: {
-                noShipping: {name: "No Shipping", field:false},
-                getFromFile: {name: "Get From File", field:false},
-                setProvAddr: {name: "Set Provided Address", field:false}
+                noShipping: { name: "No Shipping", field: false },
+                getFromFile: { name: "Get From File", field: false },
+                setProvAddr: { name: "Set Provided Address", field: false },
               },
             },
             "-",
@@ -153,13 +153,13 @@ module.exports = {
               storeAs: "paymentTimeline",
               name: "Payment Timeline",
               choices: {
-                immediate: {name: "Immediate Payment Required", field:false},
-                unrestricted: {name: "Unrestricted (Allows eChecks)", field:false},
+                immediate: { name: "Immediate Payment Required", field: false },
+                unrestricted: { name: "Unrestricted (Allows eChecks)", field: false },
               },
-            }
-          ]
-        }
-      }
+            },
+          ],
+        },
+      },
     },
     {
       element: "input",
@@ -170,7 +170,7 @@ module.exports = {
     {
       element: "store",
       storeAs: "checkoutUrl",
-      name: "Store Checkout Page URL As"
+      name: "Store Checkout Page URL As",
     },
     {
       element: "store",
@@ -185,18 +185,20 @@ module.exports = {
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
     return `Create PayPal Checkout Session For $${values.price || "0.00"}`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
 
@@ -204,19 +206,21 @@ module.exports = {
     let clientSecret = bridge.transf(values.clientSecret).trim()
     let price = parseFloat(bridge.transf(values.price)) || 0
     let currency = bridge.transf(values.currency.type) || "USD"
-    if (currency == "iso4217"){
+    if (currency == "iso4217") {
       currency = bridge.transf(values.currency.value) || "USD"
     }
     let successUrl = bridge.transf(values.successUrl) || `https://example.com/success`
     let cancelUrl = bridge.transf(values.cancelUrl) || `https://example.com/cancel`
     let sandboxMode = values.sandboxMode
     let apiUrl
-    if (sandboxMode === true){
+    if (sandboxMode === true) {
       apiUrl = `https://api-m.sandbox.paypal.com`
-    } else {apiUrl = `https://api-m.paypal.com`}
+    } else {
+      apiUrl = `https://api-m.paypal.com`
+    }
 
     // Getting Access Token
-    if (!clientId || !clientSecret){
+    if (!clientId || !clientSecret) {
       return console.log(`Missing Client ID Or Client Secret!`)
     }
 
@@ -225,8 +229,8 @@ module.exports = {
     let tokenResponse = await fetch(`${apiUrl}/v1/oauth2/token`, {
       method: "POST",
       headers: {
-        "Authorization": `Basic ${basicAuth}`,
-        "Content-Type": "application/x-www-form-urlencoded"
+        Authorization: `Basic ${basicAuth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: "grant_type=client_credentials",
     })
@@ -234,18 +238,18 @@ module.exports = {
     let tokenData = await tokenResponse.json()
     let accessToken = tokenData.access_token
 
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     let application_context = {}
 
     application_context["return_url"] = successUrl
     application_context["cancel_url"] = cancelUrl
 
-    if (values.applicationContext[0].data.brandName !== ""){
+    if (values.applicationContext[0].data.brandName !== "") {
       application_context["brand_name"] = bridge.transf(values.applicationContext[0].data.brandName)
     }
 
-    switch(values.applicationContext[0].data.landingPage.type){
+    switch (values.applicationContext[0].data.landingPage.type) {
       case "billing": {
         application_context["landing_page"] = "BILLING"
         break
@@ -257,7 +261,7 @@ module.exports = {
       }
     }
 
-    switch(values.applicationContext[0].data.userAction.type){
+    switch (values.applicationContext[0].data.userAction.type) {
       case "payNow": {
         application_context["user_action"] = "PAY_NOW"
         break
@@ -269,7 +273,7 @@ module.exports = {
       }
     }
 
-    switch(values.applicationContext[0].data.shippingPref.type){
+    switch (values.applicationContext[0].data.shippingPref.type) {
       case "noShipping": {
         application_context["shipping_preference"] = "NO_SHIPPING"
         break
@@ -286,11 +290,11 @@ module.exports = {
       }
     }
 
-    switch(values.applicationContext[0].data.paymentTimeline.type){
+    switch (values.applicationContext[0].data.paymentTimeline.type) {
       case "immediate": {
         application_context["payment_method"] = {
           payee_preferred: "IMMEDIATE_PAYMENT_REQUIRED",
-          payer_selected: "PAYPAL"
+          payer_selected: "PAYPAL",
         }
         break
       }
@@ -298,7 +302,7 @@ module.exports = {
       case "unrestricted": {
         application_context["payment_method"] = {
           payee_preferred: "UNRESTRICTED",
-          payer_selected: "PAYPAL"
+          payer_selected: "PAYPAL",
         }
       }
     }
@@ -313,28 +317,28 @@ module.exports = {
           },
         },
       ],
-      application_context
+      application_context,
     }
 
-    if (values.referenceId !== ""){
-      orderBody.purchase_units[0].reference_id = bridge.transf(values.referenceId).trim().slice(0,127)
+    if (values.referenceId !== "") {
+      orderBody.purchase_units[0].reference_id = bridge.transf(values.referenceId).trim().slice(0, 127)
     }
 
     // Initiating A Checkout
     let orderResponse = await fetch(`${apiUrl}/v2/checkout/orders`, {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(orderBody)
+      body: JSON.stringify(orderBody),
     })
 
     let orderData = await orderResponse.json()
-    let checkoutUrl = orderData.links?.find(link => link.rel === "approve")?.href
+    let checkoutUrl = orderData.links?.find((link) => link.rel === "approve")?.href
 
     bridge.store(values.checkoutUrl, checkoutUrl)
     bridge.store(values.sessionId, orderData.id)
     bridge.store(values.fullSession, orderData)
-  }
+  },
 }

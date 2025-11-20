@@ -1,4 +1,4 @@
-modVersion = "v1.1.0";
+modVersion = "v1.1.0"
 module.exports = {
   data: {
     name: "Catbox.moe",
@@ -62,7 +62,7 @@ module.exports = {
     {
       element: "variable",
       storeAs: "buffer",
-      name: "Buffer"
+      name: "Buffer",
     },
     "-",
     {
@@ -79,29 +79,29 @@ module.exports = {
 
   subtitle: (values, constants, thisAction) => {
     // To use thisAction, constants must also be present
-    let subtitle;
+    let subtitle
     switch (values.action.type) {
       case "uploadFile": {
-        subtitle = `Upload File "${values.action.value}" To catbox.moe`;
-        break;
+        subtitle = `Upload File "${values.action.value}" To catbox.moe`
+        break
       }
 
       case "uploadUrl": {
-        subtitle = `Upload URL "${values.action.value}" To catbox.moe`;
+        subtitle = `Upload URL "${values.action.value}" To catbox.moe`
         break
       }
 
       case "uploadBuffer": {
-        subtitle = `Upload Buffer ${values.buffer.type}(${values.buffer.value}) To catbox.moe`;
+        subtitle = `Upload Buffer ${values.buffer.type}(${values.buffer.value}) To catbox.moe`
         break
       }
 
       case "deleteFile": {
-        subtitle = `Delete File(s) "${values.action.value}" From catbox.moe`;
+        subtitle = `Delete File(s) "${values.action.value}" From catbox.moe`
         break
       }
     }
-    return subtitle;
+    return subtitle
   },
 
   script: (values) => {
@@ -114,9 +114,12 @@ module.exports = {
         values.UI[4].element = ""
       }
 
-      setTimeout(() => {
-        values.updateUI()
-      }, skipAnimation ? 1 : values.commonAnimation * 100)
+      setTimeout(
+        () => {
+          values.updateUI()
+        },
+        skipAnimation ? 1 : values.commonAnimation * 100
+      )
     }
 
     reflem(true)
@@ -131,26 +134,26 @@ module.exports = {
   async run(values, message, client, bridge) {
     // This is the exact order of things required, other orders will brick
     for (const moduleName of this.modules) {
-      await client.getMods().require(moduleName);
+      await client.getMods().require(moduleName)
     }
 
-    const fs = require("node:fs");
-    const path = require("node:path");
-    const { FormData } = require("undici");
-    const { Blob } = require("node:buffer");
+    const fs = require("node:fs")
+    const path = require("node:path")
+    const { FormData } = require("undici")
+    const { Blob } = require("node:buffer")
 
-    let catBoxApi = `https://catbox.moe/user/api.php`;
-    let action = bridge.transf(values.action.type);
-    let actionData = bridge.transf(values.action.value);
-    let userHash = bridge.transf(values.userHash);
+    let catBoxApi = `https://catbox.moe/user/api.php`
+    let action = bridge.transf(values.action.type)
+    let actionData = bridge.transf(values.action.value)
+    let userHash = bridge.transf(values.userHash)
 
-    const botData = require("../data.json");
-    const workingDir = path.normalize(process.cwd());
-    let projectFolder;
+    const botData = require("../data.json")
+    const workingDir = path.normalize(process.cwd())
+    let projectFolder
     if (workingDir.includes(path.join("common", "Bot Maker For Discord"))) {
-      projectFolder = botData.prjSrc;
+      projectFolder = botData.prjSrc
     } else {
-      projectFolder = workingDir;
+      projectFolder = workingDir
     }
 
     async function sendForm(form) {
@@ -163,116 +166,116 @@ module.exports = {
         headers: {
           "user-agent": "bmods/Acedia",
         },
-      });
-      const responseText = await response.text();
+      })
+      const responseText = await response.text()
       if (!response.ok) {
-        throw new Error(`Catbox API Error: ${responseText}`);
+        throw new Error(`Catbox API Error: ${responseText}`)
       }
-      return responseText.trim();
+      return responseText.trim()
     }
 
     function parseInput(input) {
       if (typeof input === "string") {
         try {
-          const parsed = JSON.parse(input);
-          if (Array.isArray(parsed)) return parsed;
-        } catch { }
+          const parsed = JSON.parse(input)
+          if (Array.isArray(parsed)) return parsed
+        } catch {}
       }
-      return Array.isArray(input) ? input : [input];
+      return Array.isArray(input) ? input : [input]
     }
 
     function extractFileName(actionDataString) {
       try {
-        let parsed = new URL(actionDataString);
-        return parsed.pathname.split("/").pop();
+        let parsed = new URL(actionDataString)
+        return parsed.pathname.split("/").pop()
       } catch {
-        return actionDataString;
+        return actionDataString
       }
     }
 
     function randomString(length) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let result = '';
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+      let result = ""
       for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+        result += chars.charAt(Math.floor(Math.random() * chars.length))
       }
-      return result;
+      return result
     }
 
-    let result;
+    let result
 
     try {
       switch (action) {
         case "uploadFile": {
-          let relativePath = path.normalize(actionData);
-          let filePath = path.join(projectFolder, relativePath);
+          let relativePath = path.normalize(actionData)
+          let filePath = path.join(projectFolder, relativePath)
           if (!fs.existsSync(path.dirname(filePath))) {
-            fs.mkdirSync(path.dirname(filePath), { recursive: true });
+            fs.mkdirSync(path.dirname(filePath), { recursive: true })
           }
           if (!fs.existsSync(filePath)) {
-            throw new Error(`File "${filePath}" Not Found!`);
+            throw new Error(`File "${filePath}" Not Found!`)
           }
 
-          let form = new FormData();
-          let fileBuffer = fs.readFileSync(filePath);
-          let fileName = path.basename(filePath);
-          form.append("reqtype", "fileupload");
+          let form = new FormData()
+          let fileBuffer = fs.readFileSync(filePath)
+          let fileName = path.basename(filePath)
+          form.append("reqtype", "fileupload")
           if (userHash) {
-            form.append("userhash", userHash);
+            form.append("userhash", userHash)
           }
-          form.append("fileToUpload", new Blob([fileBuffer]), fileName);
-          result = await sendForm(form);
-          break;
+          form.append("fileToUpload", new Blob([fileBuffer]), fileName)
+          result = await sendForm(form)
+          break
         }
 
         case "uploadBuffer": {
-          let form = new FormData();
+          let form = new FormData()
           let fileBuffer = bridge.get(values.buffer)
           if (!Buffer.isBuffer(fileBuffer)) {
             throw new Error(`Variable Provided Isn't A Buffer!`)
           }
           let fileName = actionData.trim() || `upload-${randomString(16)}.bin`
-          form.append("reqtype", "fileupload");
+          form.append("reqtype", "fileupload")
           if (userHash) {
-            form.append("userhash", userHash);
+            form.append("userhash", userHash)
           }
-          form.append("fileToUpload", new Blob([fileBuffer]), fileName);
-          result = await sendForm(form);
-          break;
+          form.append("fileToUpload", new Blob([fileBuffer]), fileName)
+          result = await sendForm(form)
+          break
         }
 
         case "uploadUrl": {
-          let form = new FormData();
-          form.append("reqtype", "urlupload");
+          let form = new FormData()
+          form.append("reqtype", "urlupload")
           if (userHash) {
-            form.append("userhash", userHash);
+            form.append("userhash", userHash)
           }
-          form.append("url", actionData);
-          result = await sendForm(form);
-          break;
+          form.append("url", actionData)
+          result = await sendForm(form)
+          break
         }
 
         case "deleteFile": {
           if (!userHash) {
-            throw new Error(`User Hash Is Required To Delete Files!`);
+            throw new Error(`User Hash Is Required To Delete Files!`)
           }
-          let form = new FormData();
-          form.append("reqtype", "deletefiles");
-          form.append("userhash", userHash);
-          let files = parseInput(actionData);
-          let fileNames = [];
+          let form = new FormData()
+          form.append("reqtype", "deletefiles")
+          form.append("userhash", userHash)
+          let files = parseInput(actionData)
+          let fileNames = []
           for (let file of files) {
-            fileNames.push(extractFileName(file));
+            fileNames.push(extractFileName(file))
           }
-          form.append("files", fileNames.join(" "));
-          result = await sendForm(form);
-          break;
+          form.append("files", fileNames.join(" "))
+          result = await sendForm(form)
+          break
         }
       }
 
-      bridge.store(values.response, result);
+      bridge.store(values.response, result)
     } catch (error) {
-      bridge.store(values.response, error.message);
+      bridge.store(values.response, error.message)
     }
   },
-};
+}

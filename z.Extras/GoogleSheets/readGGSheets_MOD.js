@@ -1,7 +1,7 @@
 modVersion = "v1.0.3"
 module.exports = {
   data: {
-    name: "Read Google Sheet"
+    name: "Read Google Sheet",
   },
   aliases: [],
   modules: ["googleapis", "node:fs", "node:path"],
@@ -16,28 +16,28 @@ module.exports = {
       element: "input",
       storeAs: "sheetLink",
       name: "Link To Google Sheets",
-      placeholder: "https://docs.google.com/spreadsheets/d/.../edit#gid=0"
+      placeholder: "https://docs.google.com/spreadsheets/d/.../edit#gid=0",
     },
     {
       element: "typedDropdown",
       storeAs: "authType",
       name: "Authorize With",
       choices: {
-        keyFile: {name: "Key File", field:true, placeholder:"path/to/keyfile.json"},
-        apiKey: {name: "API Key", field:true, placeholder:"API Key"}
+        keyFile: { name: "Key File", field: true, placeholder: "path/to/keyfile.json" },
+        apiKey: { name: "API Key", field: true, placeholder: "API Key" },
       },
       help: {
         title: "Which To Use",
-        UI:[
+        UI: [
           {
             element: "text",
             text: `<div style="font-size:20px">
               A Key File Would Be Better In This Case As Using A API Key Would Require The Sheet To Be Public.<br></br>
               Set The Sheet Permissions To Allow Anyone With The Link To View The Sheet.
-            </div>`
-          }
-        ]
-      }
+            </div>`,
+          },
+        ],
+      },
     },
     "-",
     {
@@ -58,13 +58,13 @@ module.exports = {
               element: "input",
               storeAs: "tab",
               name: "Tab",
-              placeholder: "Sheet1"
+              placeholder: "Sheet1",
             },
             {
               element: "input",
               storeAs: "cellRange",
               name: "Cell",
-              placeholder: "A1 or A1:C3"
+              placeholder: "A1 or A1:C3",
             },
             "-",
             {
@@ -75,53 +75,57 @@ module.exports = {
             {
               element: "store",
               storeAs: "result",
-              name: "Store Range Result As"
-            }
-          ]
-        }
-      }
+              name: "Store Range Result As",
+            },
+          ],
+        },
+      },
     },
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
     return `Read ${values.rangeList.length} Range(s) From Sheet: ${values.sheetLink}`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
 
     const fs = require("node:fs")
     const path = require("node:path")
-    const {google} = require("googleapis")
-    
+    const { google } = require("googleapis")
+
     let authType = bridge.transf(values.authType.type)
 
     let ggClient
 
-    switch(authType){
+    switch (authType) {
       case "keyFile": {
         const botData = require("../data.json")
         const workingDir = path.normalize(process.cwd())
         let projectFolder
-        if (workingDir.includes(path.join("common", "Bot Maker For Discord"))){
+        if (workingDir.includes(path.join("common", "Bot Maker For Discord"))) {
           projectFolder = botData.prjSrc
-        } else {projectFolder = workingDir}
+        } else {
+          projectFolder = workingDir
+        }
 
         let relativeKeyFilePath = bridge.transf(values.authType.value)
         let keyFilePath = path.join(projectFolder, relativeKeyFilePath)
 
         const auth = new google.auth.GoogleAuth({
           keyFile: keyFilePath,
-          scopes: ['https://www.googleapis.com/auth/spreadsheets']
+          scopes: ["https://www.googleapis.com/auth/spreadsheets"],
         })
 
         ggClient = await auth.getClient()
@@ -133,21 +137,19 @@ module.exports = {
       }
     }
 
-    
     let sheetLink = bridge.transf(values.sheetLink)
     let match = sheetLink.match(/\/d\/([a-zA-Z0-9-_]+)/)
     let spreadsheetId = match[1]
 
-
     let sheets = google.sheets({
       version: "v4",
-      auth: ggClient
+      auth: ggClient,
     })
 
     let rangeList = []
     let rangeMap = {}
 
-    for (let range of values.rangeList){
+    for (let range of values.rangeList) {
       let rangeData = range.data
       let tab = bridge.transf(rangeData.tab).trim()
       let cellRange = bridge.transf(rangeData.cellRange).trim().toUpperCase()
@@ -157,29 +159,29 @@ module.exports = {
       rangeList.push(rangeString)
       rangeMap[rangeString] = {
         parseResults: rangeData.parseResults,
-        result: rangeData.result
+        result: rangeData.result,
       }
     }
 
     let batchResponse = await sheets.spreadsheets.values.batchGet({
       spreadsheetId,
-      ranges: rangeList
+      ranges: rangeList,
     })
 
-    for (let rangeResult of batchResponse.data.valueRanges){
+    for (let rangeResult of batchResponse.data.valueRanges) {
       let rangeId = rangeResult.range
       let rowData = rangeResult.values || []
 
       let meta = rangeMap[rangeId]
       let parsedText
 
-      if (meta.parseResults){
-        parsedText = rowData.map(row => row.join(" | ")).join("\n")
+      if (meta.parseResults) {
+        parsedText = rowData.map((row) => row.join(" | ")).join("\n")
       } else {
         parsedText = rowData
       }
 
       bridge.store(meta.result, parsedText)
     }
-  }
+  },
 }

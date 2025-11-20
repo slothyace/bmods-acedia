@@ -1,4 +1,4 @@
-modVersion = "v1.0.0";
+modVersion = "v1.0.0"
 module.exports = {
   data: {
     name: "Litterbox.Catbox.moe",
@@ -37,7 +37,7 @@ module.exports = {
     {
       element: "variable",
       storeAs: "buffer",
-      name: "Buffer"
+      name: "Buffer",
     },
     "-",
     {
@@ -45,11 +45,11 @@ module.exports = {
       storeAs: "duration",
       name: "Valid For",
       choices: {
-        "1h": {name: "1 Hour", field:false},
-        "12h": {name: "12 Hours", field:false},
-        "24h": {name: "24 Hours", field:false},
-        "72h": {name: "72 Hours", field:false},
-      }
+        "1h": { name: "1 Hour", field: false },
+        "12h": { name: "12 Hours", field: false },
+        "24h": { name: "24 Hours", field: false },
+        "72h": { name: "72 Hours", field: false },
+      },
     },
     "-",
     {
@@ -66,19 +66,19 @@ module.exports = {
 
   subtitle: (values, constants, thisAction) => {
     // To use thisAction, constants must also be present
-    let subtitle;
+    let subtitle
     switch (values.action.type) {
       case "uploadFile": {
-        subtitle = `Upload File "${values.action.value}" To litterbox.catbox.moe`;
-        break;
+        subtitle = `Upload File "${values.action.value}" To litterbox.catbox.moe`
+        break
       }
 
       case "uploadBuffer": {
-        subtitle = `Upload Buffer ${values.buffer.type}(${values.buffer.value}) To litterbox.catbox.moe`;
+        subtitle = `Upload Buffer ${values.buffer.type}(${values.buffer.value}) To litterbox.catbox.moe`
         break
       }
     }
-    return subtitle;
+    return subtitle
   },
 
   script: (values) => {
@@ -91,9 +91,12 @@ module.exports = {
         values.UI[2].element = ""
       }
 
-      setTimeout(() => {
-        values.updateUI()
-      }, skipAnimation ? 1 : values.commonAnimation * 100)
+      setTimeout(
+        () => {
+          values.updateUI()
+        },
+        skipAnimation ? 1 : values.commonAnimation * 100
+      )
     }
 
     reflem(true)
@@ -108,25 +111,25 @@ module.exports = {
   async run(values, message, client, bridge) {
     // This is the exact order of things required, other orders will brick
     for (const moduleName of this.modules) {
-      await client.getMods().require(moduleName);
+      await client.getMods().require(moduleName)
     }
 
-    const fs = require("node:fs");
-    const path = require("node:path");
-    const { FormData } = require("undici");
-    const { Blob } = require("node:buffer");
+    const fs = require("node:fs")
+    const path = require("node:path")
+    const { FormData } = require("undici")
+    const { Blob } = require("node:buffer")
 
-    let litterBoxApi = `https://litterbox.catbox.moe/resources/internals/api.php`;
-    let action = bridge.transf(values.action.type);
-    let actionData = bridge.transf(values.action.value);
+    let litterBoxApi = `https://litterbox.catbox.moe/resources/internals/api.php`
+    let action = bridge.transf(values.action.type)
+    let actionData = bridge.transf(values.action.value)
 
-    const botData = require("../data.json");
-    const workingDir = path.normalize(process.cwd());
-    let projectFolder;
+    const botData = require("../data.json")
+    const workingDir = path.normalize(process.cwd())
+    let projectFolder
     if (workingDir.includes(path.join("common", "Bot Maker For Discord"))) {
-      projectFolder = botData.prjSrc;
+      projectFolder = botData.prjSrc
     } else {
-      projectFolder = workingDir;
+      projectFolder = workingDir
     }
 
     let duration = bridge.transf(values.duration.type)
@@ -140,65 +143,65 @@ module.exports = {
         headers: {
           "user-agent": "bmods/Acedia",
         },
-      });
-      const responseText = await response.text();
+      })
+      const responseText = await response.text()
       if (!response.ok) {
-        throw new Error(`LitterBox API Error: ${responseText}`);
+        throw new Error(`LitterBox API Error: ${responseText}`)
       }
-      return responseText.trim();
+      return responseText.trim()
     }
 
     function randomString(length) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let result = '';
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+      let result = ""
       for (let i = 0; i < length; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+        result += chars.charAt(Math.floor(Math.random() * chars.length))
       }
-      return result;
+      return result
     }
 
-    let result;
+    let result
 
     try {
       switch (action) {
         case "uploadFile": {
-          let relativePath = path.normalize(actionData);
-          let filePath = path.join(projectFolder, relativePath);
+          let relativePath = path.normalize(actionData)
+          let filePath = path.join(projectFolder, relativePath)
           if (!fs.existsSync(path.dirname(filePath))) {
-            fs.mkdirSync(path.dirname(filePath), { recursive: true });
+            fs.mkdirSync(path.dirname(filePath), { recursive: true })
           }
           if (!fs.existsSync(filePath)) {
-            throw new Error(`File "${filePath}" Not Found!`);
+            throw new Error(`File "${filePath}" Not Found!`)
           }
 
-          let form = new FormData();
-          let fileBuffer = fs.readFileSync(filePath);
-          let fileName = path.basename(filePath);
-          form.append("reqtype", "fileupload");
-          form.append("fileToUpload", new Blob([fileBuffer]), fileName);
+          let form = new FormData()
+          let fileBuffer = fs.readFileSync(filePath)
+          let fileName = path.basename(filePath)
+          form.append("reqtype", "fileupload")
+          form.append("fileToUpload", new Blob([fileBuffer]), fileName)
           form.append("time", duration)
-          result = await sendForm(form);
-          break;
+          result = await sendForm(form)
+          break
         }
 
         case "uploadBuffer": {
-          let form = new FormData();
+          let form = new FormData()
           let fileBuffer = bridge.get(values.buffer)
           if (!Buffer.isBuffer(fileBuffer)) {
             throw new Error(`Variable Provided Isn't A Buffer!`)
           }
           let fileName = actionData.trim() || `upload-${randomString(16)}.bin`
-          form.append("reqtype", "fileupload");
-          form.append("fileToUpload", new Blob([fileBuffer]), fileName);
+          form.append("reqtype", "fileupload")
+          form.append("fileToUpload", new Blob([fileBuffer]), fileName)
           form.append("time", duration)
-          result = await sendForm(form);
-          break;
+          result = await sendForm(form)
+          break
         }
       }
 
-      bridge.store(values.response, result);
+      bridge.store(values.response, result)
     } catch (error) {
-      bridge.store(values.response, error.message);
+      bridge.store(values.response, error.message)
     }
   },
-};
+}

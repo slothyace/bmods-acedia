@@ -6,7 +6,7 @@ module.exports = {
     port: "3001",
   },
   aliases: [],
-  modules: ["node:http","node:os","node:fs","node:path","node:url","node:crypto",],
+  modules: ["node:http", "node:os", "node:fs", "node:path", "node:url", "node:crypto"],
   category: "Utilities",
   info: {
     source: "https://github.com/slothyace/bmods-acedia/tree/main/Actions",
@@ -29,29 +29,31 @@ module.exports = {
       element: "input",
       storeAs: "storageFolder",
       name: "Store File In",
-      placeholer: "/tempHtml"
+      placeholer: "/tempHtml",
     },
     "-",
     {
       element: "input",
       storeAs: "uploadPassword",
-      name: "Password To Authorize Upload"
+      name: "Password To Authorize Upload",
     },
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
     return `Create HTML Upload Webpage ${values.host}:${values.port}/upload`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
 
@@ -80,15 +82,15 @@ module.exports = {
       fs.mkdirSync(storageFolder, { recursive: true })
     }
 
-    const server = http.createServer((request, response)=>{
+    const server = http.createServer((request, response) => {
       let endPoint = request.url
 
-      switch(endPoint){
+      switch (endPoint) {
         case "/upload":
-          if (request.method == "POST" && request.headers["uploadpass"] == uploadPassword.trim()){
+          if (request.method == "POST" && request.headers["uploadpass"] == uploadPassword.trim()) {
             let postBody = ""
-            request.on("data", (dataChunk)=> (postBody += dataChunk))
-            request.on("end", ()=>{
+            request.on("data", (dataChunk) => (postBody += dataChunk))
+            request.on("end", () => {
               let json = JSON.parse(postBody)
               let htmlContent = json.htmlContent
               htmlContent = Buffer.from(htmlContent, "base64").toString("utf-8")
@@ -98,15 +100,16 @@ module.exports = {
               fs.writeFileSync(fileLoc, htmlContent, "utf-8")
               let returnUrl = `http://${host}:${port}/${fileName}`
               response.writeHead(200, {
-                "content-type": "application/json"
+                "content-type": "application/json",
               })
-              response.end(JSON.stringify(
-                {
+              response.end(
+                JSON.stringify({
                   success: true,
                   url: returnUrl,
                   fileName: fileName,
-                  filePath: path.join(storageDir, `${fileName}.html`)
-                }))
+                  filePath: path.join(storageDir, `${fileName}.html`),
+                })
+              )
             })
           } else {
             response.writeHead(404)
@@ -116,13 +119,13 @@ module.exports = {
 
         default:
           let viewFileName
-          if (endPoint.startsWith("/") == true){
+          if (endPoint.startsWith("/") == true) {
             viewFileName = endPoint.slice(1)
           }
           let completeViewFilePath = path.join(storageFolder, `${viewFileName}.html`)
-          if (fs.existsSync(completeViewFilePath)){
+          if (fs.existsSync(completeViewFilePath)) {
             response.writeHead(200, {
-              "content-type": "text/html"
+              "content-type": "text/html",
             })
             fs.createReadStream(completeViewFilePath).pipe(response)
           } else {
@@ -133,8 +136,8 @@ module.exports = {
       }
     })
 
-    server.listen(port, host, ()=>{
+    server.listen(port, host, () => {
       console.log(`[HTML Upload Webpage] Upload Endpoint Started On http://${host}:${port}/upload.`)
     })
-  }
+  },
 }

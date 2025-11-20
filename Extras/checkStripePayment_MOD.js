@@ -1,7 +1,7 @@
 modVersion = "v1.0.1"
 module.exports = {
   data: {
-    name: "Check Stripe Payment Status"
+    name: "Check Stripe Payment Status",
   },
   aliases: [],
   modules: ["stripe"],
@@ -37,18 +37,20 @@ module.exports = {
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
     return `Check Payment Status for Session ID: ${values.sessionId || "?"}`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
 
@@ -56,7 +58,7 @@ module.exports = {
     let stripeKey = bridge.transf(values.stripeKey).trim()
     let sessionId = bridge.transf(values.sessionId).trim()
 
-    if (!stripeKey || !sessionId){
+    if (!stripeKey || !sessionId) {
       return console.error(`A Stripe Key And Session Id Is Required!`)
     }
 
@@ -66,8 +68,8 @@ module.exports = {
 
       bridge.store(values.paymentStatus, session.payment_status)
       bridge.store(values.fullSession, session)
-    } catch (error){
+    } catch (error) {
       return console.error(`An Error Occured When Checking Session Status: ${error.message}`)
     }
-  }
+  },
 }

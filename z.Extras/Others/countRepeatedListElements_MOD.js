@@ -1,7 +1,7 @@
 modVersion = "v1.0.0"
 module.exports = {
   data: {
-    name: "Count Repeated List Elements"
+    name: "Count Repeated List Elements",
   },
   aliases: [],
   modules: [],
@@ -23,7 +23,7 @@ module.exports = {
       storeAs: "listElements",
       name: "Look For Elements",
       types: {
-        elements: "elements"
+        elements: "elements",
       },
       max: 1000,
       UItypes: {
@@ -36,7 +36,7 @@ module.exports = {
               element: "input",
               storeAs: "elementValue",
               name: "Element Value (Filter For)",
-              placeholder: "A"
+              placeholder: "A",
             },
             {
               element: "toggle",
@@ -47,17 +47,17 @@ module.exports = {
             {
               element: "store",
               storeAs: "store",
-              name: "Store Number Of Occurrences As"
-            }
-          ]
-        }
-      }
+              name: "Store Number Of Occurrences As",
+            },
+          ],
+        },
+      },
     },
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
   subtitle: (values, constants, thisAction) => {
@@ -81,12 +81,12 @@ module.exports = {
 
       const comparisonValue = caseSensitive ? elementValue : elementValue.toLowerCase()
 
-      const filteredList = inputList.filter(e => {
+      const filteredList = inputList.filter((e) => {
         const val = String(e)
         return (caseSensitive ? val : val.toLowerCase()) === comparisonValue
       })
 
       bridge.store(listElementData.store, filteredList.length)
     }
-  }
+  },
 }

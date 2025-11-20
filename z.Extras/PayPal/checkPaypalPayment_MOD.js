@@ -2,7 +2,7 @@ modVersion = "v1.0.0"
 module.exports = {
   data: {
     name: "Check PayPal Payment Status",
-    autoCapture: true
+    autoCapture: true,
   },
   aliases: [],
   modules: [],
@@ -37,10 +37,10 @@ module.exports = {
             text: `<div style="font-size:20px">
               Sandbox Mode Is For Testing Purposes And Doesn't Make Actual Charges.<br><br>
               Live Mode On The Other Hand, Does Actually Make Charges And Should Be Enabled When You're Ready To Ask For Money.
-            </div>`
+            </div>`,
           },
         ],
-      } ,
+      },
     },
     "-",
     {
@@ -61,10 +61,10 @@ module.exports = {
             text: `<div style="font-size:20px">
               After Initial Payment By The Person, The Funds Are Held By PayPal Until You "Capture" It. If You Do Not "Capture" It, You WON'T Get Paid<br><br>
               By Toggling On This Toggle, It Would Check If The Status Is "APPROVED" And If It Is, "Captures" It For You
-            </div>`
-          }
-        ]
-      }
+            </div>`,
+          },
+        ],
+      },
     },
     {
       element: "store",
@@ -79,18 +79,20 @@ module.exports = {
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
     return `Check Payment Status for Session ID: ${values.sessionId || "?"}`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
 
@@ -99,12 +101,14 @@ module.exports = {
     let sessionId = bridge.transf(values.sessionId).trim()
     let sandboxMode = values.sandboxMode
     let apiUrl
-    if (sandboxMode === true){
+    if (sandboxMode === true) {
       apiUrl = `https://api-m.sandbox.paypal.com`
-    } else {apiUrl = `https://api-m.paypal.com`}
+    } else {
+      apiUrl = `https://api-m.paypal.com`
+    }
 
     // Getting Access Token
-    if (!clientId || !clientSecret || !sessionId){
+    if (!clientId || !clientSecret || !sessionId) {
       return console.log(`Missing Client ID Or Client Secret Or Session ID!`)
     }
 
@@ -113,8 +117,8 @@ module.exports = {
     let tokenResponse = await fetch(`${apiUrl}/v1/oauth2/token`, {
       method: "POST",
       headers: {
-        "Authorization": `Basic ${basicAuth}`,
-        "Content-Type": "application/x-www-form-urlencoded"
+        Authorization: `Basic ${basicAuth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: "grant_type=client_credentials",
     })
@@ -122,33 +126,33 @@ module.exports = {
     let tokenData = await tokenResponse.json()
     let accessToken = tokenData.access_token
 
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     let statusResponse = await fetch(`${apiUrl}/v2/checkout/orders/${sessionId}`, {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
-      }
+      },
     })
 
     let statusData = await statusResponse.json()
     let paymentStatus = statusData.status
 
-    if (values.autoCapture === true){
-      if (paymentStatus === "APPROVED"){
-        let captureUrl = statusData.links?.find(link => link.rel === "capture")?.href
+    if (values.autoCapture === true) {
+      if (paymentStatus === "APPROVED") {
+        let captureUrl = statusData.links?.find((link) => link.rel === "capture")?.href
         let captureResponse = await fetch(captureUrl, {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
           },
-          body: "{}"
+          body: "{}",
         })
 
         let captureData = await captureResponse.json()
-        if (captureResponse.ok){
+        if (captureResponse.ok) {
           paymentStatus = captureData.status
           statusData = captureData
         } else {
@@ -159,5 +163,5 @@ module.exports = {
 
     bridge.store(values.paymentStatus, paymentStatus)
     bridge.store(values.fullSession, statusData)
-  }
+  },
 }

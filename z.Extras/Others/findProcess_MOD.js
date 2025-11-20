@@ -17,9 +17,9 @@ module.exports = {
       storeAs: "searchType",
       name: "Search Process By",
       choices: {
-        name: {name: "Name", field: true, placeholder: "Process Name"},
-        port: {name: "Port", field: true, placeholder: "Port Number"},
-        pid: {name: "Process ID", field: true, placeholder: "Process Id"},
+        name: { name: "Name", field: true, placeholder: "Process Name" },
+        port: { name: "Port", field: true, placeholder: "Port Number" },
+        pid: { name: "Process ID", field: true, placeholder: "Process Id" },
       },
     },
     "-",
@@ -28,10 +28,10 @@ module.exports = {
       storeAs: "filter",
       name: "Filter Results",
       choices: {
-        none: {name: "Dont Filter", field: false},
-        name: {name: "Name", field: true, placeholder: "Process Name"},
-        bin: {name: "Binary", field: true, placeholder: "Binary Path"},
-        cmd: {name: "Command", field: true, placeholder: "Execution Command"},
+        none: { name: "Dont Filter", field: false },
+        name: { name: "Name", field: true, placeholder: "Process Name" },
+        bin: { name: "Binary", field: true, placeholder: "Binary Path" },
+        cmd: { name: "Command", field: true, placeholder: "Execution Command" },
       },
     },
     {
@@ -48,18 +48,22 @@ module.exports = {
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Find Process with ${thisAction.UI.find((e)=>e.storeAs == "searchType").choices[values.searchType.type].name}: ${values.searchType.value}`
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
+    return `Find Process with ${thisAction.UI.find((e) => e.storeAs == "searchType").choices[values.searchType.type].name}: ${
+      values.searchType.value
+    }`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
 
@@ -71,25 +75,24 @@ module.exports = {
     let strictFilter = values.strictFilter
 
     let results
-    let processes = await find(searchType, searchValue, {strict: true})
+    let processes = await find(searchType, searchValue, { strict: true })
 
-    if (filterType == "none"){
+    if (filterType == "none") {
       results = processes
     } else {
-      results = processes.filter(process =>{
-        if (strictFilter == true){
+      results = processes.filter((process) => {
+        if (strictFilter == true) {
           return process[filterType] === `"${filterValue}"`
         } else {
           return process[filterType].includes(`"${filterValue}"`)
         }
-        
       })
     }
 
-    if (results.length == "0"){
+    if (results.length == "0") {
       bridge.store(values.searchResults, undefined)
     } else {
       bridge.store(values.searchResults, results)
-    } 
-  }
+    }
+  },
 }

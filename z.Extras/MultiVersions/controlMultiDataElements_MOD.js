@@ -1,7 +1,7 @@
 modVersion = "v1.0.0"
 module.exports = {
   data: {
-    name: "Control Multiple Data Elements"
+    name: "Control Multiple Data Elements",
   },
   aliases: [],
   modules: [],
@@ -23,7 +23,7 @@ module.exports = {
       storeAs: "keys",
       name: "Data Key",
       types: {
-        key: "key"
+        key: "key",
       },
       max: 250,
       UItypes: {
@@ -35,71 +35,73 @@ module.exports = {
             {
               element: "input",
               storeAs: "key",
-              name: "Key"
+              name: "Key",
             },
             "-",
             {
               element: "store",
               storeAs: "oldValue",
-              name: "Store Old Value As"
+              name: "Store Old Value As",
             },
             {
               element: "typedDropdown",
               storeAs: "newValue",
               name: "Element Value",
               choices: {
-                add: {name: "Add To Value", field:true, placeholder: "Value To Add"},
-                overwrite: {name: "Overwrite", field:true, placeholder: "Value"},
+                add: { name: "Add To Value", field: true, placeholder: "Value To Add" },
+                overwrite: { name: "Overwrite", field: true, placeholder: "Value" },
               },
             },
-          ]
-        }
-      }
+          ],
+        },
+      },
     },
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
     return `Control ${values.keys.length} Data Elements`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
 
     let dataInput = bridge.get(values.dataInput)
 
-    for (let key of values.keys){
+    for (let key of values.keys) {
       let keyData = key.data
       let currentData = dataInput[keyData.key]
       bridge.store(keyData.oldValue, currentData)
       let controlType = keyData.newValue.type
       let dataOverwrite
-      switch(controlType){
-          case "add":{
-            let controlValue = bridge.transf(keyData.newValue.value)
-            if(parseFloat(currentData) != NaN && parseFloat(controlValue) != NaN && currentData && keyData.newValue.value){
-              dataOverwrite = Number(currentData) + Number(controlValue)
-            } else {
-              dataOverwrite = `${currentData}${controlValue}`
-            }
-            break
+      switch (controlType) {
+        case "add": {
+          let controlValue = bridge.transf(keyData.newValue.value)
+          if (parseFloat(currentData) != NaN && parseFloat(controlValue) != NaN && currentData && keyData.newValue.value) {
+            dataOverwrite = Number(currentData) + Number(controlValue)
+          } else {
+            dataOverwrite = `${currentData}${controlValue}`
           }
-
-          case "overwrite":{
-            let controlValue = bridge.transf(keyData.newValue.value)
-            dataOverwrite = controlValue
-            break
-          }
+          break
         }
+
+        case "overwrite": {
+          let controlValue = bridge.transf(keyData.newValue.value)
+          dataOverwrite = controlValue
+          break
+        }
+      }
       dataInput[keyData.key] = dataOverwrite
     }
-  }
+  },
 }

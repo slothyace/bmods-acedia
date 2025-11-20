@@ -1,7 +1,7 @@
 modVersion = "v1.0.2"
 module.exports = {
   data: {
-    name: "Loop Thru Files In Folder"
+    name: "Loop Thru Files In Folder",
   },
   aliases: [],
   modules: ["node:fs", "node:path"],
@@ -15,19 +15,19 @@ module.exports = {
     {
       element: "input",
       storeAs: "folderPath",
-      name: "Folder Path"
+      name: "Folder Path",
     },
     {
       element: "input",
       storeAs: "extensionFilter",
       name: "Extension Filter",
-      placeholder: ".mp3"
+      placeholder: ".mp3",
     },
     "-",
     {
       element: "store",
       storeAs: "fileName",
-      name: "Store File Name As"
+      name: "Store File Name As",
     },
     {
       element: "store",
@@ -38,23 +38,25 @@ module.exports = {
     {
       element: "actions",
       storeAs: "actions",
-      name: "Actions"
+      name: "Actions",
     },
     "-",
     {
       element: "text",
-      text: modVersion
-    }
+      text: modVersion,
+    },
   ],
 
-  subtitle: (values, constants, thisAction) =>{ // To use thisAction, constants must also be present
-    return `Loop Thru ${values.folderPath.startsWith("/") ? values.folderPath : "/" + (values.folderPath||"")}`
+  subtitle: (values, constants, thisAction) => {
+    // To use thisAction, constants must also be present
+    return `Loop Thru ${values.folderPath.startsWith("/") ? values.folderPath : "/" + (values.folderPath || "")}`
   },
 
   compatibility: ["Any"],
 
-  async run(values, message, client, bridge){ // This is the exact order of things required, other orders will brick
-    for (const moduleName of this.modules){
+  async run(values, message, client, bridge) {
+    // This is the exact order of things required, other orders will brick
+    for (const moduleName of this.modules) {
       await client.getMods().require(moduleName)
     }
 
@@ -64,30 +66,32 @@ module.exports = {
     const botData = require("../data.json")
     const workingDir = path.normalize(process.cwd())
     let projectFolder
-    if (workingDir.includes(path.join("common", "Bot Maker For Discord"))){
+    if (workingDir.includes(path.join("common", "Bot Maker For Discord"))) {
       projectFolder = botData.prjSrc
-    } else {projectFolder = workingDir}
+    } else {
+      projectFolder = workingDir
+    }
 
     let relativeFolder = bridge.transf(values.folderPath)
 
     let folderPath = path.join(projectFolder, relativeFolder)
 
-    if (!fs.existsSync(folderPath)){
+    if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath, { recursive: true })
     }
 
     let files = fs.readdirSync(folderPath)
 
     let extensionFilter = bridge.transf(values.extensionFilter) || ".*"
-    if (!extensionFilter.startsWith(".")){
+    if (!extensionFilter.startsWith(".")) {
       extensionFilter = `.${extensionFilter}`
     }
 
-    if (extensionFilter !== ".*"){
-      files = files.filter(file => file.toLowerCase().endsWith(extensionFilter.toLowerCase()))
+    if (extensionFilter !== ".*") {
+      files = files.filter((file) => file.toLowerCase().endsWith(extensionFilter.toLowerCase()))
     }
 
-    for(let file of files){
+    for (let file of files) {
       let fullPath = path.join(folderPath, file)
       let storedRelativePath = fullPath.replace(projectFolder, "")
       let fileName = path.basename(fullPath)
@@ -95,5 +99,5 @@ module.exports = {
       bridge.store(values.relativePath, storedRelativePath)
       await bridge.runner(values.actions, message, client, bridge.variables)
     }
-  }
+  },
 }
